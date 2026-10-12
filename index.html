@@ -245,7 +245,7 @@
         <div class="folder-card folder-maytruong" onclick="openFolder('screen-maytruong')">
             <div class="folder-icon">📚</div>
             <h2 class="folder-title">Máy Trưởng</h2>
-            <p class="folder-desc">Đáp án chuyên môn Máy trưởng (16 bài)</p>
+            <p class="folder-desc">Đáp án chuyên môn Máy trưởng (16 bài + Tổng hợp)</p>
         </div>
         
         <div class="folder-card folder-maypho" onclick="openFolder('screen-maypho')">
@@ -282,6 +282,9 @@
             <button class="back-btn" onclick="goBackToHome()">⬅ QUAY LẠI TỔNG</button>
         </div>
         <div class="list-container">
+            <!-- ĐÃ THÊM FILE TỔNG HỢP MÁY TRƯỞNG VÀO ĐÂY -->
+            <a class="file-link" onclick="openDoc('tonghopmaytruong.html')">📌 Tổng hợp toàn bộ đáp án chuyên môn Máy trưởng</a>
+            
             <a class="file-link" onclick="openDoc('Ảnhhưởngchânkhôngbìnhngưng.html')">Ảnh hưởng chân không bình ngưng</a>
             <a class="file-link" onclick="openDoc('aplucnhiet.html')">Ảnh hưởng của áp lực, nhiệt độ hơi mới và chân không bình ngưng đến quá trình vận hành và hiệu suất của tuabin</a>
             <a class="file-link" onclick="openDoc('Ảnhhưởngcủanhiệtđộhơichínhtớithiếtbịvàhiệusuấttuabin.html')">Ảnh hưởng của nhiệt độ hơi chính tới thiết bị và hiệu suất tuabin</a>
@@ -290,7 +293,7 @@
             <a class="file-link" onclick="openDoc('CácloạitổnthấttronghệthốngTuabinBìnhngưng.html')">Các loại tổn thất trong hệ thống Tuabin - Bình ngưng</a>
             <a class="file-link" onclick="openDoc('caoápCấutạotácdụngvàsựcốthườnggặp.html')">Hệ thống bình gia nhiệt cao áp - Cấu tạo, tác dụng và sự cố thường gặp</a>
             <a class="file-link" onclick="openDoc('Cấutạobìnhngưngvàxửlýsựcốmứcnướcgiảmnhanh.html')">Cấu tạo, tác dụng bình ngưng và xử lý sự cố mức nước giảm nhanh</a>
-            <a class="file-link" onclick="openDoc('chatluonghoi.html">Chất lượng hơi nước và chỉ tiêu môi trường chu trình tuabin</a>
+            <a class="file-link" onclick="openDoc('Chấtlượnghơinướcvàchỉtiêumôitrườngchutrìnhtuabin.html')">Chất lượng hơi nước và chỉ tiêu môi trường chu trình tuabin</a>
             <a class="file-link" onclick="openDoc('Hyddro.html')">Hiện tượng, nguyên nhân, biện pháp xử lý sự chênh áp dầu chèn - Hydro dao động</a>
             <a class="file-link" onclick="openDoc('khởi động lạnh.html')">Các bước chuẩn bị, kiểm tra và trình tự khởi động Tuabin từ trạng thái lạnh tới đầy tải</a>
             <a class="file-link" onclick="openDoc('Quytrìnhxửlýkhẩncấpmấtđiệntoànnhàmáy(Blackout).html')">Quy trình xử lý sự cố khẩn cấp mất điện toàn nhà máy (Blackout)</a>
@@ -342,7 +345,6 @@
         </div>
         <div class="list-container">
             <a class="file-link" onclick="openDoc('tracnghiemtb.html')">Đề thi Trắc nghiệm Tuabin Bậc 3</a>
-            <!-- ĐÃ THÊM FILE AN TOÀN ĐIỆN VÀO ĐÂY -->
             <a class="file-link" onclick="openDoc('antoandien.html')">Đề thi Trắc nghiệm An toàn điện</a>
         </div>
     </div>
@@ -385,9 +387,24 @@
     }
 
     function openDoc(filename) {
-        document.getElementById('doc-iframe').src = filename;
-        document.getElementById('main-wrapper').style.display = 'none';
-        document.getElementById('screen-content').style.display = 'block';
+        // Kiểm tra xem file có tồn tại trên server không
+        fetch(filename, { method: 'HEAD' })
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById('doc-iframe').src = filename;
+                    document.getElementById('main-wrapper').style.display = 'none';
+                    document.getElementById('screen-content').style.display = 'block';
+                } else {
+                    throw new Error(`File "${filename}" không tồn tại hoặc chưa được tải lên (Lỗi ${response.status}).`);
+                }
+            })
+            .catch(error => {
+                if (error.message.includes('File')) {
+                    alert(`⚠️ LỖI MỞ TÀI LIỆU!\n\n${error.message}\n\nVui lòng kiểm tra lại tên file hoặc đảm bảo file đã được upload lên hệ thống.`);
+                } else {
+                     alert(`⚠️ KHÔNG THỂ KẾT NỐI!\n\nVui lòng kiểm tra lại kết nối mạng của bạn.\nChi tiết: ${error.message}`);
+                }
+            });
     }
 
     function closeDoc() {
