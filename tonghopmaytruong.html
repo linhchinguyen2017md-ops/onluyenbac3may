@@ -1,0 +1,2784 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TÀI LIỆU VẬN HÀNH TUABIN – BÌNH NGƯNG · Nhà máy nhiệt điện</title>
+<style>
+  :root{
+    --primary: #0b5394;
+    --primary-dark: #073b6b;
+    --primary-light: #e8f0fb;
+    --accent: #c0392b;
+    --accent-light: #fdecea;
+    --warning: #f39c12;
+    --warning-light: #fff8e1;
+    --success: #27ae60;
+    --success-light: #e8f8ef;
+    --purple: #7d3c98;
+    --purple-light: #f4ecf7;
+    --cyan: #0e7490;
+    --cyan-light: #e0f7fa;
+    --border: #d0d7de;
+    --bg: #f7f9fc;
+    --text: #1f2328;
+    --muted: #57606a;
+  }
+  *{box-sizing: border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin: 0;
+    font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    font-size: 16px;
+    min-height: 100vh;
+  }
+  .container{
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 28px 22px 80px;
+  }
+
+  /* ===== TOP BAR ===== */
+  .topbar{
+    background: linear-gradient(135deg, #0b3d6b 0%, #0b5394 60%, #1a73c9 100%);
+    color: #fff;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 3px 12px rgba(11,83,148,0.25);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .topbar .logo{
+    font-size: 1.4rem;
+    flex-shrink: 0;
+  }
+  .topbar .title{
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: 0.3px;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .topbar .back-btn{
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: #fff;
+    padding: 6px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.88rem;
+    font-weight: 600;
+    display: none;
+    align-items: center;
+    gap: 8px;
+    transition: background .2s;
+    font-family: inherit;
+  }
+  .topbar .back-btn:hover{background: rgba(255,255,255,0.3);}
+  .topbar .back-btn.show{display: inline-flex;}
+
+  /* ===== HOME PAGE ===== */
+  .home-hero{
+    background: linear-gradient(135deg, #0b3d6b 0%, #0b5394 40%, #1a73c9 75%, #2196f3 100%);
+    color: #fff;
+    padding: 46px 32px;
+    text-align: center;
+    border-radius: 16px;
+    margin-bottom: 28px;
+    box-shadow: 0 10px 34px rgba(11,83,148,0.3);
+    position: relative;
+    overflow: hidden;
+  }
+  .home-hero::before{
+    content: "⚙";
+    position: absolute;
+    font-size: 16rem;
+    opacity: 0.07;
+    top: -40px;
+    right: 30px;
+    line-height: 1;
+  }
+  .home-hero h1{
+    margin: 0 0 12px;
+    font-size: 1.85rem;
+    line-height: 1.3;
+    position: relative;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+  .home-hero .subtitle{
+    margin: 0;
+    font-size: 1rem;
+    opacity: 0.96;
+    font-style: italic;
+    position: relative;
+  }
+  .home-hero .scope{
+    display: inline-block;
+    margin-top: 16px;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.32);
+    padding: 7px 20px;
+    border-radius: 22px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    position: relative;
+  }
+
+  .folder-hint{
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.9rem;
+    font-style: italic;
+    margin: 0 0 20px;
+  }
+
+  /* ===== FOLDER GRID ===== */
+  .folder-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 18px;
+    margin-bottom: 30px;
+  }
+  .folder-card{
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform .25s, box-shadow .25s;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+  .folder-card:hover{
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(11,83,148,0.18);
+  }
+  .folder-card .card-header{
+    padding: 16px 20px;
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.02rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    line-height: 1.35;
+  }
+  .folder-card .card-num{
+    background: rgba(255,255,255,0.25);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    flex-shrink: 0;
+    font-size: 1rem;
+    border: 1px solid rgba(255,255,255,0.3);
+  }
+  .folder-card .card-body{
+    padding: 14px 20px 16px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .folder-card .card-desc{
+    font-size: 0.88rem;
+    color: var(--muted);
+    margin: 0 0 12px;
+    flex: 1;
+  }
+  .folder-card .card-tags{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .folder-card .tag{
+    display: inline-block;
+    background: var(--primary-light);
+    color: var(--primary-dark);
+    font-size: 0.72rem;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-weight: 600;
+  }
+  .folder-card .card-cta{
+    font-size: 0.86rem;
+    font-weight: 700;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .folder-card .card-cta::after{
+    content: "→";
+    transition: transform .25s;
+  }
+  .folder-card:hover .card-cta::after{transform: translateX(5px);}
+
+  /* Card color variants */
+  .folder-card.c-1 .card-header{background: linear-gradient(135deg, #0b3d6b 0%, #1a5f9e 100%);}
+  .folder-card.c-2 .card-header{background: linear-gradient(135deg, #0e7490 0%, #0891b2 100%);}
+  .folder-card.c-3 .card-header{background: linear-gradient(135deg, #b9770e 0%, #f39c12 100%);}
+  .folder-card.c-4 .card-header{background: linear-gradient(135deg, #1e8449 0%, #27ae60 100%);}
+  .folder-card.c-5 .card-header{background: linear-gradient(135deg, #7d3c98 0%, #9b59b6 100%);}
+  .folder-card.c-6 .card-header{background: linear-gradient(135deg, #a04000 0%, #e67e22 100%);}
+  .folder-card.c-7 .card-header{background: linear-gradient(135deg, #7b0d0d 0%, #c0392b 100%);}
+  .folder-card.c-8 .card-header{background: linear-gradient(135deg, #4a235a 0%, #7d3c98 100%);}
+  .folder-card.c-9 .card-header{background: linear-gradient(135deg, #1a5276 0%, #2980b9 100%);}
+  .folder-card.c-10 .card-header{background: linear-gradient(135deg, #0b3d6b 0%, #2980b9 100%);}
+  .folder-card.c-11 .card-header{background: linear-gradient(135deg, #1e8449 0%, #2ecc71 100%);}
+  .folder-card.c-12 .card-header{background: linear-gradient(135deg, #7b0d0d 0%, #e74c3c 100%);}
+  .folder-card.c-13 .card-header{background: linear-gradient(135deg, #0e7490 0%, #06b6d4 100%);}
+  .folder-card.c-14 .card-header{background: linear-gradient(135deg, #4a235a 0%, #9b59b6 100%);}
+  .folder-card.c-end .card-header{background: linear-gradient(135deg, #1e8449 0%, #27ae60 100%);}
+
+  /* ===== PAGE (DETAIL) ===== */
+  .page{
+    display: none;
+    animation: fadeIn .35s ease;
+  }
+  .page.active{display: block;}
+  @keyframes fadeIn{
+    from{opacity: 0; transform: translateY(12px);}
+    to{opacity: 1; transform: translateY(0);}
+  }
+
+  .page-header{
+    padding: 26px 30px;
+    border-radius: 14px;
+    color: #fff;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 24px rgba(11,83,148,0.22);
+    position: relative;
+    overflow: hidden;
+  }
+  .page-header::before{
+    content: "";
+    position: absolute;
+    top: -50px; right: -30px;
+    width: 220px; height: 220px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 50%;
+  }
+  .page-header .pnum{
+    display: inline-block;
+    background: rgba(255,255,255,0.22);
+    padding: 5px 16px;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+    position: relative;
+  }
+  .page-header h1{
+    margin: 0 0 8px;
+    font-size: 1.5rem;
+    line-height: 1.35;
+    position: relative;
+  }
+  .page-header .pdesc{
+    margin: 0;
+    opacity: 0.95;
+    font-size: 0.96rem;
+    position: relative;
+  }
+
+  .page-header.p-1{background: linear-gradient(135deg, #0b3d6b 0%, #1a5f9e 100%);}
+  .page-header.p-2{background: linear-gradient(135deg, #0e7490 0%, #0891b2 100%);}
+  .page-header.p-3{background: linear-gradient(135deg, #b9770e 0%, #f39c12 100%);}
+  .page-header.p-4{background: linear-gradient(135deg, #1e8449 0%, #27ae60 100%);}
+  .page-header.p-5{background: linear-gradient(135deg, #7d3c98 0%, #9b59b6 100%);}
+  .page-header.p-6{background: linear-gradient(135deg, #a04000 0%, #e67e22 100%);}
+  .page-header.p-7{background: linear-gradient(135deg, #7b0d0d 0%, #c0392b 100%);}
+  .page-header.p-8{background: linear-gradient(135deg, #4a235a 0%, #7d3c98 100%);}
+  .page-header.p-9{background: linear-gradient(135deg, #1a5276 0%, #2980b9 100%);}
+  .page-header.p-10{background: linear-gradient(135deg, #0b3d6b 0%, #2980b9 100%);}
+  .page-header.p-11{background: linear-gradient(135deg, #1e8449 0%, #2ecc71 100%);}
+  .page-header.p-12{background: linear-gradient(135deg, #7b0d0d 0%, #e74c3c 100%);}
+  .page-header.p-13{background: linear-gradient(135deg, #0e7490 0%, #06b6d4 100%);}
+  .page-header.p-14{background: linear-gradient(135deg, #4a235a 0%, #9b59b6 100%);}
+  .page-header.p-end{background: linear-gradient(135deg, #1e8449 0%, #27ae60 100%);}
+
+  /* ===== INNER ACCORDION ===== */
+  details.sub{
+    background: #fff;
+    border: 1px solid var(--border);
+    border-left: 5px solid var(--primary);
+    border-radius: 10px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    transition: box-shadow .25s;
+  }
+  details.sub[open]{box-shadow: 0 4px 14px rgba(11,83,148,0.1);}
+  details.sub > summary{
+    cursor: pointer;
+    list-style: none;
+    padding: 14px 20px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    user-select: none;
+    transition: background .2s;
+  }
+  details.sub > summary::-webkit-details-marker{display:none;}
+  details.sub > summary::before{
+    content: "▸";
+    color: var(--primary);
+    font-size: 1.05rem;
+    transition: transform .25s;
+    flex-shrink: 0;
+  }
+  details.sub[open] > summary::before{transform: rotate(90deg);}
+  details.sub > summary:hover{background: var(--primary-light);}
+  details.sub .sub-body{padding: 4px 22px 18px;}
+
+  /* ===== CONTENT STYLES ===== */
+  h3{
+    color: var(--primary-dark);
+    margin-top: 22px;
+    margin-bottom: 10px;
+    font-size: 1.12rem;
+    border-bottom: 1px dashed var(--border);
+    padding-bottom: 6px;
+  }
+  h4{
+    color: #1a4d80;
+    margin-top: 16px;
+    margin-bottom: 8px;
+    font-size: 1.02rem;
+  }
+  p{margin: 10px 0;}
+  ul, ol{margin: 8px 0 12px; padding-left: 24px;}
+  li{margin: 6px 0;}
+  code{
+    background: #eef2f7;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 0.9em;
+    color: #b83280;
+    white-space: nowrap;
+  }
+
+  .section-card{
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 22px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+  }
+  .formula{
+    background: #fff;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--primary);
+    padding: 14px 18px;
+    border-radius: 6px;
+    margin: 14px 0;
+    text-align: center;
+    font-family: "Cambria Math", "Times New Roman", serif;
+    font-size: 1.1rem;
+    color: #0b3d6b;
+    overflow-x: auto;
+    font-weight: 600;
+  }
+  .callout{
+    background: var(--primary-light);
+    border-left: 4px solid var(--primary);
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin: 14px 0;
+  }
+  .callout.warning{background: var(--warning-light);border-left-color: var(--warning);}
+  .callout.danger{background: var(--accent-light);border-left-color: var(--accent);}
+  .callout.success{background: var(--success-light);border-left-color: var(--success);}
+  .callout.purple{background: var(--purple-light);border-left-color: var(--purple);}
+  .callout.cyan{background: var(--cyan-light);border-left-color: var(--cyan);}
+  .callout strong{color: var(--primary-dark);}
+  .callout.danger strong{color: var(--accent);}
+  .callout.warning strong{color: #b9770e;}
+  .callout.success strong{color: #1e8449;}
+  .callout.purple strong{color: var(--purple);}
+  .callout.cyan strong{color: var(--cyan);}
+
+  .params-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .param-box{
+    background: linear-gradient(135deg, #f4f8fd 0%, #e8f0fb 100%);
+    border: 1px solid #c9dcf0;
+    border-radius: 8px;
+    padding: 12px 14px;
+    border-left: 4px solid var(--primary);
+  }
+  .param-box .label{
+    font-size: 0.78rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 4px;
+  }
+  .param-box .value{
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+    font-family: "Consolas", monospace;
+  }
+  .param-box.danger{background: linear-gradient(135deg, #fdf3f2 0%, #fdecea 100%);border-color: #f5c6c0;border-left-color: var(--accent);}
+  .param-box.danger .value{color: var(--accent);}
+  .param-box.warning{background: linear-gradient(135deg, #fffcf0 0%, #fff8e1 100%);border-color: #f5dfa0;border-left-color: var(--warning);}
+  .param-box.warning .value{color: #b9770e;}
+  .param-box.success{background: linear-gradient(135deg, #f0faf4 0%, #e8f8ef 100%);border-color: #b7e4c7;border-left-color: var(--success);}
+  .param-box.success .value{color: #1e8449;}
+
+  .badge{
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.76rem;
+    font-weight: 600;
+    margin-right: 6px;
+    color: #fff;
+  }
+  .badge.blue{background: var(--primary);}
+  .badge.red{background: var(--accent);}
+  .badge.green{background: var(--success);}
+  .badge.orange{background: var(--warning);}
+  .badge.purple{background: var(--purple);}
+  .badge.cyan{background: var(--cyan);}
+  .badge.gray{background: #6b7280;}
+
+  .step{
+    background: #f9fbfd;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 12px;
+    border-left: 5px solid var(--primary);
+    display: flex;
+    gap: 14px;
+  }
+  .step-num{
+    background: var(--primary);
+    color: #fff;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    flex-shrink: 0;
+    font-size: 0.95rem;
+  }
+  .step-content{flex: 1;}
+  .step-content .title{
+    font-weight: 700;
+    color: var(--primary-dark);
+    margin-bottom: 6px;
+    font-size: 1rem;
+  }
+
+  .remedy-list{counter-reset: rem;list-style: none;padding-left: 0;}
+  .remedy-list li{
+    counter-increment: rem;
+    position: relative;
+    padding: 12px 16px 12px 58px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    border-left: 5px solid var(--primary);
+  }
+  .remedy-list li::before{
+    content: counter(rem);
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30px;
+    height: 30px;
+    background: var(--primary);
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.88rem;
+  }
+
+  .emergency-box{
+    background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
+    color: #fff;
+    padding: 20px 24px;
+    border-radius: 10px;
+    margin: 18px 0;
+    box-shadow: 0 6px 20px rgba(192,57,43,0.25);
+  }
+  .emergency-box h3{
+    color: #fff;
+    margin-top: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.1rem;
+    border-bottom: none;
+  }
+  .emergency-box h3::before{content: "⚠";font-size: 1.5rem;}
+  .emergency-box p{margin: 8px 0;}
+  .emergency-box strong{color: #ffe082;}
+  .emergency-box ul{margin: 8px 0 0; padding-left: 22px;}
+
+  table{
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    font-size: 0.9rem;
+  }
+  thead{background: var(--primary);color: #fff;}
+  th, td{
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tbody tr:nth-child(even){background: #f4f7fb;}
+  tbody tr:hover{background: #e8f0fb;}
+  th{font-weight: 600;font-size: 0.85rem;}
+  .val-warn{color: #b9770e;font-weight: 700;font-family: "Consolas", monospace;}
+  .val-trip{color: var(--accent);font-weight: 700;font-family: "Consolas", monospace;}
+  .val-normal{color: #1e8449;font-weight: 700;font-family: "Consolas", monospace;}
+
+  .chart-card{
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 18px 12px;
+    margin: 18px 0;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  }
+  .chart-card h4{margin-top: 0;color: var(--primary-dark);font-size: 1rem;}
+  .chart-card svg{width: 100%;height: auto;display: block;}
+  .chart-legend{
+    display: flex;flex-wrap: wrap;gap: 16px;justify-content: center;
+    margin-top: 10px;font-size: 0.85rem;
+  }
+  .chart-legend .item{display: inline-flex;align-items: center;gap: 8px;}
+  .chart-legend .swatch{width: 22px;height: 4px;border-radius: 2px;display: inline-block;}
+  .chart-legend .swatch.dashed{height: 0;border-top: 3px dashed;background: transparent !important;}
+  .chart-note{text-align: center;font-size: 0.83rem;color: var(--muted);font-style: italic;margin-top: 8px;}
+
+  .loss-card{
+    background: #fff;border: 1px solid var(--border);border-radius: 10px;
+    margin-bottom: 14px;box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    overflow: hidden;display: flex;
+  }
+  .loss-letter{
+    min-width: 80px;display: flex;flex-direction: column;align-items: center;
+    justify-content: center;color: #fff;font-size: 2rem;font-weight: 800;
+    padding: 12px 0;flex-shrink: 0;line-height: 1;
+  }
+  .loss-letter small{font-size: 0.65rem;font-weight: 600;text-transform: uppercase;letter-spacing: 0.5px;opacity: 0.9;margin-top: 4px;}
+  .loss-letter.l-a{background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);}
+  .loss-letter.l-b{background: linear-gradient(135deg, #d35400 0%, #e67e22 100%);}
+  .loss-letter.l-c{background: linear-gradient(135deg, #7d3c98 0%, #9b59b6 100%);}
+  .loss-letter.l-d{background: linear-gradient(135deg, #0b5394 0%, #1a73c9 100%);}
+  .loss-letter.l-e{background: linear-gradient(135deg, #1e8449 0%, #27ae60 100%);}
+  .loss-body{padding: 14px 20px;flex: 1;}
+  .loss-body .title{font-weight: 700;color: var(--primary-dark);margin-bottom: 6px;font-size: 1.02rem;}
+
+  .prot-group{background: #fff;border: 1px solid var(--border);border-radius: 12px;margin-bottom: 16px;overflow: hidden;box-shadow: 0 2px 8px rgba(0,0,0,0.05);}
+  .prot-header{padding: 12px 20px;color: #fff;font-size: 1.02rem;font-weight: 700;display: flex;align-items: center;gap: 12px;}
+  .prot-header .num{
+    background: rgba(255,255,255,0.25);width: 34px;height: 34px;border-radius: 50%;
+    display: inline-flex;align-items: center;justify-content: center;font-weight: 700;flex-shrink: 0;font-size: 0.95rem;
+  }
+  .prot-header.h-1{background: linear-gradient(135deg, #b9770e 0%, #f39c12 100%);}
+  .prot-header.h-2{background: linear-gradient(135deg, #7b0d0d 0%, #c0392b 100%);}
+  .prot-header.h-3{background: linear-gradient(135deg, #7d3c98 0%, #9b59b6 100%);}
+  .prot-header.h-4{background: linear-gradient(135deg, #a04000 0%, #e67e22 100%);}
+  .prot-header.h-5{background: linear-gradient(135deg, #0b5394 0%, #1a73c9 100%);}
+  .prot-header.h-6{background: linear-gradient(135deg, #1e8449 0%, #27ae60 100%);}
+  .prot-header.h-7{background: linear-gradient(135deg, #1a5276 0%, #2980b9 100%);}
+  .prot-header.h-8{background: linear-gradient(135deg, #4a235a 0%, #7d3c98 100%);}
+  .prot-body{padding: 2px 16px 12px;}
+
+  .interlock-list{counter-reset: int;list-style: none;padding-left: 0;}
+  .interlock-list li{
+    counter-increment: int;position: relative;padding: 14px 20px 14px 62px;
+    background: #fff;border: 1px solid var(--border);border-radius: 10px;
+    margin-bottom: 12px;box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    border-left: 5px solid var(--success);
+  }
+  .interlock-list li::before{
+    content: counter(int);position: absolute;left: 16px;top: 16px;
+    width: 34px;height: 34px;
+    background: linear-gradient(135deg, #1e8449 0%, #27ae60 100%);
+    color: #fff;border-radius: 50%;display: flex;align-items: center;justify-content: center;
+    font-weight: 700;font-size: 0.92rem;
+  }
+  .interlock-list li strong{color: #1e8449;}
+
+  .function-card{
+    background: #fff;border: 1px solid var(--border);border-radius: 10px;
+    margin-bottom: 12px;box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    overflow: hidden;display: flex;
+  }
+  .function-num{
+    background: linear-gradient(135deg, #0b5394 0%, #1a73c9 100%);
+    color: #fff;min-width: 64px;display: flex;align-items: center;justify-content: center;
+    font-size: 1.6rem;font-weight: 700;flex-shrink: 0;
+  }
+  .function-body{padding: 14px 20px;flex: 1;}
+  .function-body .title{font-weight: 700;color: var(--primary-dark);margin-bottom: 6px;font-size: 1.02rem;}
+
+  .reason-card{
+    background: #fff;border: 1px solid var(--border);border-radius: 10px;
+    padding: 14px 18px 14px 60px;margin-bottom: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);position: relative;
+    border-left: 5px solid var(--accent);
+  }
+  .reason-card::before{
+    content: "!";position: absolute;left: 16px;top: 16px;width: 30px;height: 30px;
+    background: var(--accent);color: #fff;border-radius: 50%;
+    display: flex;align-items: center;justify-content: center;font-weight: 700;font-size: 1.05rem;
+  }
+  .reason-card .title{font-weight: 700;color: var(--accent);margin-bottom: 6px;font-size: 1rem;}
+
+  .symptom-list{list-style: none;padding-left: 0;}
+  .symptom-list li{
+    position: relative;padding: 12px 18px 12px 50px;
+    background: #fff8e1;border: 1px solid #f5dfa0;
+    border-left: 5px solid var(--warning);border-radius: 8px;
+    margin-bottom: 10px;box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+  .symptom-list li::before{
+    content: "🔔";position: absolute;left: 14px;top: 50%;
+    transform: translateY(-50%);font-size: 1.1rem;
+  }
+
+  .cause-list{list-style: none;padding-left: 0;counter-reset: cause;}
+  .cause-list li{
+    counter-increment: cause;position: relative;
+    padding: 12px 18px 12px 50px;background: #fdecea;
+    border: 1px solid #f5c6c0;border-left: 5px solid var(--accent);
+    border-radius: 8px;margin-bottom: 10px;box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+  .cause-list li::before{
+    content: counter(cause);position: absolute;left: 14px;top: 50%;
+    transform: translateY(-50%);width: 26px;height: 26px;
+    background: var(--accent);color: #fff;border-radius: 50%;
+    display: flex;align-items: center;justify-content: center;
+    font-weight: 700;font-size: 0.82rem;
+  }
+
+  .action-step{
+    background: #f9fbfd;border: 1px solid var(--border);border-radius: 10px;
+    padding: 14px 18px;margin-bottom: 12px;border-left: 5px solid var(--success);
+    display: flex;gap: 14px;
+  }
+  .action-num{
+    background: var(--success);color: #fff;width: 34px;height: 34px;
+    border-radius: 50%;display: inline-flex;align-items: center;justify-content: center;
+    font-weight: 700;flex-shrink: 0;font-size: 0.95rem;
+  }
+  .action-content{flex: 1;}
+  .action-content .title{font-weight: 700;color: #1e8449;margin-bottom: 6px;font-size: 1rem;}
+
+  .phase{
+    background: #fff;border-radius: 12px;padding: 0;margin-bottom: 18px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .phase-header{
+    padding: 14px 20px;color: #fff;font-size: 1.02rem;font-weight: 700;
+    display: flex;align-items: center;gap: 12px;
+  }
+  .phase-header.phase-1{background: linear-gradient(135deg, #0b5394 0%, #1a73c9 100%);}
+  .phase-header.phase-2{background: linear-gradient(135deg, #7b0d0d 0%, #c0392b 100%);}
+  .phase-header.phase-3{background: linear-gradient(135deg, #1e8449 0%, #27ae60 100%);}
+  .phase-num{
+    background: rgba(255,255,255,0.25);width: 34px;height: 34px;
+    border-radius: 50%;display: inline-flex;align-items: center;justify-content: center;
+    font-weight: 700;flex-shrink: 0;
+  }
+  .phase-body{padding: 16px 22px 8px;}
+
+  .struct-card{
+    background: #fff;border: 1px solid var(--border);border-radius: 10px;
+    margin-bottom: 12px;box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    overflow: hidden;display: flex;
+  }
+  .struct-icon{
+    min-width: 70px;display: flex;align-items: center;justify-content: center;
+    background: linear-gradient(135deg, #0b5394 0%, #1a73c9 100%);
+    color: #fff;font-size: 1.7rem;flex-shrink: 0;
+  }
+  .struct-body{padding: 12px 20px;flex: 1;}
+  .struct-body .title{font-weight: 700;color: var(--primary-dark);margin-bottom: 6px;font-size: 1rem;}
+
+  .danger-card{
+    background: #fff;border: 1px solid var(--border);border-radius: 10px;
+    margin-bottom: 12px;box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    overflow: hidden;display: flex;
+  }
+  .danger-icon{
+    min-width: 70px;display: flex;align-items: center;justify-content: center;
+    background: linear-gradient(135deg, #7b0d0d 0%, #c0392b 100%);
+    color: #fff;font-size: 1.7rem;flex-shrink: 0;
+  }
+  .danger-body{padding: 12px 20px;flex: 1;}
+  .danger-body .title{font-weight: 700;color: var(--accent);margin-bottom: 6px;font-size: 1rem;}
+
+  .concept-box{
+    background: linear-gradient(135deg, #e8f0fb 0%, #d4e6f7 100%);
+    border: 1px solid #b8d4ef;border-left: 6px solid var(--primary);
+    border-radius: 10px;padding: 18px 22px;margin: 16px 0;
+    box-shadow: 0 3px 10px rgba(11,83,148,0.08);
+  }
+  .concept-box .title{
+    color: var(--primary-dark);font-size: 1.08rem;font-weight: 700;
+    margin-bottom: 10px;display: flex;align-items: center;gap: 10px;
+  }
+  .concept-box .title::before{content: "📖";font-size: 1.25rem;}
+
+  .level-grid{display: grid;grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));gap: 14px;margin: 18px 0;}
+  .level-card{
+    background: #fff;border-radius: 12px;overflow: hidden;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.07);border: 1px solid var(--border);
+    display: flex;flex-direction: column;
+  }
+  .level-header{
+    padding: 12px 16px;color: #fff;font-weight: 700;font-size: 0.96rem;
+    display: flex;align-items: center;gap: 10px;
+  }
+  .level-header .icon{
+    background: rgba(255,255,255,0.25);width: 30px;height: 30px;
+    border-radius: 50%;display: inline-flex;align-items: center;justify-content: center;
+    font-weight: 700;flex-shrink: 0;font-size: 1rem;
+  }
+  .level-header.normal{background: linear-gradient(135deg, #1e8449 0%, #27ae60 100%);}
+  .level-header.l1{background: linear-gradient(135deg, #b9770e 0%, #f39c12 100%);}
+  .level-header.l2{background: linear-gradient(135deg, #a04000 0%, #e67e22 100%);}
+  .level-header.l3{background: linear-gradient(135deg, #7b0d0d 0%, #c0392b 100%);}
+  .level-body{padding: 14px 16px;flex: 1;}
+  .level-body .time{font-size: 1.35rem;font-weight: 800;color: var(--primary-dark);font-family: "Consolas", monospace;margin-bottom: 6px;display: block;}
+  .level-body p{margin: 6px 0;font-size: 0.88rem;color: var(--muted);}
+
+  .flow-diagram{
+    background: #f4f8fd;border: 1px solid #c9dcf0;border-radius: 10px;
+    padding: 16px 18px;margin: 16px 0;text-align: center;
+    font-family: "Consolas", monospace;font-size: 0.98rem;font-weight: 600;
+    color: var(--primary-dark);overflow-x: auto;
+  }
+  .flow-diagram .arrow{color: var(--accent);margin: 0 8px;font-size: 1.15rem;}
+
+  /* Back to top */
+  #backtop{
+    position: fixed;bottom: 26px;right: 26px;
+    background: var(--primary);color: #fff;width: 46px;height: 46px;
+    border-radius: 50%;display: flex;align-items: center;justify-content: center;
+    font-size: 1.3rem;text-decoration: none;
+    box-shadow: 0 4px 14px rgba(11,83,148,0.4);
+    z-index: 999;transition: background .2s;
+    cursor: pointer;border: none;
+  }
+  #backtop:hover{background: var(--accent);}
+
+  footer.main-footer{
+    margin-top: 60px;
+    padding: 22px 20px;
+    border-top: 2px solid var(--border);
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.88rem;
+    line-height: 1.8;
+  }
+
+  @media(max-width: 720px){
+    .topbar .title{font-size: 0.85rem;}
+    .topbar .back-btn{padding: 5px 12px;font-size: 0.78rem;}
+    .home-hero h1{font-size: 1.25rem;}
+    .home-hero::before{font-size: 9rem;top: 10px;}
+    .home-hero{padding: 30px 20px;}
+    .page-header h1{font-size: 1.15rem;}
+    .page-header{padding: 20px 22px;}
+    .folder-grid{grid-template-columns: 1fr;}
+    details.sub > summary{padding: 12px 14px;font-size: 0.94rem;}
+    details.sub .sub-body{padding: 4px 14px 14px;}
+    .step{padding: 12px 14px;gap: 12px;}
+    .step-num{width: 30px;height: 30px;font-size: 0.88rem;}
+    .remedy-list li, .emergency-box{padding-left: 52px;}
+    .loss-card{flex-direction: column;}
+    .loss-letter{min-width: auto;padding: 10px 0;font-size: 1.5rem;flex-direction: row;gap: 8px;}
+    .loss-letter small{margin-top: 0;}
+    table{font-size: 0.78rem;}
+    th, td{padding: 7px 8px;}
+    .struct-card, .danger-card, .function-card{flex-direction: column;}
+    .struct-icon, .danger-icon, .function-num{min-width: auto;padding: 10px 0;font-size: 1.4rem;}
+    .action-step{padding: 12px 14px;gap: 12px;}
+    .action-num{width: 30px;height: 30px;font-size: 0.88rem;}
+    .phase-body{padding: 12px 14px 6px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= TOP BAR ================= -->
+<div class="topbar">
+  <span class="logo">⚙</span>
+  <span class="title">TÀI LIỆU VẬN HÀNH TUABIN – BÌNH NGƯNG · Nhà máy nhiệt điện</span>
+  <button class="back-btn" id="backBtn" onclick="goHome()">← Quay lại thư mục</button>
+</div>
+
+<div class="container">
+
+<!-- ================= HOME PAGE ================= -->
+<div id="homePage" class="page active">
+
+  <div class="home-hero">
+    <h1>TỔNG HỢP TÀI LIỆU VẬN HÀNH TUABIN – BÌNH NGƯNG</h1>
+    <p class="subtitle">Cơ sở lý thuyết – Ảnh hưởng thông số – Cấu tạo thiết bị – Quy trình khởi động – Bảo vệ &amp; Xử lý sự cố</p>
+    <span class="scope">Áp dụng cho tổ máy nhiệt điện đốt than 500 – 600 MW · Chuẩn ISO 80000</span>
+  </div>
+
+  <p class="folder-hint">📁 Nhấn vào từng hạng mục bên dưới để mở trang chi tiết</p>
+
+  <div class="folder-grid">
+
+    <div class="folder-card c-1" onclick="openPage('p1')">
+      <div class="card-header">
+        <span class="card-num">1</span>
+        <span>Cơ sở lý thuyết chu trình nhiệt &amp; Ảnh hưởng các thông số hơi</span>
+      </div>
+      <div class="card-body">
+        <p class="card-desc">Công thức cơ bản, ảnh hưởng của P₀ – T₀ – Pₖ, đồ thị công suất, 5 loại tổn thất và giải pháp hạn chế.</p>
+        <div class="card-tags">
+          <span class="tag">Công thức</span>
+          <span class="tag">P₀ / T₀ / Pₖ</span>
+          <span class="tag">Tổn thất</span>
+        </div>
+        <span class="card-cta">Mở trang chi tiết</span>
+      </div>
+    </div>
+
+    <div class="folder-card c-2" onclick="openPage('p2')">
+      <div class="card-header">
+        <span class="card-num">2</span>
+        <span>Chân không &amp; Bình ngưng</span>
+      </div>
+      <div class="card-body">
+        <p class="card-desc">Các bước tạo chân không, cấu tạo bình ngưng (8 bộ phận), xử lý mức nước giảm nhanh.</p>
+        <div class="card-tags">
+          <span class="tag">Tạo chân không</span>
+          <span class="tag">Cấu tạo</span>
+          <span class="tag">Mức nước</span>
+        </div>
+        <span class="card-cta">Mở trang chi tiết</span>
+      </div>
+    </div>
+
+    <div class="folder-card c-3" onclick="openPage('p3')">
+      <div class="card-header">
+        <span class="card-num">3</span>
+        <span>Nhiệt độ hơi chính tăng cao</span>
+      </div>
+      <div class="card-body">
+        <p class="card-desc">Hiện tượng, 5 nguyên nhân, quy trình 5 bước xử lý, ngưỡng Trip 565 °C / 15 phút.</p>
+        <div class="card-tags">
+          <span class="tag">565 °C</span>
+          <span class="tag">Phun giảm ôn</span>
+          <span class="tag">MFT</span>
+        </div>
+        <span class="card-cta">Mở trang chi tiết</span>
+      </div>
+    </div>
+
+    <div class="folder-card c-4" onclick="openPage('p4')">
+      <div class="card-header">
+        <span class="card-num">4</span>
+        <span>Bình khử khí</span>
+      </div>
+      <div class="card-body">
+        <p class="card-desc">4 tác dụng, 3 lý do khử khí, sơ đồ thang mức nước, xử lý mức giảm nhanh (ngưỡng −1 825 mm).</p>
+        <div class="card-tags">
+          <span class="tag">O₂ ≤ 7 ppb</span>
+          <span class="tag">−1 825 mm</span>
+          <span class="tag">Henry-Dalton</span>
+        </div>
+        <span class="card-cta">Mở trang chi tiết</span>
+      </div>
+    </div>
+
+    <div class="folder-card c-5" onclick="openPage('p5')">
+      <div class="card-header">
+        <span class="card-num">5</span>
+        <span>Bình gia nhiệt cao áp (BGN 6, 7, 8)</span>
+      </div>
+      <div class="card-body">
+        <p class="card-desc">Thông số vận hành, cấu tạo 5 điểm, 3 vùng truyền nhiệt, 5 sự cố &amp; 5 trường hợp tách bình.</p>
+        <div class="card-tags">
+          <span class="tag">Shell &amp; Tube</span>
+          <span class="tag">3 vùng</span>
+          <span class="tag">Thủy kích</span>
+        </div>
+        <span class="card-cta">Mở trang chi tiết</span>
+      </div>
+    </div>
+
+    <div class="folder-card c-6" onclick="openPage('p6')">
+      <div class="card-header">
+        <span class="card-num">6</span>
+        <span>Dầu chèn – Hydro máy phát</span>
+      </div>
+      <div class="card-body">
+        <p class="card-desc">Nguyên lý ΔP = 0,55 – 0,60 bar; 5 nhóm nguyên nhân dao động; quy trình xử lý; ngưỡng Low 0,41 bar.</p>
+        <div class="card-tags">
+          <span class="tag">ΔP 0,55 bar</span>
+          <span class="tag">DPRV</span>
+          <span class="tag">H₂ 5,17 bar</span>
+        </div>
+        <span class="card-cta">Mở trang chi tiết</span>
+      </div>
+    </div>
+
+    <div class="folder-card c-7" onclick="openPage('p7')">
+      <div class="card-header">
+        <span class="card-num">7</span>
+        <span>Dầu bôi trơn tuabin giảm thấp</span>
+      </div>
+      <div class="card-body">
+        <p class="card-desc">Hiện tượng, 3 nhóm nguyên nhân, quy trình xử lý 2 giai đoạn, ngưỡng Trip ≤ 1,21 bar.</p>
+        <div class="card-tags">
+          <span class="tag">≤ 1,21 bar</span>
+          <span class="tag">Bơm AC/DC</span>
+          <span class="tag">Phá chân không</span>
+        </div>
+        <span class="card-cta">Mở trang chi tiết</span>
+      </div>
+    </div>
+
+    <div class="folder-card c-8" onclick="openPage('p8')">
+      <div class="card-header">
+        <span class="card-num">8</span>
+        <span>Bảo vệ Tuabin &amp; Liên động sau Trip</span>
+      </div>
+      <div class="card-body">
+        <p class="card-desc">8 nhóm bảo vệ cốt lõi (dầu, tốc độ, rung, nhiệt, chân không, hơi, stator, lò hơi) + 10 liên động tự động.</p>
+        <div class="card-tags">
+          <span class="tag">8 nhóm BV</span>
+          <span class="tag">10 liên động</span>
+          <span class="tag">Trip</span>
+        </div>
+        <span class="card-cta">Mở trang chi tiết</span>
+      </div>
+    </div>
+
+    <div class="folder-card c-9" onclick="openPage('p9')">
+      <div class="card-header">
+        <span class="card-num">9</span>
+        <span>Runback Tuabin &amp; BOP</span>
+      </div>
+      <div class="card-body">
+        <p class="card-desc">Khái niệm Runback, 5 trường hợp kích hoạt, 4 điều kiện tiên quyết, 5 nhóm tín hiệu liên động.</p>
+        <div class="card-tags">
+          <span class="tag">60% tải</span>
+          <span class="tag">Master Auto</span>
+          <span class="tag">SWC</span>
+        </div>
+        <span class="card-cta">Mở trang chi tiết</span>
+      </div>
+    </div>
+
+    <div class="folder-card c-10" onclick="openPage('p10')">
+      <div class="card-header">
+        <span class="card-num">10</span>
+        <span>Thủy kích Tuabin</span>
+      </div>
+      <div class="card-body">
+        <p class="card-desc">Khái niệm, 4 tác hại, 5 hiện tượng nhận biết, nguyên nhân từ lò hơi / khởi động / thiết bị phụ, 3 giai đoạn xử lý.</p>
+        <div class="card-tags">
+          <span class="tag">Water hammer</span>
+          <span class="tag">Cong trục</span>
+          <span class="tag">24 giờ</span>
+        </div>
+        <span class="card-cta">Mở trang chi tiết</span>
+      </div>
+    </div>
+
+    <div class="folder-card c-11" onclick="openPage('p11')">
+      <div class="card-header">
+        <span class="card-num">11</span>
+        <span>Quy trình khởi động Tuabin từ trạng thái lạnh</span>
+      </div>
+      <div class="card-body">
+        <p class="card-desc">Chuẩn bị, thí nghiệm, các trường hợp cấm khởi động, 7 bước từ Reset đến đầy tải 100%.</p>
+        <div class="card-tags">
+          <span class="tag">Rotor Prewarm</span>
+          <span class="tag">Chest Prewarm</span>
+          <span class="tag">3000 RPM</span>
+        </div>
+        <span class="card-cta">Mở trang chi tiết</span>
+      </div>
+    </div>
+
+    <div class="folder-card c-12" onclick="openPage('p12')">
+      <div class="card-header">
+        <span class="card-num">12</span>
+        <span>Blackout – Mất toàn bộ AC &amp; DC</span>
+      </div>
+      <div class="card-body">
+        <p class="card-desc">Sự cố nghiêm trọng nhất: 2 giai đoạn xử lý, xả khí Hydro khẩn cấp, vần trục thủ công, phục hồi khi có nguồn cứu hộ.</p>
+        <div class="card-tags">
+          <span class="tag">ESOP</span>
+          <span class="tag">H₂ 5,17 bar</span>
+          <span class="tag">Jacking Oil</span>
+        </div>
+        <span class="card-cta">Mở trang chi tiết</span>
+      </div>
+    </div>
+
+    <div class="folder-card c-13" onclick="openPage('p13')">
+      <div class="card-header">
+        <span class="card-num">13</span>
+        <span>Chất lượng hơi nước &amp; Chỉ tiêu môi trường</span>
+      </div>
+      <div class="card-body">
+        <p class="card-desc">6 thông số chất lượng hơi, 4 mức Action Level, TCVN 7440:2005 &amp; 5945:2005, 5 lý do kiểm soát.</p>
+        <div class="card-tags">
+          <span class="tag">TCVN 7440</span>
+          <span class="tag">Action Level</span>
+          <span class="tag">SCC</span>
+        </div>
+        <span class="card-cta">Mở trang chi tiết</span>
+      </div>
+    </div>
+
+    <div class="folder-card c-14" onclick="openPage('p14')">
+      <div class="card-header">
+        <span class="card-num">14</span>
+        <span>Sự cố rung bơm cấp khi tổ máy 540 MW</span>
+      </div>
+      <div class="card-body">
+        <p class="card-desc">Bảng ngưỡng nhiệt độ – rung – áp lực; 4 nhóm nguyên nhân; trình tự xử lý 4 bước; ngưỡng bảo vệ nghiêm trọng.</p>
+        <div class="card-tags">
+          <span class="tag">100/150 µm</span>
+          <span class="tag">Cavitation</span>
+          <span class="tag">Runout</span>
+        </div>
+        <span class="card-cta">Mở trang chi tiết</span>
+      </div>
+    </div>
+
+    <div class="folder-card c-end" onclick="openPage('pend')">
+      <div class="card-header">
+        <span class="card-num">✓</span>
+        <span>Kết luận tổng hợp – Nguyên tắc vàng vận hành</span>
+      </div>
+      <div class="card-body">
+        <p class="card-desc">4 nguyên tắc vàng: bảo vệ tổ máy, ngưỡng quan trọng, trình tự xử lý chuẩn, vận hành tối ưu.</p>
+        <div class="card-tags">
+          <span class="tag">Nguyên tắc vàng</span>
+          <span class="tag">Ngưỡng BV</span>
+        </div>
+        <span class="card-cta">Mở trang chi tiết</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================= -->
+<!-- PAGE 1 -->
+<!-- ============================================================= -->
+<div id="p1" class="page">
+  <div class="page-header p-1">
+    <span class="pnum">PHẦN 1</span>
+    <h1>Cơ sở lý thuyết chu trình nhiệt &amp; Ảnh hưởng các thông số hơi</h1>
+    <p class="pdesc">Công thức – Ảnh hưởng P₀, T₀, Pₖ – Đồ thị – 5 loại tổn thất – Giải pháp</p>
+  </div>
+
+  <details class="sub" open>
+    <summary>Công thức cơ bản</summary>
+    <div class="sub-body">
+      <div class="formula">H₀ = i₀ − i<sub>k</sub></div>
+      <div class="formula">η<sub>t</sub> = H₀ / q₁</div>
+      <div class="formula">P = ṁ · (h₀ − h<sub>k</sub>) · η<sub>td</sub> · η<sub>g</sub></div>
+      <div class="formula">η<sub>chu trình</sub> ≈ (h₀ − h<sub>k</sub>) / (h₀ − h'<sub>k</sub>)</div>
+      <p style="text-align:center;color:var(--muted);font-style:italic;">
+        H₀ – nhiệt giáng lý thuyết; i₀ – entanpi hơi vào; i<sub>k</sub> – entanpi hơi thoát; q₁ – nhiệt lượng cấp; ṁ – lưu lượng hơi; η<sub>td</sub> – hiệu suất tuabin; η<sub>g</sub> – hiệu suất máy phát.
+      </p>
+      <div class="callout">Ba thông số ảnh hưởng đồng thời: <strong>áp lực hơi mới P₀</strong>, <strong>nhiệt độ hơi mới T₀</strong>, <strong>chân không bình ngưng P<sub>k</sub></strong>.</div>
+    </div>
+  </details>
+
+  <details class="sub">
+    <summary>Ảnh hưởng của áp lực hơi mới P₀</summary>
+    <div class="sub-body">
+      <div class="effect-card" style="border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;">
+        <div style="padding:12px 18px;color:#fff;font-weight:700;background:linear-gradient(135deg,#0b5394 0%,#1a73c9 100%);">↑ Khi tăng P₀</div>
+        <div style="padding:14px 18px;">
+          <ul>
+            <li>Mật độ hơi tăng, lưu lượng qua tuabin tăng nếu độ mở van không đổi.</li>
+            <li>Áp suất các tầng tăng, lực dọc trục tăng, ứng suất thân vỏ và cánh tăng.</li>
+            <li>Dễ gây rung động, quá tải cánh tầng cuối và tăng nguy cơ hư hỏng ổ trục.</li>
+            <li>Nhiệt độ bão hòa tăng → độ quá nhiệt giảm, hơi cuối ẩm hơn → xói mòn cánh.</li>
+            <li>Trong giới hạn cho phép, tăng P₀ <strong>tăng hiệu suất chu trình Rankine</strong>.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="effect-card" style="border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+        <div style="padding:12px 18px;color:#fff;font-weight:700;background:linear-gradient(135deg,#7b0d0d 0%,#c0392b 100%);">↓ Khi giảm P₀</div>
+        <div style="padding:14px 18px;">
+          <ul>
+            <li>Công suất giảm, phải mở van lớn hơn để giữ tải.</li>
+            <li>Lưu lượng thể tích tăng, có thể quá tải tầng cuối.</li>
+            <li>Hiệu suất giảm do tổn thất tiết lưu và lệch khỏi điểm thiết kế.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="sub">
+    <summary>Ảnh hưởng của nhiệt độ hơi mới T₀</summary>
+    <div class="sub-body">
+      <div class="effect-card" style="border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;">
+        <div style="padding:12px 18px;color:#fff;font-weight:700;background:linear-gradient(135deg,#b9770e 0%,#f39c12 100%);">↑ Khi tăng T₀</div>
+        <div style="padding:14px 18px;">
+          <ul>
+            <li>Entanpi hơi vào tăng, công sinh ra tăng.</li>
+            <li>Nhiệt độ kim loại, độ giãn nở nhiệt và ứng suất nhiệt tăng.</li>
+            <li>Dễ gây creep, oxy hóa, biến dạng và giảm tuổi thọ vật liệu.</li>
+            <li>Tăng T₀ làm <strong>giảm độ ẩm cuối</strong> → tốt cho tầng cánh LP.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="effect-card" style="border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+        <div style="padding:12px 18px;color:#fff;font-weight:700;background:linear-gradient(135deg,#0b5394 0%,#1a73c9 100%);">↓ Khi giảm T₀</div>
+        <div style="padding:14px 18px;">
+          <ul>
+            <li>Entanpi giảm, công suất giảm.</li>
+            <li>Độ ẩm cuối tăng → xói mòn cánh tầng cuối.</li>
+            <li>Có thể phải giảm tải để bảo vệ tuabin.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="sub">
+    <summary>Ảnh hưởng của chân không bình ngưng P<sub>k</sub></summary>
+    <div class="sub-body">
+      <div class="effect-card" style="border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;">
+        <div style="padding:12px 18px;color:#fff;font-weight:700;background:linear-gradient(135deg,#0b5394 0%,#1a73c9 100%);">↑ Khi chân không tăng (Pₖ giảm)</div>
+        <div style="padding:14px 18px;">
+          <ul>
+            <li>Nhiệt độ hơi thoát LP <strong>giảm</strong>, nhiệt giáng <strong>tăng</strong> → công suất <strong>tăng nhẹ</strong>.</li>
+            <li><strong>Độ khô hơi thoát LP giảm</strong> → tăng độ ẩm cuối, nguy cơ xói mòn cánh tầng cuối.</li>
+            <li>Phải đưa <strong>bơm chân không</strong> và <strong>bơm tuần hoàn</strong> vào làm việc → <strong>điện tự dùng tăng</strong>.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="effect-card" style="border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+        <div style="padding:12px 18px;color:#fff;font-weight:700;background:linear-gradient(135deg,#7b0d0d 0%,#c0392b 100%);">↓ Khi chân không giảm (Pₖ tăng)</div>
+        <div style="padding:14px 18px;">
+          <ul>
+            <li><strong>Nhiệt giáng giảm</strong>, <strong>công suất tuabin giảm</strong>.</li>
+            <li>Nhiệt độ kim loại tầng cánh cuối và hơi thoát <strong>tăng</strong>, <strong>độ rung tăng</strong>.</li>
+            <li><strong>Phun giảm ôn hơi thoát</strong> kích hoạt → <strong>tổn thất công suất</strong>.</li>
+          </ul>
+          <div class="params-grid">
+            <div class="param-box warning"><span class="label">Cảnh báo H</span><span class="value">P<sub>k</sub> ≥ 0,169 bar</span></div>
+            <div class="param-box danger"><span class="label">Cảnh báo HH</span><span class="value">P<sub>k</sub> ≥ 0,254 bar</span></div>
+          </div>
+          <div class="emergency-box">
+            <h3>HÀNH ĐỘNG THEO NGƯỠNG</h3>
+            <ul>
+              <li>Nếu <strong>P<sub>k</sub> ≥ 0,169 bar</strong> → <strong>giảm tải tổ máy</strong>.</li>
+              <li>Nếu <strong>P<sub>k</sub> ≥ 0,254 bar</strong> → <strong>TRIP TUABIN KHẨN CẤP</strong>.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="sub">
+    <summary>Đồ thị công suất – chân không</summary>
+    <div class="sub-body">
+      <div class="chart-card">
+        <h4>Đồ thị: Công suất tuabin và công suất thực theo P<sub>k</sub></h4>
+        <svg viewBox="0 0 900 500" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="zG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#27ae60" stop-opacity="0.12"/><stop offset="100%" stop-color="#27ae60" stop-opacity="0.02"/></linearGradient>
+            <linearGradient id="zY" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f39c12" stop-opacity="0.13"/><stop offset="100%" stop-color="#f39c12" stop-opacity="0.02"/></linearGradient>
+            <linearGradient id="zR" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#c0392b" stop-opacity="0.18"/><stop offset="100%" stop-color="#c0392b" stop-opacity="0.03"/></linearGradient>
+            <linearGradient id="pF" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a73c9" stop-opacity="0.25"/><stop offset="100%" stop-color="#1a73c9" stop-opacity="0.02"/></linearGradient>
+          </defs>
+          <rect x="90" y="60" width="197" height="340" fill="url(#zG)"/>
+          <rect x="287" y="60" width="194" height="340" fill="url(#zY)"/>
+          <rect x="720" y="60" width="130" height="340" fill="url(#zR)"/>
+          <g stroke="#e3e8ef" stroke-width="1">
+            <line x1="90" y1="60" x2="850" y2="60"/><line x1="90" y1="128" x2="850" y2="128"/>
+            <line x1="90" y1="196" x2="850" y2="196"/><line x1="90" y1="264" x2="850" y2="264"/>
+            <line x1="90" y1="332" x2="850" y2="332"/><line x1="90" y1="400" x2="850" y2="400"/>
+          </g>
+          <line x1="90" y1="60" x2="90" y2="400" stroke="#57606a" stroke-width="1.5"/>
+          <line x1="90" y1="400" x2="850" y2="400" stroke="#57606a" stroke-width="1.5"/>
+          <g font-size="12" fill="#57606a" text-anchor="end">
+            <text x="82" y="64">110</text><text x="82" y="132">100</text><text x="82" y="200">90</text>
+            <text x="82" y="268">80</text><text x="82" y="336">70</text><text x="82" y="404">60</text>
+          </g>
+          <g font-size="11" fill="#57606a" text-anchor="middle">
+            <text x="90" y="420">0.03</text><text x="287" y="420">0.10</text>
+            <text x="481" y="420">0.169</text><text x="720" y="420">0.254</text><text x="850" y="420">0.30</text>
+          </g>
+          <text x="470" y="460" font-size="13" text-anchor="middle" font-weight="600">Áp suất bình ngưng Pₖ (bar)</text>
+          <text x="30" y="230" font-size="12" text-anchor="middle" font-weight="600" transform="rotate(-90, 30, 230)">Công suất tương đối (%)</text>
+          <polyline points="90,106 146,121 242,132 287,140 428,166 481,182 568,212 720,273 850,334" fill="none" stroke="#1a73c9" stroke-width="3"/>
+          <path d="M90,106 L146,121 L242,132 L287,140 L428,166 L481,182 L568,212 L720,273 L850,334 L850,400 L90,400 Z" fill="url(#pF)"/>
+          <polyline points="90,182 146,147 242,136 287,151 428,193 481,216 568,250 720,311 850,379" fill="none" stroke="#27ae60" stroke-width="3" stroke-dasharray="9,5"/>
+          <circle cx="242" cy="136" r="7" fill="#27ae60" stroke="#fff" stroke-width="2.5"/>
+          <line x1="242" y1="60" x2="242" y2="400" stroke="#27ae60" stroke-width="1.5" stroke-dasharray="4,4"/>
+          <text x="242" y="54" font-size="11" fill="#1e8449" text-anchor="middle" font-weight="700">ĐIỂM TỐI ƯU</text>
+          <line x1="481" y1="60" x2="481" y2="400" stroke="#f39c12" stroke-width="2" stroke-dasharray="6,4"/>
+          <rect x="441" y="18" width="80" height="22" rx="11" fill="#f39c12"/>
+          <text x="481" y="33" font-size="11" fill="#fff" text-anchor="middle" font-weight="700">H · 0.169</text>
+          <line x1="720" y1="60" x2="720" y2="400" stroke="#c0392b" stroke-width="2.5" stroke-dasharray="6,4"/>
+          <rect x="675" y="18" width="90" height="22" rx="11" fill="#c0392b"/>
+          <text x="720" y="33" font-size="11" fill="#fff" text-anchor="middle" font-weight="700">HH · 0.254</text>
+        </svg>
+        <div class="chart-legend">
+          <span class="item"><span class="swatch" style="background:#1a73c9;"></span> Công suất tuabin</span>
+          <span class="item"><span class="swatch dashed" style="border-color:#27ae60;"></span> Công suất thực (trừ tự dùng)</span>
+          <span class="item"><span class="swatch" style="background:#27ae60;"></span> Điểm tối ưu kinh tế</span>
+        </div>
+        <p class="chart-note">Tồn tại <strong>điểm tối ưu kinh tế</strong> (0,05 ÷ 0,084 bar) – công suất thực đạt cực đại sau khi trừ công suất tự dùng.</p>
+      </div>
+    </div>
+  </details>
+
+  <details class="sub">
+    <summary>5 loại tổn thất trong hệ thống Tuabin – Bình ngưng</summary>
+    <div class="sub-body">
+      <div class="loss-card">
+        <div class="loss-letter l-a">a<small>qk</small></div>
+        <div class="loss-body">
+          <div class="title">Tổn thất nhiệt hơi thoát (q<sub>k</sub>)</div>
+          <p><strong>Tổn thất lớn nhất</strong> (50 – 60 % tổng nhiệt cấp). Hơi sau giãn nở truyền <strong>ẩn nhiệt ngưng tụ</strong> cho nước tuần hoàn làm mát.</p>
+        </div>
+      </div>
+      <div class="loss-card">
+        <div class="loss-letter l-b">b<small>khí động</small></div>
+        <div class="loss-body">
+          <div class="title">Tổn thất bên trong các tầng cánh tuabin</div>
+          <ul>
+            <li><strong>Tiết lưu tại van</strong> (MSV, CV, RSV, IV).</li>
+            <li><strong>Ma sát và xoáy lốc</strong> trên bề mặt cánh.</li>
+            <li><strong>Tốc độ ra</strong> – động năng dư không thu hồi.</li>
+            <li><strong>Độ ẩm</strong> tại tầng cánh cuối LP.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="loss-card">
+        <div class="loss-letter l-c">c<small>rò rỉ</small></div>
+        <div class="loss-body">
+          <div class="title">Rò rỉ môi chất &amp; Tổn thất chân không</div>
+          <ul><li>Rò rỉ hơi qua vành chèn trục, ty van.</li><li>Lọt không khí vào bình ngưng.</li></ul>
+        </div>
+      </div>
+      <div class="loss-card">
+        <div class="loss-letter l-d">d<small>cơ khí</small></div>
+        <div class="loss-body">
+          <div class="title">Tổn thất cơ khí</div>
+          <p>Ma sát tại ổ đỡ, gối chặn và tiêu hao dẫn động <strong>bơm dầu chính (MOP)</strong>.</p>
+        </div>
+      </div>
+      <div class="loss-card">
+        <div class="loss-letter l-e">e<small>tỏa nhiệt</small></div>
+        <div class="loss-body">
+          <div class="title">Tổn thất tỏa nhiệt ra môi trường</div>
+          <p>Nhiệt thất thoát qua bề mặt kim loại xilanh và đường ống do bảo ôn xuống cấp.</p>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="sub">
+    <summary>Nguyên nhân &amp; Giải pháp hạn chế tổn thất</summary>
+    <div class="sub-body">
+      <h4>5 nguyên nhân gia tăng tổn thất</h4>
+      <div class="reason-card"><div class="title">Suy giảm độ chân không</div><p>Bám cáu ống, lưu lượng nước tuần hoàn không đủ, nhiệt độ nước vào cao, bơm chân không kém.</p></div>
+      <div class="reason-card"><div class="title">Thông số hơi đầu vào không đạt</div><p>Độ quá nhiệt giảm → hơi sớm bão hòa → tăng độ ẩm.</p></div>
+      <div class="reason-card"><div class="title">Tách các bình gia nhiệt</div><p>Hơi trích phải giãn nở tiếp xuống LP → tăng q<sub>k</sub>.</p></div>
+      <div class="reason-card"><div class="title">Vận hành non tải</div><p>Van CV khép nhỏ → tổn thất tiết lưu lớn.</p></div>
+      <div class="reason-card"><div class="title">Cáu cặn &amp; xuống cấp cơ khí</div><p>Cánh bám muối; khe hở vành chèn mòn.</p></div>
+
+      <h4>5 giải pháp chính</h4>
+      <div class="action-step"><div class="action-num">1</div><div class="action-content"><div class="title">Nâng cao &amp; duy trì độ chân không tối ưu</div><p>Dùng bi cao su (Taprogge), vệ sinh lưới chắn rác, xử lý điểm lọt khí.</p></div></div>
+      <div class="action-step"><div class="action-num">2</div><div class="action-content"><div class="title">Duy trì đầy đủ BGN</div><p>Không tách khi không có sự cố; giữ mức nước đọng ổn định.</p></div></div>
+      <div class="action-step"><div class="action-num">3</div><div class="action-content"><div class="title">Giữ thông số hơi định mức &amp; trượt áp</div><p>Vận hành Sliding Pressure ở tải trung gian.</p></div></div>
+      <div class="action-step"><div class="action-num">4</div><div class="action-content"><div class="title">Kiểm soát áp lực hơi chèn trục</div><p>Duy trì 0,28 bar.</p></div></div>
+      <div class="action-step"><div class="action-num">5</div><div class="action-content"><div class="title">Đảm bảo phẩm chất hơi &amp; bảo ôn</div><p>Giám sát silic, natri, độ dẫn; bọc kín cách nhiệt.</p></div></div>
+    </div>
+  </details>
+</div>
+
+<!-- ============================================================= -->
+<!-- PAGE 2 -->
+<!-- ============================================================= -->
+<div id="p2" class="page">
+  <div class="page-header p-2">
+    <span class="pnum">PHẦN 2</span>
+    <h1>Chân không &amp; Bình ngưng</h1>
+    <p class="pdesc">Tạo chân không – Cấu tạo bình ngưng – Xử lý mức nước giảm nhanh</p>
+  </div>
+
+  <details class="sub" open>
+    <summary>Các bước tạo chân không bình ngưng</summary>
+    <div class="sub-body">
+      <div class="step"><div class="step-num">1</div><div class="step-content"><div class="title">Chuẩn bị hệ thống hơi tự dùng</div><ul><li>Áp lực ống góp hơi tự dùng đạt <strong>15 bar</strong>.</li></ul></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-content"><div class="title">Cấp hơi chèn trục</div><ul><li>Áp lực hơi chèn <strong>0,27 ÷ 0,28 bar</strong>.</li><li>Nhiệt độ hơi chèn ~ <strong>250 °C</strong> (dải <code>148,9 °C &lt; T &lt; 398,9 °C</code>).</li></ul></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-content"><div class="title">Reset tuabin trên DCS</div></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-content"><div class="title">Đóng van phá chân không, cấp nước làm kín</div><ul><li>Đóng <strong>02 van phá hoại chân không</strong>.</li><li>Cấp nước chèn làm kín van phá chân không và cổ bình ngưng (A, B).</li></ul></div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-content"><div class="title">Khởi động bơm chân không</div><ul><li>Đưa <strong>02 bơm chân không</strong> vào vận hành.</li></ul></div></div>
+      <div class="step"><div class="step-num">6</div><div class="step-content"><div class="title">Thiết lập van xả đọng</div>
+        <ul><li>Van xả đọng hơi chính, tái nhiệt nóng/lạnh: <strong>AUTO</strong>.</li><li>Van xả vỏ trong/ngoài (SD1, SD2), van xả MSV, S4, CRV, IV: <strong>AUTO và mở</strong>.</li></ul>
+        <div class="callout danger"><strong>Lưu ý an toàn:</strong> Van stop hơi tái lạnh phải <strong>đóng</strong> khi van xả khí lò hơi đang mở; chỉ mở van stop khi áp lực hơi chính đạt <strong>2 – 3 bar</strong>.</div>
+      </div></div>
+      <div class="step"><div class="step-num">7</div><div class="step-content"><div class="title">Giám sát và hoàn thành</div>
+        <div class="params-grid">
+          <div class="param-box success"><span class="label">Hoàn thành</span><span class="value">&lt; 0,1 bar</span></div>
+          <div class="param-box"><span class="label">Vận hành ổn định</span><span class="value">0,05 ÷ 0,084 bar</span></div>
+        </div>
+      </div></div>
+    </div>
+  </details>
+
+  <details class="sub">
+    <summary>Biện pháp khắc phục khi chân không giảm</summary>
+    <div class="sub-body">
+      <ol class="remedy-list">
+        <li><strong>Chạy bơm chân không dự phòng</strong> (nếu có). Kiểm tra dòng điện, áp suất hút.</li>
+        <li><strong>Kiểm tra hệ thống nước tuần hoàn:</strong> lưu lượng, nhiệt độ, chênh nhiệt. Báo trưởng ca tách nhánh bình ngưng vệ sinh nếu nghi ngờ tắc.</li>
+        <li><strong>Kiểm tra áp lực hơi chèn trục</strong> — nếu mất hơi chèn, không khí lọt vào bình ngưng.</li>
+        <li><strong>Kiểm tra van phun giảm ôn cổ thoát</strong> — đảm bảo tự động mở bảo vệ vỏ LP.</li>
+      </ol>
+      <div class="emergency-box">
+        <h3>HÀNH ĐỘNG THEO NGƯỠNG P<sub>k</sub></h3>
+        <ul>
+          <li>Nếu <strong>P<sub>k</sub> ≥ 0,169 bar</strong> → <strong>giảm tải tổ máy</strong>.</li>
+          <li>Nếu <strong>P<sub>k</sub> ≥ 0,254 bar</strong> → <strong>TRIP TUABIN KHẨN CẤP</strong>.</li>
+        </ul>
+      </div>
+    </div>
+  </details>
+
+  <details class="sub">
+    <summary>Cấu tạo bình ngưng (8 bộ phận chính)</summary>
+    <div class="sub-body">
+      <div class="struct-card"><div class="struct-icon">🏭</div><div class="struct-body"><div class="title">1. Vỏ bình ngưng</div><p>Thép hàn, chịu chân không bên trong và khí quyển bên ngoài. Đỉnh vỏ nối với cổ xả tuabin hạ áp.</p></div></div>
+      <div class="struct-card"><div class="struct-icon">💧</div><div class="struct-body"><div class="title">2. Hộp nước (Water Boxes)</div><p>Chia ngăn cho phép cô lập bảo dưỡng một nửa bình ngưng.</p></div></div>
+      <div class="struct-card"><div class="struct-icon">🔲</div><div class="struct-body"><div class="title">3. Mặt sàng ống</div><p>Giữ và làm kín đầu ống (nong ống hoặc nong kết hợp hàn).</p></div></div>
+      <div class="struct-card"><div class="struct-icon">⚙</div><div class="struct-body"><div class="title">4. Chùm ống truyền nhiệt</div><p>Đường kính 19 – 25 mm; vật liệu đồng – niken, inox, hoặc <strong>titan</strong>.</p></div></div>
+      <div class="struct-card"><div class="struct-icon">📏</div><div class="struct-body"><div class="title">5. Tấm đỡ ống</div><p>Giữ chùm ống không bị võng, triệt tiêu rung động.</p></div></div>
+      <div class="struct-card"><div class="struct-icon">🛢</div><div class="struct-body"><div class="title">6. Giếng gom nước ngưng (Hotwell)</div><p>Thu gom nước ngưng, có đường hút đến bơm nước ngưng (CEP).</p></div></div>
+      <div class="struct-card"><div class="struct-icon">🌬</div><div class="struct-body"><div class="title">7. Hệ thống rút khí không ngưng</div><p>Làm lạnh sâu hỗn hợp khí sót trước khi đưa ra ngoài qua bơm hút chân không / ejector.</p></div></div>
+      <div class="struct-card"><div class="struct-icon">🔧</div><div class="struct-body"><div class="title">8. Vành phun giảm ôn / Bộ nhận xả tắt</div><p>Tiếp nhận hơi từ LP Bypass, hơi xả bẫy, nước ngưng chu trình.</p></div></div>
+
+      <h4>Nguyên lý hoạt động</h4>
+      <table>
+        <thead><tr><th>Thông số</th><th>Phía Vỏ (Shell)</th><th>Phía Ống (Tube)</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Môi chất</strong></td><td>Hơi thoát tuabin LP</td><td>Nước làm mát tuần hoàn</td></tr>
+          <tr><td><strong>Áp suất</strong></td><td>Chân không sâu (5 – 10 kPa)</td><td>Áp suất dư (2 – 4 bar)</td></tr>
+          <tr><td><strong>Pha</strong></td><td>Hơi bão hòa → nước bão hòa</td><td>Pha lỏng (nhiệt độ tăng dần)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+
+  <details class="sub">
+    <summary>Xử lý sự cố mức nước bình ngưng giảm nhanh</summary>
+    <div class="sub-body">
+      <h4>Nguyên nhân</h4>
+      <div class="reason-card"><div class="title">1. Rò rỉ/thất thoát chu trình</div><p>Bục ống sinh hơi, van xả bao hơi kẹt mở, bục ống mềm blowdown.</p></div>
+      <div class="reason-card"><div class="title">2. Bypass đóng khẩn cấp</div><p>Van LP Bypass đóng Quick Close khi trip/sa thải.</p></div>
+      <div class="reason-card"><div class="title">3. Sự cố cấp bổ sung</div><p>Van điều chỉnh kẹt, bơm bổ sung trip, van xả tràn mở nhầm.</p></div>
+      <div class="reason-card"><div class="title">4. Mất cân bằng hút – đẩy</div><p>Van điều khiển mức khử khí mở 100%.</p></div>
+      <div class="reason-card"><div class="title">5. Lỗi C&amp;I</div><p>Cảm biến mức báo ảo.</p></div>
+
+      <h4>Trình tự xử lý</h4>
+      <div class="action-step"><div class="action-num">1</div><div class="action-content"><div class="title">Khống chế bơm ngưng dự phòng</div><p>Chuyển bơm nước ngưng dự phòng sang <strong>MAN</strong> để tránh tự động vào khi áp lực giảm.</p></div></div>
+      <div class="action-step"><div class="action-num">2</div><div class="action-content"><div class="title">Huy động tối đa nguồn nước bổ sung</div><ul><li>Khởi động khẩn cấp bơm bổ sung nước ngưng + bơm nước khử khoáng.</li><li>Van cấp nước bổ sung sang <strong>MAN</strong> mở 100%.</li><li>Mở van điện cấp nước khử khoáng trực tiếp.</li></ul></div></div>
+      <div class="action-step"><div class="action-num">3</div><div class="action-content"><div class="title">Cắt giảm nước ngưng thoát ra ngoài</div><ul><li>Giảm lưu lượng cấp lên bình khử khí (van về <strong>MAN</strong>).</li><li>Đóng van xả tràn nước ngưng nếu đang mở.</li><li>Mở xả sự cố BGN cao áp và hạ áp về bình ngưng.</li></ul></div></div>
+      <div class="action-step"><div class="action-num">4</div><div class="action-content"><div class="title">Phối hợp với Lò trưởng</div><ul><li>Đóng van xả liên tục và xả sự cố bao hơi.</li><li>Nếu mức tiếp tục giảm: giảm tải (Boiler Master ~<strong>40%</strong>).</li><li>Nếu mức đạt <code>250 mm</code>: sẵn sàng dừng bơm ngưng chủ động / trip bơm.</li></ul></div></div>
+
+      <div class="emergency-box">
+        <h3>NGƯỠNG BẢO VỆ NGHIÊM TRỌNG</h3>
+        <p>Khi mức nước bình ngưng giảm tới <strong>250 mm</strong>:</p>
+        <ul>
+          <li><strong>SẴN SÀNG</strong> phương án chuyển đổi dừng bơm ngưng chủ động.</li>
+          <li>Hoặc xử lý <strong>TRIP BƠM</strong> theo quy trình.</li>
+          <li><strong>TUYỆT ĐỐI KHÔNG</strong> để bơm nước ngưng chạy cạn.</li>
+        </ul>
+      </div>
+    </div>
+  </details>
+</div>
+
+<!-- ============================================================= -->
+<!-- PAGE 3 -->
+<!-- ============================================================= -->
+<div id="p3" class="page">
+  <div class="page-header p-3">
+    <span class="pnum">PHẦN 3</span>
+    <h1>Nhiệt độ hơi chính tăng cao</h1>
+    <p class="pdesc">Ảnh hưởng – Dấu hiệu – Nguyên nhân – Quy trình xử lý 5 bước</p>
+  </div>
+
+  <details class="sub" open>
+    <summary>Ảnh hưởng của nhiệt độ hơi chính</summary>
+    <div class="sub-body">
+      <div class="effect-card" style="border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;">
+        <div style="padding:12px 18px;color:#fff;font-weight:700;background:linear-gradient(135deg,#7b0d0d 0%,#c0392b 100%);">↑ Khi nhiệt độ hơi chính tăng cao</div>
+        <div style="padding:14px 18px;">
+          <h4>Đối với hiệu suất</h4>
+          <ul>
+            <li>Tăng <strong>nhiệt độ trung bình cấp nhiệt</strong> → tăng hiệu suất nhiệt.</li>
+            <li><strong>Độ khô hơi tầng cuối LP tăng</strong>, giảm độ ẩm hơi thoát.</li>
+          </ul>
+          <h4>Đối với an toàn kim loại</h4>
+          <ul>
+            <li>Quá nhiệt bộ quá nhiệt, đường ống hơi chính, MSV, CV, cánh tĩnh/động HP.</li>
+            <li>Thúc đẩy <strong>dão nhiệt (creep)</strong>, giảm tuổi thọ.</li>
+            <li>Gây <strong>ứng suất nhiệt</strong> và chênh giãn nở rotor/stator.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="effect-card" style="border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+        <div style="padding:12px 18px;color:#fff;font-weight:700;background:linear-gradient(135deg,#0b5394 0%,#1a73c9 100%);">↓ Khi nhiệt độ hơi chính giảm thấp</div>
+        <div style="padding:14px 18px;">
+          <h4>Đối với kinh tế chu trình</h4>
+          <ul>
+            <li>Giảm nhiệt giáng lý thuyết → giảm công suất, hiệu suất.</li>
+            <li>Phải <strong>tăng lưu lượng hơi</strong> để giữ tải → tăng tổn thất áp lực và <strong>tăng lực dọc trục</strong>.</li>
+          </ul>
+          <h4>Nguy cơ xói mòn &amp; thủy kích</h4>
+          <ul>
+            <li><strong>Độ ẩm cuối tăng cao</strong> → rỗ, mòn cánh động.</li>
+            <li>Giảm đột ngột (<code>≥ 50 °C / 15 phút</code> hoặc <code>−65,5 °C / 15 phút</code>) → <strong>thủy kích</strong> → cong trục, cháy gối chặn.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="sub">
+    <summary>Dấu hiệu và nguyên nhân sự cố</summary>
+    <div class="sub-body">
+      <h4>Dấu hiệu</h4>
+      <ul class="symptom-list">
+        <li>DCS/TCS phát chuông và cảnh báo <strong>nhiệt độ hơi chính cao</strong>.</li>
+        <li>Dải nhiệt độ vùng quá nhiệt lò hơi tăng lên.</li>
+        <li>Van phun nước giảm ôn <strong>mở 100 %</strong> nhưng nhiệt độ vẫn tăng.</li>
+      </ul>
+
+      <h4>Nguyên nhân</h4>
+      <table>
+        <thead><tr><th>Nhóm</th><th>Chi tiết</th></tr></thead>
+        <tbody>
+          <tr><td><span class="badge red">1</span> Phun giảm ôn lỗi</td><td>Áp lực nước cấp tụt; van kẹt đóng; tắc rọ lọc.</td></tr>
+          <tr><td><span class="badge red">2</span> Cháy lò mất cân đối</td><td>Tỉ lệ than – gió không hợp lý; trung tâm ngọn lửa đẩy cao.</td></tr>
+          <tr><td><span class="badge red">3</span> Biến động thông số</td><td>Áp lực hơi tăng nhanh; nhiệt độ nước cấp giảm.</td></tr>
+          <tr><td><span class="badge red">4</span> Cháy lại đuôi lò</td><td>Cháy lại phần đuôi lò đối lưu.</td></tr>
+          <tr><td><span class="badge red">5</span> Lỗi C&amp;I</td><td>Can nhiệt báo sai giá trị cao.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+
+  <details class="sub">
+    <summary>Quy trình xử lý 5 bước</summary>
+    <div class="sub-body">
+      <div class="action-step"><div class="action-num">1</div><div class="action-content"><div class="title">Báo cáo &amp; Xác minh điểm đo</div><p>Báo Trưởng ca, Trưởng kíp lò máy; liên hệ C&amp;I kiểm tra đối chiếu.</p></div></div>
+      <div class="action-step"><div class="action-num">2</div><div class="action-content"><div class="title">Xử lý hệ thống giảm ôn &amp; Nước cấp</div><ul><li>Chuyển van phun giảm ôn từ <strong>AUTO → MANUAL</strong> mở tối đa.</li><li>Nếu thiếu áp lực: điều chỉnh khớp nối thủy lực bơm cấp sang MAN hoặc khởi động bơm cấp dự phòng.</li><li>Nếu tắc rọ lọc: tăng chênh áp ống góp nước cấp và bao hơi.</li></ul></div></div>
+      <div class="action-step"><div class="action-num">3</div><div class="action-content"><div class="title">Phối hợp điều chỉnh cháy lò</div><ul><li>Giảm than cấp; điều chỉnh tỉ lệ gió sơ cấp – thứ cấp hạ trung tâm ngọn lửa.</li><li>Đưa áp lực hơi về định mức nếu tăng cao.</li></ul></div></div>
+      <div class="action-step"><div class="action-num">4</div><div class="action-content"><div class="title">Tương tác phía Tuabin</div><p>Tuabin Master sang <strong>MAN</strong>, tăng phụ tải để giải nhiệt.</p></div></div>
+      <div class="action-step"><div class="action-num">5</div><div class="action-content"><div class="title">Bảo vệ ngừng máy khẩn cấp</div><ul><li>Giám sát nhiệt độ kim loại ống vách lò, ống hơi chính.</li><li>Nhiệt độ đạt <strong>565 °C / 15 phút</strong> → <strong>TRIP Tuabin</strong>.</li><li>Nếu bảo vệ không tác động → dừng tuabin bằng tay + xin lệnh <strong>MFT</strong>.</li></ul></div></div>
+
+      <div class="params-grid">
+        <div class="param-box danger"><span class="label">Trip Tuabin</span><span class="value">565 °C / 15 phút</span></div>
+        <div class="param-box warning"><span class="label">Giảm đột ngột</span><span class="value">≥ 50 °C / 15 phút</span></div>
+        <div class="param-box warning"><span class="label">Ngưỡng nguy hiểm khác</span><span class="value">−65,5 °C / 15 phút</span></div>
+      </div>
+    </div>
+  </details>
+</div>
+
+<!-- ============================================================= -->
+<!-- PAGE 4 -->
+<!-- ============================================================= -->
+<div id="p4" class="page">
+  <div class="page-header p-4">
+    <span class="pnum">PHẦN 4</span>
+    <h1>Bình khử khí</h1>
+    <p class="pdesc">4 tác dụng – 3 lý do khử khí – Sơ đồ mức nước – Xử lý mức giảm nhanh</p>
+  </div>
+
+  <details class="sub" open>
+    <summary>4 tác dụng của bình khử khí</summary>
+    <div class="sub-body">
+      <div class="function-card"><div class="function-num">1</div><div class="function-body"><div class="title">🌬 Tách và loại bỏ khí không ngưng</div><p>Loại bỏ O₂, CO₂ hòa tan bằng phương pháp <strong>nhiệt</strong> (gia nhiệt lên nhiệt độ bão hòa, giải phóng theo định luật <strong>Henry – Dalton</strong>).</p></div></div>
+      <div class="function-card"><div class="function-num">2</div><div class="function-body"><div class="title">🔥 Gia nhiệt sơ bộ nước cấp</div><p>Như bình gia nhiệt kiểu hỗn hợp, nâng nhiệt độ nước ngưng đến nhiệt độ bão hòa.</p></div></div>
+      <div class="function-card"><div class="function-num">3</div><div class="function-body"><div class="title">🛢 Dự trữ nước cấp</div><p>Bể chứa nước cấp dung tích lớn, tiếp nhận xả dồn đọng từ BGN 6, 7, 8.</p></div></div>
+      <div class="function-card"><div class="function-num">4</div><div class="function-body"><div class="title">⬆ Tạo cột áp tĩnh chống xâm thực bơm</div><p>Lắp cao trình cao → cột áp thủy tĩnh ổn định tại cửa hút bơm tăng áp.</p></div></div>
+    </div>
+  </details>
+
+  <details class="sub">
+    <summary>3 lý do phải khử khí</summary>
+    <div class="sub-body">
+      <div class="reason-card"><div class="title">Chống ăn mòn điện hóa kim loại</div><p>O₂ + CO₂ gây <strong>mỏng thành ống</strong>, <strong>rỗ bề mặt (pitting)</strong> trên bao hơi, dàn ống sinh hơi, bộ hâm → <strong>bục vỡ nổ ống</strong>.</p></div>
+      <div class="reason-card"><div class="title">Đảm bảo tiêu chuẩn chất lượng nước cấp</div><p>Duy trì <code>≤ 7 ppb</code> O₂ hòa tan sau bình khử khí.</p></div>
+      <div class="reason-card"><div class="title">Duy trì hiệu quả trao đổi nhiệt</div><p>Khí không ngưng bám thành <strong>màng khí cách nhiệt</strong> trên ống sinh hơi, giảm hệ số truyền nhiệt.</p></div>
+    </div>
+  </details>
+
+  <details class="sub">
+    <summary>Sơ đồ thang mức nước &amp; xử lý mức giảm nhanh</summary>
+    <div class="sub-body">
+      <div class="chart-card">
+        <h4>Thang mức nước bình khử khí</h4>
+        <svg viewBox="0 0 900 340" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="nz" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#27ae60" stop-opacity="0.18"/><stop offset="100%" stop-color="#27ae60" stop-opacity="0.05"/></linearGradient>
+            <linearGradient id="lz" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#f39c12" stop-opacity="0.2"/><stop offset="100%" stop-color="#f39c12" stop-opacity="0.05"/></linearGradient>
+            <linearGradient id="tz" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#c0392b" stop-opacity="0.25"/><stop offset="100%" stop-color="#c0392b" stop-opacity="0.08"/></linearGradient>
+          </defs>
+          <rect x="200" y="60" width="600" height="60" fill="url(#nz)"/>
+          <rect x="200" y="120" width="600" height="60" fill="url(#lz)"/>
+          <rect x="200" y="180" width="600" height="60" fill="url(#tz)"/>
+          <rect x="200" y="240" width="600" height="50" fill="url(#tz)"/>
+          <g font-family="Segoe UI" font-size="13" font-weight="700">
+            <text x="220" y="95" fill="#1e8449">BÌNH THƯỜNG</text>
+            <text x="220" y="155" fill="#b9770e">CẢNH BÁO LOW</text>
+            <text x="220" y="215" fill="#c0392b">CẢNH BÁO LOW–LOW</text>
+            <text x="220" y="270" fill="#7b0d0d">VÙNG BẢO VỆ TRIP</text>
+          </g>
+          <g font-family="Consolas" font-size="12">
+            <line x1="200" y1="60" x2="800" y2="60" stroke="#57606a" stroke-width="1.5"/>
+            <text x="810" y="64" font-weight="700">0 mm</text>
+            <line x1="200" y1="120" x2="800" y2="120" stroke="#f39c12" stroke-width="2" stroke-dasharray="5,4"/>
+            <text x="810" y="124" fill="#b9770e" font-weight="700">−800 mm</text>
+            <line x1="200" y1="180" x2="800" y2="180" stroke="#e67e22" stroke-width="2" stroke-dasharray="5,4"/>
+            <text x="810" y="184" fill="#a04000" font-weight="700">−1 400 mm</text>
+            <line x1="200" y1="240" x2="800" y2="240" stroke="#c0392b" stroke-width="3" stroke-dasharray="6,4"/>
+            <text x="810" y="244" fill="#c0392b" font-weight="700">−1 825 mm</text>
+          </g>
+          <line x1="200" y1="90" x2="800" y2="90" stroke="#27ae60" stroke-width="3"/>
+          <text x="180" y="93" font-family="Consolas" font-size="11" fill="#1e8449" font-weight="700" text-anchor="end">Mức chuẩn</text>
+        </svg>
+      </div>
+
+      <h4>Dấu hiệu</h4>
+      <ul class="symptom-list">
+        <li>Mức nước DCS và ống thủy tụt dốc liên tục.</li>
+        <li>Cảnh báo Low hoặc Low-Low Alarm.</li>
+        <li>Ngưỡng bảo vệ Trip bơm cấp nước: <code>−1 825 mm</code>.</li>
+      </ul>
+
+      <h4>Nguyên nhân</h4>
+      <ol class="cause-list">
+        <li>Bơm ngưng đang chạy bị trip, bơm dự phòng không liên động.</li>
+        <li>Van điều khiển mức nước khử khí kẹt đóng / lỗi tín hiệu.</li>
+        <li>Van xả tràn mở nhầm; rò rỉ van xả đáy bể.</li>
+        <li>Nổ vỡ ống dàn sinh hơi, bộ hâm, đường nước cấp chính.</li>
+        <li>Mất nước dồn đọng từ BGN cao áp.</li>
+      </ol>
+
+      <h4>Trình tự xử lý</h4>
+      <div class="action-step"><div class="action-num">1</div><div class="action-content"><div class="title">Khôi phục nguồn cấp nước ngưng</div><ul><li>Kiểm tra bơm nước ngưng, khởi động bằng tay bơm dự phòng nếu trip.</li><li>Van điều chỉnh mức khử khí sang <strong>Manual</strong> mở lớn.</li><li>Nếu van kẹt: mở van bypass.</li></ul></div></div>
+      <div class="action-step"><div class="action-num">2</div><div class="action-content"><div class="title">Loại trừ thất thoát xả nước</div><ul><li>Kiểm tra van xả tràn bình khử khí.</li><li>Kiểm tra van xả đáy bể nước cấp.</li></ul></div></div>
+      <div class="action-step"><div class="action-num">3</div><div class="action-content"><div class="title">Phối hợp lò hơi</div><ul><li>Kiểm tra tương quan lưu lượng nước cấp – hơi chính.</li><li>Nếu nổ ống nặng → <strong>MFT</strong>.</li></ul></div></div>
+      <div class="action-step"><div class="action-num">4</div><div class="action-content"><div class="title">Bảo vệ tổ bơm cấp</div><ul><li>Theo dõi áp lực đầu hút và lưu lượng.</li><li>Nếu mức tới <code>−1 825 mm</code> → giảm tải hoặc dừng bơm cấp.</li></ul></div></div>
+
+      <div class="emergency-box">
+        <h3>NGƯỠNG BẢO VỆ NGHIÊM TRỌNG</h3>
+        <p>Khi mức nước bình khử khí đạt <strong>−1 825 mm</strong>:</p>
+        <ul>
+          <li><strong>BẢO VỆ TRIP BƠM CẤP NƯỚC</strong> tác động tự động.</li>
+          <li>Mục đích: <strong>ngăn ngừa xâm thực (cavitation)</strong> phá hủy cánh bơm và thân bơm.</li>
+          <li><strong>Không cưỡng bức</strong> chạy bơm cấp khi mức đã tụt dưới ngưỡng.</li>
+        </ul>
+      </div>
+    </div>
+  </details>
+</div>
+
+<!-- ============================================================= -->
+<!-- PAGE 5 -->
+<!-- ============================================================= -->
+<div id="p5" class="page">
+  <div class="page-header p-5">
+    <span class="pnum">PHẦN 5</span>
+    <h1>Bình gia nhiệt cao áp (BGN 6, 7, 8)</h1>
+    <p class="pdesc">Thông số – Cấu tạo – Tác dụng – 5 sự cố – 5 trường hợp tách bình</p>
+  </div>
+
+  <details class="sub" open>
+    <summary>Thông số vận hành cốt lõi</summary>
+    <div class="sub-body">
+      <div class="params-grid">
+        <div class="param-box"><span class="label">Vị trí lắp đặt</span><span class="value">Cốt sàn +23m</span></div>
+        <div class="param-box"><span class="label">Lưu lượng nước cấp</span><span class="value">1.690,23 t/h</span></div>
+        <div class="param-box"><span class="label">Nhiệt độ nước cấp</span><span class="value">183,7 → 290,8 °C</span></div>
+      </div>
+      <div class="flow-diagram">BGN 8 <span class="arrow">→</span> BGN 7 <span class="arrow">→</span> BGN 6 <span class="arrow">→</span> Bình khử khí</div>
+      <table>
+        <thead><tr><th>Thông số</th><th>BGN 6</th><th>BGN 7</th><th>BGN 8</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Nguồn hơi trích</strong></td><td>#3 (IP)</td><td>#2 (CRH)</td><td>#1 (HP)</td></tr>
+          <tr><td><strong>Áp suất hơi</strong></td><td><span class="badge blue">18,06 bar</span></td><td><span class="badge blue">43,76 bar</span></td><td><span class="badge blue">73,56 bar</span></td></tr>
+          <tr><td><strong>Nhiệt độ hơi vào</strong></td><td>422,6 °C</td><td>343,1 °C</td><td>419,1 °C</td></tr>
+          <tr><td><strong>Nhiệt độ nước Vào → Ra</strong></td><td>183,7 → 208,9 °C</td><td>208,9 → 254,7 °C</td><td>254,7 → 290,8 °C</td></tr>
+          <tr><td><strong>Áp suất AT (Vỏ/Ống)</strong></td><td>25 / 305 kg/cm²</td><td>53 / 305 kg/cm²</td><td>91 / 305 kg/cm²</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+
+  <details class="sub">
+    <summary>Cấu tạo thiết bị (5 điểm)</summary>
+    <div class="sub-body">
+      <div class="struct-card"><div class="struct-icon">🔧</div><div class="struct-body"><div class="title">1. Kết cấu &amp; Chiều môi chất</div><p>Vỏ – chùm ống (Shell &amp; Tube), nằm ngang. Nước cấp đi trong ống – Hơi trích đi ngoài ống.</p></div></div>
+      <div class="struct-card"><div class="struct-icon">🔲</div><div class="struct-body"><div class="title">2. Chùm ống &amp; Đầu chỏm cầu</div><p>Ống chữ U, núc thủy lực. Chỏm cầu có manhole kiểm tra.</p></div></div>
+      <div class="struct-card"><div class="struct-icon">🔥</div><div class="struct-body"><div class="title">3. Ba phân vùng truyền nhiệt</div><ul><li><strong>Giảm quá nhiệt.</strong></li><li><strong>Ngưng hơi.</strong></li><li><strong>Làm mát nước đọng.</strong></li></ul></div></div>
+      <div class="struct-card"><div class="struct-icon">🛡</div><div class="struct-body"><div class="title">4. Bảo vệ &amp; Giãn nở nhiệt</div><p>Tấm chống va đập + 01 gối cố định + 01 gối di động con lăn.</p></div></div>
+      <div class="struct-card"><div class="struct-icon">⚙</div><div class="struct-body"><div class="title">5. Van cách ly &amp; Bypass</div><p>Van chặn vào/ra + bypass 100% nước cấp; van xả đọng khẩn cấp.</p></div></div>
+    </div>
+  </details>
+
+  <details class="sub">
+    <summary>5 sự cố thường gặp &amp; xử lý</summary>
+    <div class="sub-body">
+      <div class="reason-card"><div class="title">1. Rò rỉ, bục vỡ ống trao đổi nhiệt</div>
+        <p><strong>Nhận biết:</strong> Mức nước đọng tăng vọt; van xả đọng mở 100%; cảnh báo High/High-High.</p>
+        <p><strong>Nguyên nhân:</strong> Mài mòn, ăn mòn hóa học, khuyết tật mối hàn núc ống.</p>
+        <p><strong>Hành động:</strong> Đóng van hơi trích + 1 chiều; mở bypass 100%; cô lập bình. Báo Trưởng ca giảm tải. Đóng nút ống (plugging) bị thủng.</p>
+      </div>
+      <div class="reason-card"><div class="title">2. Thủy kích trong bình và đường ống</div>
+        <p><strong>Nhận biết:</strong> Tiếng gõ kim loại, rung giật dữ dội.</p>
+        <p><strong>Nguyên nhân:</strong> Mở hơi trích quá nhanh; không sấy nóng; mức nước đáy bình quá thấp.</p>
+        <p><strong>Hành động:</strong> Mở hết van xả đọng; giảm/đóng van hơi trích. <strong>Quy tắc khởi động:</strong> Tăng nhiệt ≤ <strong>56 °C/giờ</strong>; hé van dồn đọng ~5% sấy ấm.</p>
+      </div>
+      <div class="reason-card"><div class="title">3. Mức nước đọng dâng cao</div>
+        <p><strong>Nhận biết:</strong> Mức nước tăng cao dần, lưu lượng nước cấp bình thường.</p>
+        <p><strong>Nguyên nhân:</strong> Kẹt ty van; hỏng positioner; mất khí nén.</p>
+        <p><strong>Hành động:</strong> Chuyển van xả đọng sang Manual, gõ giải kẹt hoặc mở bypass.</p>
+      </div>
+      <div class="reason-card"><div class="title">4. Kẹt con lăn chân giá đỡ trượt</div>
+        <p><strong>Nhận biết:</strong> Thân bình cong vênh, con lăn kênh.</p>
+        <p><strong>Nguyên nhân:</strong> Bụi bẩn, khô mỡ, ray rỉ sét.</p>
+        <p><strong>Hành động:</strong> Kiểm tra tại chỗ khi bình đạt nhiệt độ làm việc; bôi mỡ chịu nhiệt định kỳ.</p>
+      </div>
+      <div class="reason-card"><div class="title">5. Xì hở mặt bích / van an toàn / nứt kim loại</div>
+        <p><strong>Nhận biết:</strong> Tiếng xì rít, hơi nóng hoặc nước rò rỉ.</p>
+        <p><strong>Nguyên nhân:</strong> Giãn nở nhiệt không đều; gioăng lão hóa; van an toàn kẹt xỉ.</p>
+        <p><strong>Hành động:</strong> Nếu xì hở lớn hoặc van an toàn mất chức năng → <strong>giảm tải và tách bình ngay</strong>.</p>
+      </div>
+    </div>
+  </details>
+
+  <details class="sub">
+    <summary>5 trường hợp bắt buộc tách BGN cao áp</summary>
+    <div class="sub-body">
+      <ol class="remedy-list">
+        <li>Rò rỉ (bục thủng) hệ thống ống trao đổi nhiệt.</li>
+        <li>Có <strong>thủy kích</strong> không khắc phục được.</li>
+        <li>Xì hơi lớn ở các mặt bích đường ống hơi.</li>
+        <li>Xuất hiện <strong>vết nứt</strong> trên thân bình, đường ống nước cấp, hơi, nước đọng.</li>
+        <li>Các <strong>bảo vệ của bình mất khả năng làm việc</strong>, kể cả van an toàn.</li>
+      </ol>
+      <div class="emergency-box">
+        <h3>QUY TẮC CỐT TỬ</h3>
+        <ul>
+          <li><strong>NGHIÊM CẤM</strong> vận hành BGN cao áp khi không có bộ chỉ thị mức hoặc mất bảo vệ mức.</li>
+          <li>Khi tách BGN cao áp, <strong>bắt buộc giảm phụ tải tổ máy</strong> theo chỉ dẫn nhà chế tạo.</li>
+        </ul>
+      </div>
+    </div>
+  </details>
+</div>
+
+<!-- ============================================================= -->
+<!-- PAGE 6 -->
+<!-- ============================================================= -->
+<div id="p6" class="page">
+  <div class="page-header p-6">
+    <span class="pnum">PHẦN 6</span>
+    <h1>Dầu chèn – Hydro máy phát: Dao động chênh áp</h1>
+    <p class="pdesc">Nguyên lý ΔP – Hiện tượng – 5 nhóm nguyên nhân – Quy trình xử lý</p>
+  </div>
+
+  <details class="sub" open>
+    <summary>Tổng quan và nguyên lý</summary>
+    <div class="sub-body">
+      <div class="section-card">
+        <p>Máy phát điện dùng khí <strong>Hydro (H₂)</strong> làm mát trực tiếp. Hệ thống <strong>dầu chèn (Seal Oil)</strong> cấp dầu áp lực cao vào vành chèn trục hai đầu máy phát để ngăn Hydro rò rỉ ra gối trục.</p>
+        <div class="formula">ΔP = P<sub>dầu chèn</sub> − P<sub>H₂</sub> = 0,55 ÷ 0,60 bar<br><span style="font-size:0.85rem;font-weight:400;color:var(--muted);">(định mức: 0,55 bar / 8 psig)</span></div>
+        <div class="params-grid">
+          <div class="param-box"><span class="label">Áp lực H₂ danh định</span><span class="value">5,03 ÷ 5,45 bar</span></div>
+          <div class="param-box"><span class="label">Áp lực MSOP</span><span class="value">≥ 8,5 bar</span></div>
+          <div class="param-box"><span class="label">ΔP Low</span><span class="value">≤ 0,41 bar</span></div>
+          <div class="param-box"><span class="label">Chân không bể dầu chèn</span><span class="value">−760 mmHg</span></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="sub">
+    <summary>Hiện tượng dao động chênh áp</summary>
+    <div class="sub-body">
+      <h4>Chỉ thị trên DCS/TCS</h4>
+      <ul>
+        <li>Chỉ thị chênh áp tại vành chèn dao động, kim rung lắc mạnh.</li>
+        <li>Cảnh báo: <em>"Seal Oil / Hydrogen Diff Pressure Abnormal"</em> hoặc <em>"Low"</em> (≤ 0,41 bar).</li>
+        <li>Áp lực đầu đẩy MSOP-A và ống góp dầu chèn dao động.</li>
+      </ul>
+      <h4>Khi ΔP giảm thấp (≤ 0,41 bar)</h4>
+      <ul>
+        <li>Màng dầu suy yếu → Hydro đẩy ngược dầu ra ngoài.</li>
+        <li>Tiêu hao H₂ bổ sung &gt; 26 m³/ngày.</li>
+        <li>Nồng độ H₂ tại khoang dầu hồi tăng cao → nguy cơ cháy nổ.</li>
+      </ul>
+      <h4>Khi ΔP tăng cao (≥ 0,75 – 0,80 bar)</h4>
+      <ul>
+        <li>Dầu phun ngược vào khoang vỏ máy phát.</li>
+        <li>Cảnh báo mức dầu cao tại bình bẫy dầu chèn.</li>
+        <li>Nhiệt độ bạc, rung gối 7, 8 dao động.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="sub">
+    <summary>5 nhóm nguyên nhân</summary>
+    <div class="sub-body">
+      <table>
+        <thead><tr><th>Nhóm</th><th>Cơ chế</th><th>Thiết bị</th></tr></thead>
+        <tbody>
+          <tr><td><span class="badge blue">1</span> Van DPRV</td><td>Ty van/lõi kẹt; màng cao su chai; đường xung tắc</td><td>Van điều áp vi sai, van bypass, ống xung</td></tr>
+          <tr><td><span class="badge blue">2</span> Bơm &amp; cấp dầu</td><td>Phin lọc bẩn; bơm xâm thực; nguồn cấp không ổn định</td><td>Phin lọc, MSOP-A/B, bể chân không, van phao</td></tr>
+          <tr><td><span class="badge blue">3</span> Áp suất H₂ biến động</td><td>Nạp H₂ quá nhanh; rò rỉ gioăng</td><td>Ống góp H₂, van nạp/xả</td></tr>
+          <tr><td><span class="badge blue">4</span> Cơ khí vành chèn</td><td>Vành chèn xước, mòn; lệch tâm rotor</td><td>Cụm vành chèn TE, CE</td></tr>
+          <tr><td><span class="badge blue">5</span> Lỗi C&amp;I</td><td>DPT lỗi bo mạch; ống trích đọng dầu</td><td>Cảm biến chênh áp</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+
+  <details class="sub">
+    <summary>Biện pháp xử lý</summary>
+    <div class="sub-body">
+      <div class="action-step"><div class="action-num">1</div><div class="action-content"><div class="title">Kiểm tra, xác nhận và loại trừ lỗi đo lường</div><p>Đối chiếu đồng hồ tại chỗ, áp lực H₂, áp lực ống góp đầu đẩy; so sánh với DCS.</p></div></div>
+      <div class="action-step"><div class="action-num">2</div><div class="action-content"><div class="title">Xử lý DPRV và nguồn cấp dầu</div>
+        <ul>
+          <li>Van DPRV kẹt/hunting: gõ nhẹ thân van; nếu không tự cân bằng → dùng van tiết lưu bypass để ghim ΔP về <strong>0,55 ÷ 0,60 bar</strong>.</li>
+          <li>Phin lọc bẩn: chuyển sang phin dự phòng (xả khí, điền dầu trước).</li>
+          <li>Bơm MSOP sự cố: khởi động bơm dự phòng MSOP-B hoặc ESOP.</li>
+        </ul>
+      </div></div>
+      <div class="action-step"><div class="action-num">3</div><div class="action-content"><div class="title">Ngăn ngừa cháy nổ &amp; ngập dầu</div>
+        <ul>
+          <li>ΔP ≤ 0,41 bar: duy trì Vapor Extractor; mở thông gió cưỡng bức; đo H₂ xách tay; kiểm tra áp lực H₂.</li>
+          <li>ΔP tăng cao: theo dõi bẫy dầu; mở van xả đáy thân máy phát nếu cần.</li>
+        </ul>
+      </div></div>
+      <div class="action-step"><div class="action-num">4</div><div class="action-content"><div class="title">Thao tác khẩn cấp dừng máy</div>
+        <div class="emergency-box">
+          <h3>DỪNG KHẨN CẤP TỔ MÁY</h3>
+          <p>Khi ΔP &lt; 0,41 bar không khôi phục được, rò rỉ H₂ nặng, hoặc có âm thanh cọ quẹt/tia lửa/khói:</p>
+          <p><strong>MÁY TRƯỞNG LẬP TỨC NHẤN NÚT DỪNG KHẨN CẤP (TRIP TUABIN – MÁY PHÁT) CÓ PHÁ HOẠI CHÂN KHÔNG</strong>.</p>
+        </div>
+      </div></div>
+    </div>
+  </details>
+</div>
+
+<!-- ============================================================= -->
+<!-- PAGE 7 -->
+<!-- ============================================================= -->
+<div id="p7" class="page">
+  <div class="page-header p-7">
+    <span class="pnum">PHẦN 7</span>
+    <h1>Dầu bôi trơn tuabin giảm thấp</h1>
+    <p class="pdesc">Hiện tượng – 3 nhóm nguyên nhân – Xử lý 2 giai đoạn – Ngưỡng Trip ≤ 1,21 bar</p>
+  </div>
+
+  <details class="sub" open>
+    <summary>Hiện tượng nhận biết</summary>
+    <div class="sub-body">
+      <div class="callout warning"><strong>Ngưỡng bảo vệ:</strong> Khi áp lực dầu bôi trơn <code>≤ 1,21 bar</code> → rơ-le bảo vệ <strong>Trip tuabin khẩn cấp có phá hoại chân không</strong>.</div>
+      <ol class="symptom-list">
+        <li>Chỉ thị áp lực dầu trên DCS/TCS và đồng hồ tại chỗ giảm thấp, cảnh báo Low Alarm.</li>
+        <li><strong>Bơm dầu AC</strong> tự động liên động khởi động.</li>
+        <li>Nếu tiếp tục giảm ≤ 1,21 bar → <strong>rơ-le bảo vệ tác động Trip tuabin</strong>.</li>
+        <li><strong>Bơm dầu DC</strong> tự động khởi động liên động.</li>
+        <li>Nhiệt độ gối 1–8 và gối chặn tăng nhanh; rung động tăng hoặc tiếng va chạm kim loại.</li>
+      </ol>
+    </div>
+  </details>
+
+  <details class="sub">
+    <summary>Nguyên nhân sự cố</summary>
+    <div class="sub-body">
+      <div class="reason-card"><div class="title">Lỗi tổ bơm &amp; điều chỉnh</div><ul><li>Bơm dầu chính (MOP) hỏng/suy giảm công suất.</li><li>Bơm AC mất điện nguồn, trip động cơ, lỗi mạch liên động.</li><li>Van điều áp kẹt ở vị trí mở xả lớn.</li></ul></div>
+      <div class="reason-card"><div class="title">Tuyến ống, Phin lọc &amp; Phẩm chất dầu</div><ul><li>Phin lọc tắc bẩn.</li><li>Nứt/vỡ/xì hở tuyến ống áp lực.</li><li>Mức dầu bể giảm ≤ 406 mm.</li><li>Nhiệt độ dầu tăng cao; dầu lẫn nước/bọt khí.</li></ul></div>
+      <div class="reason-card"><div class="title">Lỗi C&amp;I</div><ul><li>Cảm biến hỏng hoặc đứt dây → cảnh báo ảo.</li></ul></div>
+    </div>
+  </details>
+
+  <details class="sub">
+    <summary>Biện pháp xử lý 2 giai đoạn &amp; phòng ngừa</summary>
+    <div class="sub-body">
+      <div class="phase">
+        <div class="phase-header phase-1"><span class="phase-num">1</span><span>Khi có cảnh báo suy giảm</span></div>
+        <div class="phase-body">
+          <ul>
+            <li>Kiểm tra <strong>bơm dầu AC</strong> — khởi động bằng tay nếu chưa chạy.</li>
+            <li>Kiểm tra <strong>Δp qua phin lọc</strong> — chuyển phin dự phòng nếu tắc.</li>
+            <li>Kiểm tra mức dầu bể chính; tuần tra tìm rò rỉ.</li>
+            <li>Báo Trưởng kíp, Trưởng ca; liên hệ C&amp;I kiểm tra đối chiếu.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="phase-header phase-2"><span class="phase-num">2</span><span>Khi giảm sâu ≤ 1,21 bar</span></div>
+        <div class="phase-body">
+          <ul>
+            <li>Kiểm tra bảo vệ Trip tự động; nếu không tác động → <strong>nhấn TRIP tuabin bằng tay</strong>.</li>
+            <li>Ngừng máy có phá hoại chân không: <strong>mở 02 van phá hoại chân không</strong>; mở toàn bộ van xả đọng.</li>
+            <li>Xác nhận <strong>bơm dầu DC</strong> đã tự động vận hành; nếu không → giật cần khởi động cưỡng bức.</li>
+            <li>Theo dõi nhiệt độ gối 1–8, gối chặn, dầu hồi, độ rung, độ di trục.</li>
+          </ul>
+          <div class="emergency-box">
+            <h3>QUY TẮC AN TOÀN CỐT TỬ</h3>
+            <p>Khi tốc độ rô-to về <strong>0 v/p</strong>: chỉ đưa vần trục vào làm việc khi:</p>
+            <ul>
+              <li>Áp lực dầu bôi trơn <strong>đã được khôi phục</strong>.</li>
+              <li>Nhiệt độ kim loại gối <strong>bình thường</strong>.</li>
+              <li><strong>Không có</strong> kẹt cơ học.</li>
+            </ul>
+            <p><strong>TUYỆT ĐỐI NGHIÊM CẤM</strong> ép cưỡng bức quay trục khi thiếu dầu hoặc có tiếng cọ sát.</p>
+          </div>
+        </div>
+      </div>
+      <h4>Biện pháp phòng ngừa định kỳ</h4>
+      <ol class="remedy-list">
+        <li>Tuần tra mức dầu, áp lực đầu đẩy bơm, độ chênh áp phin lọc mỗi ca.</li>
+        <li>Định kỳ thử chuyển đổi bơm AC/DC và liên động khởi động bơm dự phòng.</li>
+        <li>Lấy mẫu kiểm tra chất lượng dầu định kỳ.</li>
+        <li>Kiểm định, hiệu chuẩn cảm biến áp lực và thử mạch logic bảo vệ Trip.</li>
+      </ol>
+    </div>
+  </details>
+</div>
+
+<!-- ============================================================= -->
+<!-- PAGE 8 -->
+<!-- ============================================================= -->
+<div id="p8" class="page">
+  <div class="page-header p-8">
+    <span class="pnum">PHẦN 8</span>
+    <h1>Bảo vệ Tuabin &amp; Liên động sau Trip</h1>
+    <p class="pdesc">8 nhóm bảo vệ cốt lõi + 10 liên động tự động sau Trip</p>
+  </div>
+
+  <details class="sub" open>
+    <summary>8 nhóm bảo vệ cốt lõi</summary>
+    <div class="sub-body">
+      <div class="prot-group">
+        <div class="prot-header h-1"><span class="num">1</span><span>🛢 Dầu bôi trơn &amp; EH</span></div>
+        <div class="prot-body">
+          <table>
+            <thead><tr><th>Loại bảo vệ</th><th>Ngưỡng</th></tr></thead>
+            <tbody>
+              <tr><td>Áp lực dầu bôi trơn thấp</td><td><span class="val-trip">≤ 1,21 bar</span> <span class="badge red">Trip có phá chân không</span></td></tr>
+              <tr><td>Mức dầu bể bôi trơn thấp</td><td><span class="val-trip">≤ 406 mm</span></td></tr>
+              <tr><td>Áp lực dầu EH thấp</td><td><span class="val-trip">≤ 110 bar</span></td></tr>
+              <tr><td>Mức dầu bể EH thấp</td><td><span class="val-trip">≤ 282 mm</span> (≤ 510 lít)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="prot-group">
+        <div class="prot-header h-2"><span class="num">2</span><span>⚡ Tốc độ &amp; Vượt tốc</span></div>
+        <div class="prot-body">
+          <table>
+            <thead><tr><th>Loại</th><th>Ngưỡng</th></tr></thead>
+            <tbody>
+              <tr><td>Vượt tốc cơ khí/điện tử</td><td><span class="val-trip">3 300 min⁻¹ (110%)</span> hoặc <span class="val-trip">3 315 min⁻¹ (110,5%)</span></td></tr>
+              <tr><td>Gia tốc biến thiên quá nhanh</td><td><span class="val-trip">≥ 1 800 min⁻¹/s</span></td></tr>
+              <tr><td>Chênh lệch cảm biến tốc độ</td><td><span class="val-trip">&gt; 5 %</span></td></tr>
+              <tr><td>Tần số lưới giảm thấp</td><td><span class="val-trip">&lt; 47 Hz</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="prot-group">
+        <div class="prot-header h-3"><span class="num">3</span><span>📳 Rung động &amp; Cơ khí rô-to (TSI)</span></div>
+        <div class="prot-body">
+          <table>
+            <thead><tr><th>Loại</th><th>Ngưỡng</th></tr></thead>
+            <tbody>
+              <tr><td>Độ di trục rô-to cao</td><td><span class="val-trip">&lt; −0,63 mm</span> hoặc <span class="val-trip">&gt; +0,63 mm</span></td></tr>
+              <tr><td>Độ rung gối trục cao</td><td><span class="val-trip">≥ 150 μm</span> (thiết kế 229 μm)</td></tr>
+              <tr><td>Độ chênh giãn nở lớn</td><td><span class="val-trip">&lt; −7,67</span> hoặc <span class="val-trip">&gt; +14,88 mm</span></td></tr>
+              <tr><td>Độ giãn nở rô-to lớn</td><td><span class="val-trip">&lt; −13,36</span> hoặc <span class="val-trip">&gt; +43 mm</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="prot-group">
+        <div class="prot-header h-4"><span class="num">4</span><span>🌡 Nhiệt độ kim loại gối &amp; Tầng cánh</span></div>
+        <div class="prot-body">
+          <table>
+            <thead><tr><th>Loại</th><th>Ngưỡng</th></tr></thead>
+            <tbody>
+              <tr><td>Gối chặn cao</td><td><span class="val-trip">≥ 99 °C</span> (thiết kế 105 °C)</td></tr>
+              <tr><td>Gối đỡ 1–3</td><td><span class="val-trip">≥ 116 °C</span> (thiết kế 127 °C)</td></tr>
+              <tr><td>Gối đỡ 4–8</td><td><span class="val-trip">≥ 107 °C</span> (thiết kế 121 °C)</td></tr>
+              <tr><td>Tầng cánh cuối LP</td><td><span class="val-trip">≥ 232 °C</span> (thiết kế 260 °C)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="prot-group">
+        <div class="prot-header h-5"><span class="num">5</span><span>💨 Chân không &amp; Nhiệt độ hơi thoát</span></div>
+        <div class="prot-body">
+          <table>
+            <thead><tr><th>Loại</th><th>Ngưỡng</th></tr></thead>
+            <tbody>
+              <tr><td>Mất chân không bình ngưng</td><td><span class="val-trip">≥ 0,18 bar</span> (hoặc ≥ 0,254 bar khi tốc độ ≥ 300 min⁻¹)</td></tr>
+              <tr><td>Nhiệt độ hơi thoát HP cao</td><td><span class="val-trip">≥ 482,2 °C / 15 min</span> hoặc <span class="val-trip">≥ 510 °C tức thời</span></td></tr>
+              <tr><td>Nhiệt độ hơi thoát LP cao</td><td><span class="val-trip">≥ 93,3 °C</span> (thiết kế 107,2 °C)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="prot-group">
+        <div class="prot-header h-6"><span class="num">6</span><span>🔥 Thông số hơi chính &amp; Tái nhiệt</span></div>
+        <div class="prot-body">
+          <table>
+            <thead><tr><th>Loại</th><th>Ngưỡng</th></tr></thead>
+            <tbody>
+              <tr><td>Nhiệt độ hơi chính/tái nhiệt cao</td><td><span class="val-trip">≥ 565 °C / 15 min</span> (báo động <span class="val-warn">551 °C</span>)</td></tr>
+              <tr><td>Giảm nhiệt độ hơi nhanh</td><td><span class="val-trip">≥ 65,5 °C / 15 min</span></td></tr>
+              <tr><td>Chênh nhiệt giữa 2 lò</td><td><span class="val-trip">&gt; 41,7 °C / 15 min</span></td></tr>
+              <tr><td>Chênh nhiệt đầu vào HP, IP</td><td><span class="val-trip">&gt; 24 °C</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="prot-group">
+        <div class="prot-header h-7"><span class="num">7</span><span>💧 Nước làm mát Stator Máy phát</span></div>
+        <div class="prot-body">
+          <table>
+            <thead><tr><th>Loại</th><th>Ngưỡng</th></tr></thead>
+            <tbody>
+              <tr><td>Áp lực thấp</td><td><span class="val-trip">&lt; 5,86 bar / 60 min</span></td></tr>
+              <tr><td>Lưu lượng thấp</td><td><span class="val-trip">&lt; 56 m³/h / 60 min</span></td></tr>
+              <tr><td>Nhiệt độ cao</td><td><span class="val-trip">&gt; 83 °C / 60 min</span></td></tr>
+              <tr><td>Dòng stator / độ dẫn cao</td><td><span class="val-trip">&gt; 7 754,5 A / 120 s</span>; <span class="val-trip">&gt; 3 677 A / 210 s</span>; <span class="val-trip">&gt; 0,5 μS/cm / 600 s</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="prot-group">
+        <div class="prot-header h-8"><span class="num">8</span><span>🚨 Sự cố Lò hơi &amp; Lệnh dừng khẩn cấp</span></div>
+        <div class="prot-body">
+          <table>
+            <thead><tr><th>Loại</th><th>Ngưỡng</th></tr></thead>
+            <tbody>
+              <tr><td>Trip từ Lò hơi</td><td><strong>MFT đồng thời cả 02 lò hơi</strong></td></tr>
+              <tr><td>Trip từ Máy phát</td><td>Rơ-le bảo vệ điện tác động</td></tr>
+              <tr><td>Lỗi van BVV</td><td>Van BVV bị lỗi điều khiển</td></tr>
+              <tr><td>Dừng khẩn cấp bằng tay</td><td>Nhấn Emergency Trip</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="sub">
+    <summary>10 liên động tự động sau Trip Tuabin</summary>
+    <div class="sub-body">
+      <div class="callout danger"><strong>Lưu ý:</strong> Sau Trip, hệ thống tự động kích hoạt <strong>10 liên động</strong> theo trình tự để bảo vệ tuabin, máy phát và lò hơi.</div>
+      <ol class="interlock-list">
+        <li><strong>Đóng kín van hơi cấp vào tuabin:</strong> MSV, CV, RSV, IV.</li>
+        <li><strong>Cô lập hệ thống hơi trích:</strong> 08 cửa trích hơi.</li>
+        <li><strong>Mở xả áp &amp; thông hơi xilanh:</strong> BVV, BDV.</li>
+        <li><strong>Kích hoạt Bypass hơi:</strong> HP + LP Bypass.</li>
+        <li><strong>Mở hệ thống xả đọng:</strong> SD1, SD2, S4.</li>
+        <li><strong>Chuyển nguồn cấp hơi chèn:</strong> Hơi tự dùng, duy trì 0,28 bar.</li>
+        <li><strong>Mở phun giảm ôn cổ thoát LP.</strong></li>
+        <li><strong>Cắt điện máy phát &amp; kích từ:</strong> MC 901.</li>
+        <li><strong>Tự động vào Turning Gear</strong> khi tốc độ về 0.</li>
+        <li><strong>Giám sát quá trình giảm tốc</strong> và các thông số liên quan.</li>
+      </ol>
+    </div>
+  </details>
+</div>
+
+<!-- ============================================================= -->
+<!-- PAGE 9 -->
+<!-- ============================================================= -->
+<div id="p9" class="page">
+  <div class="page-header p-9">
+    <span class="pnum">PHẦN 9</span>
+    <h1>Runback Tuabin &amp; BOP</h1>
+    <p class="pdesc">Khái niệm – 5 trường hợp – Điều kiện – Tín hiệu liên động</p>
+  </div>
+
+  <details class="sub" open>
+    <summary>Khái niệm và 5 trường hợp Runback</summary>
+    <div class="sub-body">
+      <div class="concept-box">
+        <div class="title">Khái niệm</div>
+        <p><strong>Runback</strong> là chức năng <strong>tự động giảm nhanh phụ tải tổ máy</strong> về một ngưỡng tải an toàn tương ứng với khả năng đáp ứng của BOP còn lại khi xảy ra sự cố thiết bị chính, nhằm <strong>bảo vệ tổ máy không bị nhảy hoàn toàn</strong>.</p>
+      </div>
+      <table>
+        <thead><tr><th>TT</th><th>Sự cố kích hoạt</th><th>Mức tải sau Runback</th><th>Mục đích</th></tr></thead>
+        <tbody>
+          <tr><td><span class="badge purple">1</span></td><td>01 Bơm nước tuần hoàn (CWP)</td><td><span class="badge orange">60% (~324 MW)</span></td><td>Tránh sụt giảm chân không bình ngưng.</td></tr>
+          <tr><td><span class="badge purple">2</span></td><td>01 Bơm nước ngưng (CEP)</td><td><span class="badge orange">60% (~324 MW)</span></td><td>Cân bằng chu trình nước ngưng, chống tụt mức khử khí.</td></tr>
+          <tr><td><span class="badge purple">3</span></td><td>01 Bơm cấp (BFP)</td><td><span class="badge orange">60% (~324 MW)</span></td><td>Tránh quá dòng bơm cấp, tránh MFT.</td></tr>
+          <tr><td><span class="badge purple">4</span></td><td>Sự cố nước làm mát Stator (SWC)</td><td><span class="badge blue">Giảm dòng điện &amp; tải theo logic</span></td><td>Bảo vệ cách điện stator máy phát.</td></tr>
+          <tr><td><span class="badge purple">5</span></td><td>Trip 01 Quạt khói/gió</td><td><span class="badge blue">Giảm theo năng lực quạt còn lại</span></td><td>Giữ cân bằng áp lực âm buồng đốt.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+
+  <details class="sub">
+    <summary>Điều kiện tiên quyết để Runback tác động</summary>
+    <div class="sub-body">
+      <div class="callout purple"><strong>Nguyên tắc:</strong> Để Runback tự động kích hoạt, các điều kiện sau <strong>bắt buộc phải thỏa mãn</strong>.</div>
+      <ol class="remedy-list">
+        <li><strong>Tuabin Master</strong> ở chế độ <span class="badge purple">Auto</span>.</li>
+        <li><strong>Fuel Master (Coal Master)</strong> ở chế độ <span class="badge purple">Auto</span>.</li>
+        <li><strong>Biến tần (VFD)</strong> quạt khói A/B ở chế độ <span class="badge purple">Auto</span>.</li>
+        <li><strong>Boiler Master</strong> đạt <span class="badge orange">≥ 48%</span>.</li>
+      </ol>
+      <div class="callout warning"><strong>Ghi chú:</strong> Nếu một vòng Master ở chế độ <strong>Manual</strong> → Runback <strong>không tự động</strong> → vận hành viên phải <strong>chủ động giảm tải bằng tay</strong>.</div>
+    </div>
+  </details>
+
+  <details class="sub">
+    <summary>Các tín hiệu liên động sau Runback</summary>
+    <div class="sub-body">
+      <h4>a. Tuabin và hệ thống van hơi</h4>
+      <ul>
+        <li>Chuyển sang <strong>tốc độ giảm tải khẩn cấp</strong> có khống chế ứng suất nhiệt rô-to.</li>
+        <li>Khép bớt góc mở <strong>CV</strong> và <strong>IV</strong> tương ứng 60%.</li>
+        <li>Van <strong>BVV</strong>, <strong>RFV</strong> giám sát và sẵn sàng liên động.</li>
+      </ul>
+      <h4>b. Lò hơi (Nhiên liệu &amp; Gió)</h4>
+      <ul>
+        <li><strong>Fuel Master</strong> giảm lưu lượng than.</li>
+        <li><strong>Hệ thống Gió &amp; Khói</strong> giảm PA/SA, điều chỉnh ID Fan duy trì áp suất âm.</li>
+      </ul>
+      <h4>c. Nước cấp và Nước ngưng</h4>
+      <ul>
+        <li>Khép bớt van nước cấp bao hơi.</li>
+        <li>Bảo vệ chống quá tải bơm cấp (Runout).</li>
+        <li>Mở van phun làm mát cổ thoát LP.</li>
+        <li>Mở van tái tuần hoàn nước ngưng.</li>
+        <li>Mở van xả nước ngưng về bể dự trữ.</li>
+      </ul>
+      <h4>d. Hơi trích &amp; BGN</h4>
+      <ul>
+        <li>Áp lực cửa trích suy giảm tự nhiên.</li>
+        <li>Van xả đọng BGN tăng độ mở.</li>
+        <li>Van xả đọng nhóm A, B, C sẵn sàng mở tự động.</li>
+      </ul>
+      <h4>e. Kích hoạt bộ đếm thời gian dự phòng</h4>
+      <ul>
+        <li>SWC Runback: T1 = <strong>120 s</strong>; T2 = <strong>210 s</strong>; T3 = <strong>600 s</strong>.</li>
+        <li>Nếu thông số không về an toàn → <strong>Trip Tuabin</strong>.</li>
+      </ul>
+    </div>
+  </details>
+</div>
+
+<!-- ============================================================= -->
+<!-- PAGE 10 -->
+<!-- ============================================================= -->
+<div id="p10" class="page">
+  <div class="page-header p-10">
+    <span class="pnum">PHẦN 10</span>
+    <h1>Thủy kích Tuabin</h1>
+    <p class="pdesc">Khái niệm – 4 tác hại – 5 hiện tượng – Nguyên nhân – 3 giai đoạn xử lý</p>
+  </div>
+
+  <details class="sub" open>
+    <summary>Khái niệm và 4 tác hại</summary>
+    <div class="sub-body">
+      <div class="concept-box">
+        <div class="title">Định nghĩa</div>
+        <p><strong>Thủy kích Tuabin</strong> (<em>Steam Turbine Water Induction</em>) là hiện tượng <strong>nước hoặc hơi ẩm quá cao</strong> đột ngột xâm nhập vào phần truyền hơi của Tuabin khi đang mang tải hoặc khởi động/dừng máy.</p>
+      </div>
+      <div class="danger-card"><div class="danger-icon">🧊</div><div class="danger-body"><div class="title">1. Sốc nhiệt &amp; nứt vỡ thân vỏ</div><p>Nước làm lạnh đột ngột khoang hơi → ứng suất nhiệt cực lớn → <strong>vênh</strong>, <strong>nứt</strong> mặt bích ghép.</p></div></div>
+      <div class="danger-card"><div class="danger-icon">🌀</div><div class="danger-body"><div class="title">2. Cọ sát &amp; cong trục rotor</div><p>Chênh nhiệt co ngót trên/dưới xilanh → uốn cong thân vỏ → rotor cọ sát vành chèn → <strong>cong trục vĩnh viễn</strong>.</p></div></div>
+      <div class="danger-card"><div class="danger-icon">🔥</div><div class="danger-body"><div class="title">3. Quá tải &amp; cháy bạc ổ đỡ chặn</div><p>Độ ẩm tăng vọt → lực dọc trục tăng đột biến → <strong>cháy rỗ hợp kim Babit</strong> gối chặn.</p></div></div>
+      <div class="danger-card"><div class="danger-icon">⚔</div><div class="danger-body"><div class="title">4. Uốn cong &amp; gãy gập tầng cánh</div><p>Tại tầng cuối LP (300 – 400 m/s), lực <strong>water hammer</strong> làm cánh <strong>cong gập, rạn chân, đứt gãy</strong>.</p></div></div>
+    </div>
+  </details>
+
+  <details class="sub">
+    <summary>5 hiện tượng nhận biết</summary>
+    <div class="sub-body">
+      <div class="symptom-list">
+        <li><strong>1. Thông số hơi:</strong> Nhiệt độ giảm đột ngột; khói hơi trắng xì mạnh ở ty van, mặt bích, vành chèn.</li>
+        <li><strong>2. Độ rung &amp; âm thanh:</strong> Rung tăng dần rồi <strong>đột ngột tăng vọt</strong>; tiếng kêu lạ, va đập kim loại.</li>
+        <li><strong>3. Gối chặn &amp; di trục:</strong> Nhiệt độ tăng nhanh, di trục dao động mạnh hoặc vượt ngưỡng.</li>
+        <li><strong>4. Chênh nhiệt thân vỏ:</strong> Vách trên/dưới lệch <code>≥ 28 °C</code> (hay 50 °F).</li>
+        <li><strong>5. Đường hơi &amp; rốn xả:</strong> Nhiệt độ đường hơi giảm nhanh; cảnh báo mức nước đọng dâng cao.</li>
+      </div>
+    </div>
+  </details>
+
+  <details class="sub">
+    <summary>Nguyên nhân gây sự cố</summary>
+    <div class="sub-body">
+      <table>
+        <thead><tr><th>Hệ thống</th><th>Chi tiết</th></tr></thead>
+        <tbody>
+          <tr><td>Từ Lò hơi</td><td>Sôi bồng, nước cuốn theo hơi; ngập bao hơi; rò rỉ van giảm ôn.</td></tr>
+          <tr><td>Khởi động / Dừng máy</td><td>Sấy xilanh chưa đủ; làm nguội cưỡng bức quá nhanh; bẫy nước hơi chèn tắc.</td></tr>
+          <tr><td>Thiết bị phụ &amp; bình ngưng</td><td>Vỡ ống gia nhiệt; mức bảo vệ lỗi; van 1 chiều hơi trích không kín; mức nước bình ngưng ngập cao.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+
+  <details class="sub">
+    <summary>3 giai đoạn xử lý</summary>
+    <div class="sub-body">
+      <div class="phase">
+        <div class="phase-header phase-1"><span class="phase-num">1</span><span>Dừng khẩn cấp &amp; cô lập nguồn nước</span></div>
+        <div class="phase-body">
+          <ul>
+            <li><strong>Ngừng khẩn cấp có phá chân không:</strong> nhấn nút Emergency Trip; mở 2 van phá hoại chân không.</li>
+            <li><strong>Cắt mọi nguồn hơi/nước:</strong> MSV, CV, RSV, IV đóng; van hơi trích và 1 chiều đóng.</li>
+            <li><strong>Phối hợp Lò trưởng:</strong> tách van phun giảm ôn; mở van xả đọng bộ quá nhiệt.</li>
+            <li><strong>Mở toàn bộ van xả đọng:</strong> vỏ tuabin, MSV, CV, RSV, IV, hơi chính, tái nhiệt, hơi trích.</li>
+            <li><strong>Giám sát:</strong> di trục, chênh giãn nở, rung, nhiệt độ gối, dầu hồi.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="phase-header phase-2"><span class="phase-num">2</span><span>Sau khi dừng hẳn (0 v/p)</span></div>
+        <div class="phase-body">
+          <ul>
+            <li>Đưa <strong>vần trục</strong> vào làm việc.</li>
+            <li>Theo dõi độ lệch tâm, biến dạng rotor, tiếng kêu, dòng điện vần trục.</li>
+          </ul>
+          <div class="emergency-box">
+            <h3>NGUYÊN TẮC AN TOÀN CƠ KHÍ</h3>
+            <p><strong>TUYỆT ĐỐI KHÔNG</strong> ép quay trục nếu rotor bị kẹt hoặc dòng vần trục tăng cao bất thường.</p>
+          </div>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="phase-header phase-3"><span class="phase-num">3</span><span>Kiểm tra, đánh giá &amp; điều kiện khởi động lại</span></div>
+        <div class="phase-body">
+          <div class="callout danger"><strong>Quy định:</strong> Nghiêm cấm khởi động lại Tuabin trong vòng <strong>24 giờ</strong> sau khi ngừng khẩn cấp do nước xâm nhập.</div>
+          <div class="params-grid">
+            <div class="param-box success"><span class="label">Nguyên nhân</span><span class="value">Đã khắc phục</span></div>
+            <div class="param-box success"><span class="label">Chênh nhiệt vách</span><span class="value">&lt; 42 °C</span></div>
+            <div class="param-box success"><span class="label">Độ lệch tâm rotor</span><span class="value">&lt; 0,038 mm</span></div>
+          </div>
+          <p style="color:var(--muted);font-style:italic;font-size:0.9rem;">* Có thể cho phép tới <code>&lt; 0,06 mm</code> theo tiêu chuẩn vận hành.</p>
+          <h4>Trong quá trình khởi động lại</h4>
+          <ul>
+            <li>Hệ thống xả nước phải thông suốt.</li>
+            <li>Theo dõi liên tục độ đảo trục, di trục, chênh giãn nở, rung, nhiệt độ gối.</li>
+            <li>Nếu có tiếng va chạm kim loại → <strong>dừng Tuabin có phá hoại chân không</strong> và mở xilanh kiểm tra.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </details>
+</div>
+
+<!-- ============================================================= -->
+<!-- PAGE 11 -->
+<!-- ============================================================= -->
+<div id="p11" class="page">
+  <div class="page-header p-11">
+    <span class="pnum">PHẦN 11</span>
+    <h1>Quy trình khởi động Tuabin từ trạng thái lạnh</h1>
+    <p class="pdesc">Chuẩn bị – Thí nghiệm – Các trường hợp cấm – 7 bước từ Reset đến đầy tải</p>
+  </div>
+
+  <details class="sub" open>
+    <summary>Công tác chuẩn bị trước khởi động</summary>
+    <div class="sub-body">
+      <h4>a. Thí nghiệm trước khởi động</h4>
+      <ul>
+        <li><strong>Điều kiện chung:</strong> Công việc sửa chữa kết thúc, phiếu công tác đã khóa.</li>
+        <li><strong>Hạng mục:</strong> Van MSV, CV, CRV, BVV, bypass hạ áp; ETS; van chính; bảo vệ liên động dầu bôi trơn, dầu EH, động cơ văn trục; bảo vệ rung, chân không thấp, di trục, mất nước làm mát; TRIP bằng tay/tại chỗ; van 1 chiều cửa trích; bảo vệ chống thủy kích; nước/dầu/hydro; Bypass.</li>
+      </ul>
+      <h4>b. Công việc chuẩn bị</h4>
+      <ul>
+        <li>Xác nhận công việc xong, phiếu khóa.</li>
+        <li>Kiểm tra hệ thống dầu bôi trơn, dầu thủy lực, mức và chất lượng dầu.</li>
+        <li>Kiểm tra C&amp;I, DCS sẵn sàng; đóng điện thiết bị.</li>
+        <li>Liên hệ điện: hệ thống 1 chiều, tự dùng, UPS. Máy phát DIEZEN dự phòng.</li>
+        <li>Chuẩn bị công cụ, đồng hồ, phiếu thí nghiệm, sổ sách.</li>
+        <li>Bổ sung dầu bôi trơn, bảo vệ chắc chắn.</li>
+        <li>Bên hóa chuẩn bị nước khử khoáng đầy đủ.</li>
+        <li>Kiểm tra động cơ văn trục (vận hành ≥ 4h trước khởi động).</li>
+        <li>Kiểm tra van điều chỉnh, van hơi chính không kẹt, đóng kín.</li>
+        <li>Kiểm tra hệ thống bảo vệ, dầu EH.</li>
+        <li>Kiểm tra bình ngưng, bơm nước ngưng, bình khử khí, bơm cấp, hệ thống làm mát.</li>
+      </ul>
+      <h4>c. Các trường hợp CẤM khởi động</h4>
+      <ul>
+        <li>Hỏng bộ đo tốc độ.</li>
+        <li>Van MSV/CV/RSV/IV không đóng.</li>
+        <li>Thông số chính hiển thị lỗi.</li>
+        <li>Bơm dầu bôi trơn/một chiều lỗi.</li>
+        <li>Chất lượng hơi/dầu không đạt.</li>
+        <li>Lỗi quay trục, cọ sát, điều khiển tuabin lỗi.</li>
+        <li><strong>Độ lệch tâm rô-to &gt; 0,038 mm.</strong></li>
+        <li><strong>Chênh lệch nhiệt độ vỏ &gt; 50 °C.</strong></li>
+      </ul>
+      <h4>d. Trình tự khởi động hệ thống phụ</h4>
+      <ul>
+        <li>Khởi động hệ thống nước tuần hoàn, nước làm mát phụ.</li>
+        <li>Liên hệ hóa khởi động hệ thống điều chế nước khử khoáng.</li>
+        <li>Bổ sung nước ngưng cho bình ngưng.</li>
+        <li>Khởi động hệ thống dầu bôi trơn (Nhiệt độ dầu vào gối 10–40 °C; áp lực 1,79 – 2 bar).</li>
+        <li>Văn trục ≥ 4 tiếng (nhiệt độ dầu 15 – 32 °C).</li>
+        <li>Khởi động nước làm mát Stator.</li>
+        <li>Khởi động dầu EH (Nhiệt độ 29,4 – 49 °C; áp lực 151,7 – 165,5 bar).</li>
+        <li>Khởi động lò phụ, đưa hơi tự dùng.</li>
+        <li>Bổ sung nước bình ngưng ≥ 300 mm; khởi động hệ thống nước ngưng.</li>
+        <li>Khởi động hệ thống nước cấp; chạy bơm tuần hoàn nước cấp; cấp Amoniac, Hydrazin.</li>
+        <li>Tạo chân không (hơi tự dùng 15 bar, 350 °C; Master reset; hơi chèn 0,21 – 0,34 bar / 150 – 200 °C; 01 bơm chân không; chân không &lt; 0,1 bar).</li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="sub">
+    <summary>7 bước khởi động từ trạng thái lạnh</summary>
+    <div class="sub-body">
+      <p style="color:var(--muted);font-style:italic;">(Tuabin ngừng làm việc hơn 72 giờ)</p>
+
+      <div class="step"><div class="step-num">1</div><div class="step-content"><div class="title">Reset tuabin</div><ul><li>Chọn <code>"MASTER RESET"</code> trên TCS.</li><li>Đưa các van xả về AUTO.</li></ul></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-content"><div class="title">Sấy Rô to (Rotor Prewarm)</div>
+        <ul>
+          <li>Chọn Control =&gt; <code>"Rotor Prewarm Sys"</code>.</li>
+          <li>Mở RSDV, kiểm tra áp lực ống góp hơi tự dùng 2 đạt 15 bar. Sấy đường ống ≥ 15 phút. Đóng RSDV.</li>
+          <li>Mở MOV-HSPV, chọn sấy HSPV ON. Setpoint AOV-HSPV 2%.</li>
+          <li>Tăng dần AOV-HSPV (max 73%) đến khi áp lực 3,8 – 4,83 bar. Giữ ≤ 50 °C/h.</li>
+          <li>Đóng AOV-HSPV về 0%; đóng MOV-HSPV; chọn Rotor warming OFF.</li>
+        </ul>
+      </div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-content"><div class="title">Sấy ngực van điều chỉnh (Chest Prewarm)</div>
+        <ul>
+          <li>Kết thúc khi chênh nhiệt trong/ngoài van &lt; 42 °C.</li>
+          <li>Reset Turbin. Control &gt; Chest Prewarm &gt; Chest warming.</li>
+          <li>MSV2 10% → 15% → 20%, giữ 20%.</li>
+          <li>Setpoint MSV2 về 0%; Chest Warming OFF.</li>
+        </ul>
+      </div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-content"><div class="title">Kiểm tra van xả nhóm A, B, C về Auto</div><ul><li>Nhóm A: hơi chính.</li><li>Nhóm B: hơi tái nhiệt + vỏ HP/IP.</li><li>Nhóm C: trích LP.</li></ul></div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-content"><div class="title">Chuyển hơi chính sang hơi tự dùng</div><ul><li>Áp lực hơi chính &gt; 80 bar; nhiệt độ &gt; 400 °C.</li></ul></div></div>
+      <div class="step"><div class="step-num">6</div><div class="step-content"><div class="title">Xung động tuabin</div>
+        <h4>Kiểm tra START PERMISSIVES</h4>
+        <ul>
+          <li>Áp lực hơi chính ~80 bar; T 296 – 400 °C; quá nhiệt &gt; 75 °C.</li>
+          <li>Hơi tái nóng 232 – 400 °C.</li>
+          <li>Tuabin đã Reset, văn trục &gt; 4 giờ, setpoint tốc độ &lt; 0.</li>
+          <li>Nhiệt độ hơi chèn 148,9 – 398,9 °C.</li>
+          <li>Độ lệch tâm &lt; 0,06 mm; dầu &gt; 26,7 °C.</li>
+        </ul>
+        <p><strong>SEMI-AUTO → 100 v/p → 800 RPM (30 phút) → 2500 RPM (45 phút) → 3000 RPM (5 phút).</strong></p>
+      </div></div>
+      <div class="step"><div class="step-num">7</div><div class="step-content"><div class="title">Hòa đồng bộ &amp; tăng tải</div>
+        <ul>
+          <li>Trước hòa: 3000 RPM; P = 82 bar; T = 450 °C; Tái nóng 400 °C.</li>
+          <li>Khởi động kích từ (AVR Auto).</li>
+          <li>Hòa đồng bộ → tải ≥ 5%.</li>
+          <li>Tăng tải 25% (3%/phút) → 25% (135 MW).</li>
+          <li>Chuyển UMC; tăng tải 10%/phút.</li>
+          <li>Đưa BGN cao áp vào.</li>
+          <li>70% → tự chèn.</li>
+          <li>100% → kết thúc khởi động.</li>
+        </ul>
+        <div class="callout warning"><strong>Chú ý:</strong> Trong quá trình tăng tải, ứng suất tuabin tăng cao → giữ tải cho tới khi ứng suất giảm mới tiếp tục tăng tải.</div>
+      </div></div>
+    </div>
+  </details>
+</div>
+
+<!-- ============================================================= -->
+<!-- PAGE 12 -->
+<!-- ============================================================= -->
+<div id="p12" class="page">
+  <div class="page-header p-12">
+    <span class="pnum">PHẦN 12</span>
+    <h1>Blackout – Mất toàn bộ nguồn AC &amp; DC</h1>
+    <p class="pdesc">Tổng quan – 2 giai đoạn xử lý – Phục hồi khi có nguồn cứu hộ</p>
+  </div>
+
+  <details class="sub" open>
+    <summary>Tổng quan và thông số giới hạn</summary>
+    <div class="sub-body">
+      <p>Sự cố mất điện toàn nhà máy kết hợp EDG không khởi động và ắc quy DC cạn kiệt là kịch bản nghiêm trọng nhất.</p>
+      <div class="callout danger"><strong>Nguy cơ cháy nổ buồng máy phát:</strong> Mất màng dầu chèn → H₂ áp lực cao (~5,17 bar) rò rỉ ồ ạt qua vành chèn → hỗn hợp nổ.</div>
+      <div class="callout warning"><strong>Nguy cơ cong trục Rotor:</strong> Rotor quay quán tính giảm tốc trong ma sát khô; nhiệt tích tụ (300 – 500 °C) gây cong võng trục.</div>
+      <div class="params-grid">
+        <div class="param-box"><span class="label">Áp lực H₂</span><span class="value">~ 5,17 bar</span></div>
+        <div class="param-box"><span class="label">Dầu bôi trơn DC</span><span class="value">≈ 3,2 bar</span></div>
+        <div class="param-box danger"><span class="label">Bảo vệ dầu gối</span><span class="value">≥ 1,21 bar</span></div>
+        <div class="param-box"><span class="label">ESOP đầu đẩy</span><span class="value">≈ 11 bar</span></div>
+        <div class="param-box"><span class="label">ΔP dầu chèn – H₂</span><span class="value">≥ 0,41 bar</span></div>
+        <div class="param-box"><span class="label">Nhiệt độ xilanh HP-IP</span><span class="value">300 – 500 °C</span></div>
+      </div>
+    </div>
+  </details>
+
+  <details class="sub">
+    <summary>Giai đoạn 1: Mất AC – Vận hành bằng DC 220 V</summary>
+    <div class="sub-body">
+      <div class="step"><div class="step-num">1</div><div class="step-content"><div class="title">Kiểm tra bơm dầu sự cố DC</div><ul><li>Bơm dầu bôi trơn DC (≈3,2 bar). <strong>Không để tụt dưới 1,21 bar.</strong></li><li>Bơm dầu chèn DC ESOP (≈11 bar); duy trì ΔP ≥ 0,41 bar.</li></ul></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-content"><div class="title">Phá hoại chân không cưỡng bức</div><p>Mở <strong>02 van phá hoại chân không</strong> bằng tay tại chỗ:</p><ul><li>Tăng lực cản không khí hãm nhanh rotor về 0.</li><li>Triệt tiêu chênh áp ngăn dòng hơi/nước ngược.</li></ul></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-content"><div class="title">Thao tác van xả đọng và hơi chèn</div><ul><li>Mở toàn bộ van xả đọng.</li><li>Khi P<sub>k</sub> ≈ 0 → <strong>đóng toàn bộ van cấp hơi chèn</strong>.</li></ul></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-content"><div class="title">Vần trục bằng tay</div><p>Khi rotor về 0 v/p, quay 180° hoặc 90° định kỳ.</p></div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-content"><div class="title">Tiết kiệm dung lượng ắc quy DC</div><p>Sa thải phụ tải không thiết yếu.</p></div></div>
+    </div>
+  </details>
+
+  <details class="sub">
+    <summary>Giai đoạn 2: Cạn DC – Mất hoàn toàn AC &amp; DC</summary>
+    <div class="sub-body">
+      <div class="step"><div class="step-num">1</div><div class="step-content"><div class="title">Khẩn cấp xả khí Hydro</div>
+        <div class="callout danger"><strong>Mối nguy cao nhất:</strong> Bơm dầu chèn DC dừng → màng dầu mất → H₂ thoát vào gối trục → nguy cơ cháy nổ.</div>
+        <ul>
+          <li>Mở hết cỡ van xả khí Hydro ra ngoài trời (qua mái).</li>
+          <li>Nạp CO₂ trơ hóa nếu có hệ thống chai CO₂.</li>
+          <li><strong>Cấm tia lửa điện, ma sát cơ học quanh đầu trục.</strong></li>
+        </ul>
+      </div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-content"><div class="title">Ứng phó mài mòn bạc gối trục</div><p>Màng dầu biến mất → cổ trục cọ sát ba-bít. Nhờ phá chân không trước, rotor dừng nhanh. Hợp kim ba-bít mềm bảo vệ ngõng trục.</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-content"><div class="title">Quy định vần trục khi không có dầu</div>
+        <div class="emergency-box">
+          <h3>NGUYÊN TẮC TUYỆT ĐỐI</h3>
+          <p><strong>TUYỆT ĐỐI KHÔNG DÙNG ĐÒN BẨY CƯỠNG BỨC ÉP QUAY TRỤC.</strong></p>
+          <p>Trục tì trực tiếp lên bạc lót → nếu ép, cổ trục bị cày xước hoặc kẹt dính kim loại.</p>
+        </div>
+        <ul>
+          <li><span class="badge green">OK</span> Nếu trục quay được bằng lực tay nhẹ → nhích 180° chậm.</li>
+          <li><span class="badge red">STOP</span> Nếu có lực cản lớn → DỪNG NGAY, tháo cơ cấu đòn bẩy.</li>
+        </ul>
+      </div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-content"><div class="title">Khóa chặn cơ khí nguồn nhiệt</div><ul><li>Siết chặt ty van MSV, CV, RSV, IV, van trích.</li><li>Kiểm tra van xả đọng mở hoàn toàn.</li><li>Mở cửa thông gió tự nhiên; tháo nắp bảo vệ gối trục.</li></ul></div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-content"><div class="title">Tập trung phương án cứu hộ</div><p>Báo Lãnh đạo điều động xe máy phát di động.</p></div></div>
+    </div>
+  </details>
+
+  <details class="sub">
+    <summary>Phục hồi khi có nguồn cứu hộ</summary>
+    <div class="sub-body">
+      <ol class="remedy-list">
+        <li><strong>Khởi động lại bơm dầu bôi trơn DC</strong> ngay khi thanh cái DC có điện.</li>
+        <li><strong>Khởi động bơm dầu nâng trục (Jacking Oil Pump)</strong> khi có AC.</li>
+        <li><strong>Đưa vần trục quay trở lại</strong> khi màng dầu + áp lực nâng trục đầy đủ.</li>
+        <li><strong>Kiểm tra toàn diện:</strong> Độ đảo trục, độ võng, chênh nhiệt trên/dưới &lt; 42 °C; vần trục liên tục ≥ 4 h trước khi xem xét khởi động lại.</li>
+      </ol>
+    </div>
+  </details>
+</div>
+
+<!-- ============================================================= -->
+<!-- PAGE 13 -->
+<!-- ============================================================= -->
+<div id="p13" class="page">
+  <div class="page-header p-13">
+    <span class="pnum">PHẦN 13</span>
+    <h1>Chất lượng hơi nước &amp; Chỉ tiêu môi trường</h1>
+    <p class="pdesc">6 thông số chất lượng hơi – 4 mức Action Level – TCVN – 5 lý do kiểm soát</p>
+  </div>
+
+  <details class="sub" open>
+    <summary>Tiêu chuẩn chất lượng hơi nước (6 thông số)</summary>
+    <div class="sub-body">
+      <div class="callout cyan"><strong>Phạm vi:</strong> Chất lượng hơi nước cấp cho tuabin phải tuân thủ nghiêm ngặt các chỉ tiêu hóa lý.</div>
+      <table>
+        <thead>
+          <tr><th style="text-align:left;">TT</th><th style="text-align:left;">Thông số</th><th>Khởi động</th><th>Bình thường</th><th>Mức 1</th><th>Mức 2</th><th>Mức 3</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td>Độ dẫn cation CC (µS/cm)</td><td class="val-normal">&lt; 0.45</td><td class="val-normal">≤ 0.3</td><td class="val-warn">&gt; 0.3–0.55</td><td class="val-warn">&gt; 0.55–1.0</td><td class="val-trip">&gt; 1.0</td></tr>
+          <tr><td>2</td><td>Natri – Na (ppb)</td><td class="val-normal">&lt; 12</td><td class="val-normal">≤ 5</td><td class="val-warn">&gt; 5–10</td><td class="val-warn">&gt; 10–20</td><td class="val-trip">&gt; 20</td></tr>
+          <tr><td>3</td><td>Silica – SiO₂ (ppb)</td><td class="val-normal">&lt; 40</td><td class="val-normal">≤ 10</td><td class="val-warn">&gt; 10–20</td><td class="val-warn">&gt; 20–40</td><td class="val-trip">&gt; 40</td></tr>
+          <tr><td>4</td><td>Sunfat – SO₄²⁻ (ppb)</td><td class="val-normal">&lt; 12</td><td class="val-normal">≤ 3</td><td class="val-warn">&gt; 3–6</td><td class="val-warn">&gt; 6–12</td><td class="val-trip">&gt; 12</td></tr>
+          <tr><td>5</td><td>Clorua – Cl⁻ (ppb)</td><td class="val-normal">&lt; 12</td><td class="val-normal">≤ 3</td><td class="val-warn">&gt; 3–6</td><td class="val-warn">&gt; 6–12</td><td class="val-trip">&gt; 12</td></tr>
+          <tr><td>6</td><td>TOC (ppb)</td><td class="val-normal">&lt; 200</td><td class="val-normal">≤ 100</td><td class="val-warn">&gt; 100</td><td>—</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+
+  <details class="sub">
+    <summary>4 mức Action Level &amp; thời gian khống chế</summary>
+    <div class="sub-body">
+      <div class="level-grid">
+        <div class="level-card">
+          <div class="level-header normal"><span class="icon">✓</span><span>Bình thường</span></div>
+          <div class="level-body"><span class="time">Vô thời hạn</span><p>Giá trị vận hành tiêu chuẩn, đảm bảo độ tin cậy và an toàn lâu dài.</p></div>
+        </div>
+        <div class="level-card">
+          <div class="level-header l1"><span class="icon">1</span><span>Mức 1</span></div>
+          <div class="level-body"><span class="time">672 giờ/năm</span><p>Xử lý về bình thường trong <strong>7 ngày</strong>.</p></div>
+        </div>
+        <div class="level-card">
+          <div class="level-header l2"><span class="icon">2</span><span>Mức 2</span></div>
+          <div class="level-body"><span class="time">96 giờ/năm</span><p>Tập trung xử lý về bình thường trong <strong>24 giờ</strong>.</p></div>
+        </div>
+        <div class="level-card">
+          <div class="level-header l3"><span class="icon">3</span><span>Mức 3</span></div>
+          <div class="level-body"><span class="time">16 giờ/năm</span><p>Khôi phục trong <strong>4 giờ</strong>; nếu không đạt → <strong>dừng tổ máy</strong>.</p></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="sub">
+    <summary>Chỉ tiêu môi trường chu trình nhiệt</summary>
+    <div class="sub-body">
+      <table>
+        <thead><tr><th style="text-align:left;">STT</th><th style="text-align:left;">Chỉ tiêu</th><th>Tiêu chuẩn</th><th>Giới hạn thiết kế</th><th>Giới hạn vận hành</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Bụi tổng (Dust)</td><td><span class="badge cyan">TCVN 7440:2005</span></td><td class="val-normal">≤ 112 mg/Nm³</td><td class="val-warn">≤ 136 mg/Nm³tc</td></tr>
+          <tr><td>2</td><td>SO₂ / SOₓ</td><td><span class="badge cyan">TCVN 7440:2005</span></td><td class="val-normal">≤ 280 mg/Nm³</td><td class="val-warn">≤ 340 mg/Nm³tc</td></tr>
+          <tr><td>3</td><td>NOₓ</td><td><span class="badge cyan">TCVN 7440:2005</span></td><td class="val-normal">≤ 560 mg/Nm³</td><td class="val-warn">≤ 680 mg/Nm³tc</td></tr>
+          <tr><td>4</td><td>Nước thải &amp; nước làm mát</td><td><span class="badge cyan">TCVN 5945:2005</span></td><td class="val-normal">pH 6.5–8.5; TSS &lt; 30 mg/l</td><td class="val-warn">Nhiệt độ xả ≤ 40 °C</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+
+  <details class="sub">
+    <summary>5 lý do ban hành và kiểm soát</summary>
+    <div class="sub-body">
+      <div class="reason-card"><div class="title">1. Ngăn đóng cáu cặn, suy giảm hiệu suất</div><p>Ở áp suất cận tới hạn, tạp chất bay hơi → kết tinh bám cánh, sai lệch profin khí động, giảm nhiệt giáng.</p></div>
+      <div class="reason-card"><div class="title">2. Ngăn ăn mòn hóa học &amp; SCC</div><p>Cl⁻, SO₄²⁻ gây pitting và SCC → rỗ nứt, gãy lá cánh.</p></div>
+      <div class="reason-card"><div class="title">3. An toàn cơ cấu điều khiển, chống vượt tốc</div><p>Muối tích tụ trên MSV, CV, RSV/IV gây kẹt → đóng chậm khi load rejection → vượt tốc.</p></div>
+      <div class="reason-card"><div class="title">4. Ngăn mất cân bằng động rôto</div><p>Cáu cặn phân bố không đều → rung gối &gt; 0,125 mm; trip 0,229 mm.</p></div>
+      <div class="reason-card"><div class="title">5. Tối ưu cháy &amp; tuân thủ pháp lý</div><p>Điều chỉnh đá vôi lò CFB, tỉ lệ gió, nhiệt độ buồng lửa 850–900 °C, ESP.</p></div>
+    </div>
+  </details>
+</div>
+
+<!-- ============================================================= -->
+<!-- PAGE 14 -->
+<!-- ============================================================= -->
+<div id="p14" class="page">
+  <div class="page-header p-14">
+    <span class="pnum">PHẦN 14</span>
+    <h1>Sự cố rung bơm cấp khi tổ máy 540 MW</h1>
+    <p class="pdesc">Bảng ngưỡng – 4 nhóm nguyên nhân – 4 bước xử lý – Ngưỡng bảo vệ</p>
+  </div>
+
+  <details class="sub" open>
+    <summary>Tín hiệu cảnh báo – bảo vệ bơm cấp</summary>
+    <div class="sub-body">
+      <h4>Cụm nhiệt độ (°C) – TẤT CẢ BẢO VỆ HH TRỄ 3 GIÂY</h4>
+      <table>
+        <thead><tr><th>Vị trí</th><th>Cảnh báo (H)</th><th>Bảo vệ Trip (HH)</th></tr></thead>
+        <tbody>
+          <tr><td>Gối đỡ bơm cấp chính (DE, NDE)</td><td><span class="val-warn">85 °C</span></td><td><span class="val-trip">&gt; 95 °C</span></td></tr>
+          <tr><td>Gối đỡ bơm tăng áp</td><td><span class="val-warn">85 °C</span></td><td><span class="val-trip">&gt; 95 °C</span></td></tr>
+          <tr><td>Nước chèn bơm cấp/tăng áp</td><td><span class="val-warn">80 – 85 °C</span></td><td><span class="val-trip">&gt; 95 °C</span></td></tr>
+          <tr><td>Ổ đỡ &amp; gối chặn Khớp nối thủy lực</td><td><span class="val-warn">90 °C</span></td><td><span class="val-trip">&gt; 95 °C</span></td></tr>
+          <tr><td>Gối chặn bơm cấp chính/tăng áp</td><td><span class="val-warn">90 °C</span></td><td><span class="val-trip">&gt; 100 °C</span></td></tr>
+          <tr><td>Gối đỡ động cơ bơm cấp</td><td><span class="val-warn">95 °C</span></td><td><span class="val-trip">&gt; 100 °C</span></td></tr>
+          <tr><td>Cuộn dây động cơ (U, V, W)</td><td><span class="val-warn">130 °C</span></td><td><span class="val-trip">&gt; 135 °C</span></td></tr>
+          <tr><td>Dầu khớp nối thủy lực</td><td><span class="val-warn">110 °C</span></td><td><span class="val-trip">&gt; 130 °C</span></td></tr>
+          <tr><td>Dầu ra bộ làm mát dầu bôi trơn</td><td><span class="val-warn">55 °C</span></td><td><span class="val-trip">&gt; 60 °C</span></td></tr>
+          <tr><td>Khí làm mát động cơ (lạnh/nóng)</td><td><span class="val-warn">60.5 / 105.5 °C</span></td><td><span class="val-trip">&gt; 65.5 / &gt; 110.5 °C</span></td></tr>
+          <tr><td>Chênh nhiệt vỏ trên/dưới</td><td><span class="val-warn">|ΔT| &gt; 40 °C</span></td><td>—</td></tr>
+        </tbody>
+      </table>
+
+      <h4>Cụm độ rung trục (µm p-p) – TẤT CẢ BẢO VỆ HH TRỄ 3 GIÂY</h4>
+      <table>
+        <thead><tr><th>Vị trí</th><th>Cảnh báo (H)</th><th>Bảo vệ Trip (HH)</th></tr></thead>
+        <tbody>
+          <tr><td>Gối đỡ bơm tăng áp &amp; bơm cấp chính (X, Y)</td><td><span class="val-warn">100 µm</span></td><td><span class="val-trip">&gt; 150 µm</span></td></tr>
+          <tr><td>Khớp nối thủy lực (bánh răng nhỏ)</td><td><span class="val-warn">89 – 90 µm</span></td><td><span class="val-trip">&gt; 129 – 131 µm</span></td></tr>
+          <tr><td>Khớp nối thủy lực (bánh răng lớn)</td><td><span class="val-warn">117 µm</span></td><td><span class="val-trip">&gt; 170 µm</span></td></tr>
+          <tr><td>Động cơ bơm cấp NDE</td><td><span class="val-warn">171 µm</span></td><td><span class="val-trip">&gt; 228 µm</span></td></tr>
+          <tr><td>Động cơ bơm cấp DE</td><td><span class="val-warn">191 µm</span></td><td><span class="val-trip">&gt; 245 µm</span></td></tr>
+          <tr><td>Độ di trục gối chặn bơm cấp</td><td colspan="2" style="text-align:center;"><span class="val-warn">−500 µm đến +500 µm</span></td></tr>
+        </tbody>
+      </table>
+
+      <h4>Cụm áp lực, mức &amp; lưu lượng</h4>
+      <table>
+        <thead><tr><th>Thông số</th><th>Cảnh báo</th><th>Bảo vệ (Trip)</th><th>Trễ</th></tr></thead>
+        <tbody>
+          <tr><td>Mức nước bình khử khí</td><td><span class="val-warn">L: −715 mm; H: +548 mm</span></td><td><span class="val-trip">LL &lt; −1825 mm</span></td><td><span class="badge red">0 s</span></td></tr>
+          <tr><td>Sự cố bảo vệ phần điện</td><td>—</td><td><span class="val-trip">Trip rơ le điện</span></td><td><span class="badge red">0 s</span></td></tr>
+          <tr><td>Lưu lượng đầu hút (cao)</td><td>—</td><td><span class="val-trip">HH &gt; 1625 t/h</span></td><td><span class="badge orange">2 s</span></td></tr>
+          <tr><td>Lưu lượng đầu hút (thấp)</td><td><span class="val-warn">L: 395 t/h</span></td><td><span class="val-trip">LL &lt; 375 t/h</span></td><td><span class="badge orange">20 s</span></td></tr>
+          <tr><td>Áp lực đầu hút bơm cấp</td><td><span class="val-warn">L: 12.29 bar</span></td><td><span class="val-trip">LL &lt; 1.15 bar</span></td><td><span class="badge orange">20 s</span></td></tr>
+          <tr><td>Áp lực dầu bôi trơn tổ bơm</td><td><span class="val-warn">L: 1.7 bar</span></td><td><span class="val-trip">LL &lt; 0.8 bar</span></td><td><span class="badge orange">20 s</span></td></tr>
+          <tr><td>Áp lực nước đầu đẩy</td><td><span class="val-warn">H: 285 bar</span></td><td><span class="val-trip">HH: 290 bar</span></td><td>Cảnh báo</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+
+  <details class="sub">
+    <summary>Nguyên nhân rung bơm cấp ở tải 540 MW</summary>
+    <div class="sub-body">
+      <div class="callout">
+        <strong>Tình trạng ban đầu:</strong> Tổ máy 540 MW. Cấu hình <strong>02 tổ bơm cấp song song</strong> (khớp nối ~68–70%, ~980–1000 t/h). 01 bơm dự phòng AUTO. Chênh áp nước cấp/bao hơi ~<strong>20 bar</strong>.
+      </div>
+
+      <div class="reason-card"><div class="title">Nguyên nhân Thủy lực &amp; Dòng chảy</div>
+        <ul>
+          <li><strong>Xâm thực (Cavitation):</strong> Phin đầu hút bơm tăng áp nghẹt (Δp &gt; 0,2 bar); áp lực bình khử khí sụt; nước cấp 181,2 °C hóa hơi cục bộ tại mắt cánh → rung + tiếng ồn.</li>
+          <li><strong>Chạy lệch tải / Runout Flow:</strong> Servo ống phun Scoop 01 bơm trôi/kẹt → 1 bơm dồn tải (&gt; 1450 hoặc 1625 t/h) → mất cân bằng lực hướng tâm.</li>
+          <li><strong>Gia tăng lực dọc trục:</strong> Vành chèn cơ khí / Balance Drum mài mòn → dòng xả cân bằng lớn.</li>
+        </ul>
+      </div>
+
+      <div class="reason-card"><div class="title">Dầu bôi trơn &amp; Khớp nối thủy lực (Voith)</div>
+        <ul>
+          <li><strong>Oil Whirl / Oil Whip:</strong> Nhiệt dầu &gt; 55 °C hoặc &lt; 40 °C → mất tính liên tục màng nêm dầu.</li>
+          <li><strong>Suy giảm áp lực dầu:</strong> Phin bẩn (Δp &gt; 0,8 bar); bơm dầu trục chính suy giảm → áp &lt; 1,7 bar.</li>
+          <li><strong>Cơ cấu Voith:</strong> Mài mòn bánh răng tăng tốc; thanh trượt Scoop rơ lỏng.</li>
+        </ul>
+      </div>
+
+      <div class="reason-card"><div class="title">Cơ khí &amp; Kết cấu</div>
+        <ul>
+          <li><strong>Mất đồng tâm do giãn nở:</strong> Bệ trượt kẹt; ΔT vỏ &gt; 40 °C → cong thân bơm.</li>
+          <li><strong>Lỏng bu lông chân đế.</strong></li>
+          <li><strong>Mất cân bằng động Rotor:</strong> Cánh xâm thực, xói mòn, bám cáu.</li>
+        </ul>
+      </div>
+
+      <div class="reason-card"><div class="title">Lỗi C&amp;I</div>
+        <ul>
+          <li>Cảm biến rung lỏng, nhiễu cáp, transmitter lỗi → <strong>rung ảo</strong>.</li>
+        </ul>
+      </div>
+    </div>
+  </details>
+
+  <details class="sub">
+    <summary>Trình tự xử lý vận hành</summary>
+    <div class="sub-body">
+      <div class="action-step"><div class="action-num">1</div><div class="action-content"><div class="title">Phân tích &amp; xác thực tín hiệu</div>
+        <ul>
+          <li>Đối chiếu X/Y cùng gối. Chỉ 1 điểm tăng vọt → nghi <strong>lỗi đo</strong> → báo C&amp;I.</li>
+          <li>Rung tăng cả 2 phương + nhiệt gối tăng → xác nhận <strong>sự cố cơ khí thật</strong>.</li>
+        </ul>
+      </div></div>
+      <div class="action-step"><div class="action-num">2</div><div class="action-content"><div class="title">Điều chỉnh khống chế lưu lượng &amp; khớp nối</div>
+        <ul>
+          <li>Chuyển khớp nối thủy lực sang <strong>MANUAL</strong>.</li>
+          <li>Giảm độ mở bơm rung, tăng bù bơm còn lại → cân bằng ~<strong>850–900 t/h/bơm</strong>.</li>
+          <li>Giữ chênh áp nước cấp/bao hơi ~20 bar.</li>
+          <li>Nếu áp lực đầu hút tụt do khử khí: chuyển van cấp hơi tự dùng vào bình khử khí sang <strong>MANUAL</strong>.</li>
+        </ul>
+      </div></div>
+      <div class="action-step"><div class="action-num">3</div><div class="action-content"><div class="title">Chủ động khởi động Bơm cấp dự phòng để hoán đổi</div>
+        <p style="color:var(--accent);font-weight:600;">Nguyên tắc: tuyệt đối không để mất bơm cấp đột ngột ở tải 540 MW → nguy cơ MFT lò hơi.</p>
+        <ul>
+          <li>Kiểm tra bơm dự phòng đủ điều kiện (sấy nóng, áp lực dầu tốt).</li>
+          <li>Khởi động, tăng dần độ mở khớp nối để gánh tải.</li>
+          <li>Giảm dần độ mở khớp nối bơm rung.</li>
+          <li>Khi bơm mới ổn định → ngừng và cô lập bơm rung an toàn.</li>
+        </ul>
+      </div></div>
+      <div class="action-step"><div class="action-num">4</div><div class="action-content"><div class="title">Xử lý Dừng khẩn cấp</div>
+        <ul>
+          <li>Nếu rung vượt HH mà sau <strong>3 s</strong> không tự Trip → <strong>ấn nút dừng khẩn cấp tổ bơm</strong>.</li>
+          <li><strong>Kịch bản Runback:</strong> nếu bơm dự phòng không vào trong 8 s → Runback sẽ MFT lò hơi có lưu lượng thấp hơn. Máy trưởng phối hợp Lò trưởng giảm lò còn lại về <strong>85% RO (68% BMCR)</strong>.</li>
+        </ul>
+      </div></div>
+
+      <div class="emergency-box">
+        <h3>NGƯỠNG BẢO VỆ NGHIÊM TRỌNG</h3>
+        <ul>
+          <li><strong>Rung bơm:</strong> H = 100 µm → cảnh báo; HH = 150 µm → Trip sau 3 s.</li>
+          <li><strong>Rung động cơ:</strong> H = 171–191 µm → cảnh báo; HH = 228–245 µm → Trip sau 3 s.</li>
+          <li><strong>Lưu lượng đầu hút:</strong> &gt; 1450 t/h → liên động bơm dự phòng; &gt; 1625 t/h → Trip sau 2 s.</li>
+          <li><strong>Nếu bơm dự phòng không vào trong 8 s:</strong> Runback → MFT lò hơi.</li>
+        </ul>
+      </div>
+    </div>
+  </details>
+</div>
+
+<!-- ============================================================= -->
+<!-- PAGE KẾT LUẬN -->
+<!-- ============================================================= -->
+<div id="pend" class="page">
+  <div class="page-header p-end">
+    <span class="pnum">KẾT LUẬN</span>
+    <h1>Kết luận tổng hợp – Nguyên tắc vàng vận hành</h1>
+    <p class="pdesc">4 nguyên tắc vàng · Bảng ngưỡng bảo vệ quan trọng · Trình tự xử lý chuẩn</p>
+  </div>
+
+  <div class="section-card">
+    <div class="callout success">
+      <strong>1. Nguyên tắc bảo vệ tổ máy:</strong> Ưu tiên tuyệt đối <strong>an toàn con người – thiết bị – môi trường</strong>. Khi vượt ngưỡng bảo vệ, hành động theo đúng quy trình, không cưỡng bức thiết bị.
+    </div>
+    <div class="callout warning">
+      <strong>2. Ngưỡng bảo vệ quan trọng cần nhớ:</strong>
+      <ul style="margin-bottom:0;">
+        <li>Chân không bình ngưng: H = <code>0,169 bar</code>; HH = <code>0,254 bar</code>.</li>
+        <li>Nhiệt độ hơi chính: Báo động = <code>551 °C</code>; Trip = <code>565 °C / 15 phút</code>.</li>
+        <li>Áp lực dầu bôi trơn: Trip = <code>≤ 1,21 bar</code>.</li>
+        <li>Mức nước bình khử khí: Trip bơm cấp = <code>−1 825 mm</code>.</li>
+        <li>Chênh áp dầu chèn – Hydro: Low = <code>≤ 0,41 bar</code>; Bình thường = <code>0,55 ÷ 0,60 bar</code>.</li>
+        <li>Mức nước bình ngưng: Bảo vệ = <code>250 mm</code>.</li>
+      </ul>
+    </div>
+    <div class="callout">
+      <strong>3. Trình tự xử lý sự cố chuẩn:</strong>
+      <ul style="margin-bottom:0;">
+        <li><strong>Phát hiện – Xác minh:</strong> Kiểm tra DCS và tại chỗ; loại trừ lỗi đo lường.</li>
+        <li><strong>Báo cáo:</strong> Trưởng ca, Trưởng kíp, C&amp;I, Điện, Lò hơi.</li>
+        <li><strong>Xử lý:</strong> Theo quy trình, ưu tiên giảm tải hoặc tách thiết bị sự cố.</li>
+        <li><strong>Bảo vệ:</strong> Sẵn sàng Trip/MFT nếu vượt ngưỡng.</li>
+        <li><strong>Phục hồi:</strong> Kiểm tra đầy đủ trước khi khởi động lại.</li>
+      </ul>
+    </div>
+    <div class="callout purple">
+      <strong>4. Nguyên tắc vận hành tối ưu:</strong> Điểm tối ưu <strong>cân bằng giữa hiệu suất, an toàn và chi phí phụ trợ</strong>. Duy trì T₀ định mức, P₀ theo trượt áp, P<sub>k</sub> ở <code>0,05 ÷ 0,084 bar</code>.
+    </div>
+  </div>
+</div>
+
+<footer class="main-footer">
+  <strong>TỔNG HỢP TÀI LIỆU VẬN HÀNH TUABIN – BÌNH NGƯNG NHÀ MÁY NHIỆT ĐIỆN</strong><br>
+  Cơ sở lý thuyết – Ảnh hưởng thông số – Cấu tạo thiết bị – Quy trình khởi động – Bảo vệ &amp; Xử lý sự cố<br>
+  Áp dụng cho tổ máy nhiệt điện đốt than 500 – 600 MW · Chuẩn ISO 80000<br>
+  <span style="font-size:0.82rem;color:#8a939b;">Tài liệu tham khảo nội bộ – Phục vụ đào tạo và ôn tập vận hành</span>
+</footer>
+
+</div>
+
+<button id="backtop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Về đầu trang">▲</button>
+
+<script>
+  // ===== ROUTER =====
+  function openPage(id){
+    // Ẩn tất cả page
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    // Hiện page được chọn
+    const el = document.getElementById(id);
+    if(el){
+      el.classList.add('active');
+      // Hiện nút back
+      document.getElementById('backBtn').classList.add('show');
+      // Cập nhật hash
+      window.location.hash = id;
+      // Cuộn lên đầu
+      window.scrollTo({top:0, behavior:'instant'});
+      // Đóng tất cả accordion con trong page này trừ cái đầu
+      el.querySelectorAll('details.sub').forEach((d, i) => {
+        if(i > 0) d.open = false;
+      });
+    }
+  }
+
+  function goHome(){
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('homePage').classList.add('active');
+    document.getElementById('backBtn').classList.remove('show');
+    // Xóa hash
+    history.pushState("", document.title, window.location.pathname + window.location.search);
+    window.scrollTo({top:0, behavior:'instant'});
+  }
+
+  // ===== XỬ LÝ HASH KHI LOAD / BACK-FORWARD =====
+  function handleHash(){
+    const hash = window.location.hash.replace('#', '');
+    if(!hash || hash === 'home'){
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('homePage').classList.add('active');
+      document.getElementById('backBtn').classList.remove('show');
+    } else {
+      const el = document.getElementById(hash);
+      if(el && el.classList.contains('page')){
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        el.classList.add('active');
+        document.getElementById('backBtn').classList.add('show');
+        window.scrollTo({top:0, behavior:'instant'});
+      }
+    }
+  }
+
+  window.addEventListener('hashchange', handleHash);
+  window.addEventListener('DOMContentLoaded', () => {
+    // Nếu có hash ban đầu → mở page đó
+    if(window.location.hash) handleHash();
+    else {
+      document.getElementById('homePage').classList.add('active');
+    }
+  });
+
+  // ===== BACK TO TOP =====
+  window.addEventListener('scroll', () => {
+    const btn = document.getElementById('backtop');
+    if(window.scrollY > 400) btn.style.opacity = '1';
+    else btn.style.opacity = '0';
+    btn.style.pointerEvents = window.scrollY > 400 ? 'auto' : 'none';
+  });
+  document.getElementById('backtop').style.opacity = '0';
+</script>
+
+</body>
+</html>
