@@ -1,0 +1,1864 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mô phỏng 3D – Chân không bình ngưng – Nhà máy Nhiệt điện Mông Dương</title>
+<style>
+  :root{
+    color-scheme:dark;
+    --bg:#071421;
+    --panel:rgba(8,23,39,.96);
+    --line:rgba(65,155,201,.30);
+    --txt:#e1edf7;
+    --muted:#8ba9bf;
+    --ok:#19c37d;
+    --warn:#f5b942;
+    --orange:#ff8a3d;
+    --danger:#ff4d5e;
+    --accent:#22a6d5;
+    --seawater:#137ca5;
+    --condensate:#55b7ff;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;height:100%;overflow:hidden;background:#06111d;color:var(--txt);
+    font-family:"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  #scene{position:fixed;inset:0;width:100%;height:100%;display:block;background:#06111d;touch-action:pan-y;}
+
+  #alertVignette{
+    position:fixed;inset:0;pointer-events:none;opacity:0;
+    background:radial-gradient(ellipse at center, rgba(192,57,43,0) 35%, rgba(192,57,43,0.65) 100%);
+    transition:opacity .4s;z-index:5;
+  }
+  #alertVignette.on{opacity:1;animation:pulse 0.9s infinite;}
+  @keyframes pulse{0%,100%{opacity:.45}50%{opacity:1}}
+
+  #titleCard{
+    position:fixed;top:14px;left:14px;z-index:10;
+    background:rgba(7,20,34,.94);border:1px solid rgba(65,155,201,.35);border-radius:12px;
+    padding:12px 18px;backdrop-filter:blur(12px);
+    box-shadow:0 8px 28px rgba(0,0,0,.32),inset 0 1px rgba(120,200,235,.05);
+    max-width:min(480px,62vw);
+  }
+  #titleCard h1{margin:0;font-size:14px;letter-spacing:.5px;font-weight:700;color:#6bd5ff;text-transform:uppercase;}
+  #titleCard p{margin:3px 0 0;font-size:11.5px;color:#9bb6c9;font-style:italic;}
+  #titleCard .tag{display:inline-block;margin-top:6px;font-size:10px;font-weight:600;background:#0b6d8f;color:#fff;padding:2px 10px;border-radius:10px;}
+  #titleCard .tag2{display:inline-block;margin-top:6px;margin-left:5px;font-size:10px;font-weight:600;background:#155f9a;color:#fff;padding:2px 10px;border-radius:10px;}
+
+  #panel{
+    position:fixed;top:14px;right:14px;z-index:10;
+    width:346px;max-height:calc(100vh - 28px);overflow-y:auto;
+    background:rgba(7,20,34,.94);border:1px solid rgba(65,155,201,.35);border-radius:14px;
+    padding:14px;backdrop-filter:blur(12px);
+    box-shadow:0 8px 28px rgba(0,0,0,.32),inset 0 1px rgba(120,200,235,.05);
+    font-size:12.5px;
+  }
+  #panel::-webkit-scrollbar{width:6px;}
+  #panel::-webkit-scrollbar-thumb{background:rgba(65,155,201,.35);border-radius:3px;}
+
+  .badge{
+    display:block;text-align:center;font-weight:800;font-size:12px;
+    letter-spacing:.6px;padding:8px 10px;border-radius:9px;margin-bottom:12px;
+    color:#fff;background:var(--ok);transition:background .3s;
+    text-transform:uppercase;
+  }
+  .badge.pulse{animation:badgePulse 0.9s infinite;}
+  @keyframes badgePulse{
+    0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(255,77,94,.7);}
+    50%{opacity:.75;box-shadow:0 0 0 12px rgba(255,77,94,0);}
+  }
+
+  .sect-title{
+    font-size:10.5px;letter-spacing:1px;color:#69bfe4;font-weight:700;
+    text-transform:uppercase;margin:14px 0 7px;border-bottom:1px solid rgba(65,155,201,.28);
+    padding-bottom:5px;
+  }
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+  .cell{
+    background:rgba(12,34,54,.92);border:1px solid rgba(65,155,201,.23);
+    border-radius:8px;padding:7px 9px;position:relative;transition:all .3s;
+  }
+  .cell span{display:block;font-size:9.5px;color:#91adbf;text-transform:uppercase;letter-spacing:.3px;}
+  .cell b{font-size:15px;color:#e7f5ff;font-family:Consolas,monospace;font-weight:700;}
+  .cell i{font-size:9.5px;color:#91adbf;font-style:normal;margin-left:3px;}
+  .cell.ok b{color:#35e29a;}
+  .cell.warn b{color:#ffd166;}
+  .cell.bad b{color:#ff6575;}
+  .cell.bad{background:rgba(60,12,20,.92);border-color:rgba(255,77,94,.5);}
+  .cell.warn{background:rgba(48,34,8,.92);border-color:rgba(245,185,66,.45);}
+  .cell.ok{background:rgba(8,42,32,.92);border-color:rgba(25,195,125,.4);}
+  .cell.cond{background:linear-gradient(135deg,#0c2b45,#0b3553);border-color:#1d6287;}
+  .cell.cond b{color:#7dcaff;}
+
+  .slider-row{margin:6px 0 2px;}
+  .slider-row .lbl{display:flex;justify-content:space-between;font-size:11px;color:#a9c3d5;margin-bottom:6px;}
+  .slider-row .lbl b{color:#f0f8ff;font-family:Consolas,monospace;}
+
+  input[type=range]{
+    -webkit-appearance:none;width:100%;height:6px;border-radius:3px;outline:none;
+    background:linear-gradient(90deg,#8e44ad 0%,#27ae60 22%,#f39c12 52%,#e67e22 72%,#c0392b 88%,#7b0d0d 100%);
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;width:18px;height:18px;border-radius:50%;
+    background:#fff;border:3px solid #38bdf8;cursor:pointer;
+    box-shadow:0 0 10px rgba(56,189,248,.4);
+  }
+  input[type=range]::-moz-range-thumb{
+    width:16px;height:16px;border-radius:50%;background:#fff;border:3px solid #38bdf8;cursor:pointer;
+  }
+
+  .scale{display:flex;justify-content:space-between;font-size:9px;color:#7a8fa5;margin-top:3px;font-family:Consolas,monospace;}
+
+  .chk{
+    display:flex;align-items:center;gap:9px;padding:7px 9px;margin-bottom:6px;
+    background:rgba(11,32,51,.88);border:1px solid rgba(65,155,201,.23);
+    border-radius:8px;cursor:pointer;transition:.18s;user-select:none;
+  }
+  .chk:hover{background:rgba(15,48,72,.95);border-color:rgba(65,180,225,.55);}
+  .chk input{
+    appearance:none;-webkit-appearance:none;width:34px;height:18px;border-radius:9px;
+    background:#31495c;position:relative;cursor:pointer;transition:.2s;flex-shrink:0;margin:0;
+  }
+  .chk input::after{
+    content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;
+    background:#fff;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2);
+  }
+  .chk input:checked{background:#087da8;}
+  .chk input:checked::after{left:18px;}
+  .chk .txt{font-size:11.5px;color:#d6e8f4;line-height:1.3;}
+  .chk .txt em{display:block;font-style:normal;font-size:9.5px;color:#86a5ba;}
+
+  .views{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+  .views button{
+    padding:7px 6px;font-size:10.5px;font-weight:600;border-radius:7px;cursor:pointer;
+    background:rgba(21,75,105,.35);color:#a9dfff;border:1px solid rgba(65,155,201,.3);
+    transition:.18s;font-family:inherit;
+  }
+  .views button:hover{background:rgba(26,105,145,.48);}
+  .views button.active{background:#087da8;color:#fff;border-color:#35b9ed;}
+
+  #legend{
+    position:fixed;left:14px;bottom:14px;z-index:10;
+    background:rgba(7,20,34,.94);border:1px solid rgba(65,155,201,.35);border-radius:12px;
+    padding:11px 14px;backdrop-filter:blur(12px);font-size:11px;
+    box-shadow:0 8px 28px rgba(0,0,0,.32);max-width:min(560px,82vw);
+  }
+  #legend .row{display:flex;flex-wrap:wrap;gap:12px;}
+  #legend .item{display:inline-flex;align-items:center;gap:6px;color:#b7d0e0;}
+  #legend .sw{width:16px;height:9px;border-radius:3px;display:inline-block;}
+
+  #hint{
+    position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:9;
+    font-size:10.5px;color:#7e9eb3;letter-spacing:.4px;pointer-events:none;
+    text-align:center;text-shadow:0 1px 4px #000;
+  }
+
+  #loader{
+    position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;
+    background:#06111d;color:#73d7ff;font-size:13px;letter-spacing:1px;transition:opacity .6s;
+  }
+  #loader::before{content:"";width:9px;height:9px;border-radius:50%;background:#26c6da;margin-right:12px;box-shadow:0 0 16px #26c6da;animation:scadaPulse 1s infinite;}
+  @keyframes scadaPulse{50%{opacity:.25;transform:scale(.75)}}
+  #loader.hide{opacity:0;pointer-events:none;}
+
+  #fatalError{
+    position:fixed;inset:auto 14px 14px 14px;z-index:100;display:none;
+    padding:14px 16px;border:1px solid rgba(255,91,105,.7);border-radius:10px;
+    background:rgba(48,12,22,.97);color:#ffe7eb;font:12px/1.5 "Segoe UI",Arial,sans-serif;
+    box-shadow:0 8px 30px rgba(0,0,0,.4);max-width:760px;
+  }
+  #fatalError strong{display:block;color:#ff9aa5;margin-bottom:4px;font-size:13px;}
+  .views button:focus-visible,input:focus-visible{outline:2px solid #7dd3fc;outline-offset:2px;}
+
+  @media(max-width:820px){
+    #panel{width:min(340px,calc(100vw - 20px));top:auto;bottom:10px;right:10px;max-height:56vh;}
+    #titleCard{max-width:calc(100vw - 30px);padding:9px 12px;}
+    #titleCard h1{font-size:11.5px;}
+    #titleCard p{font-size:10px;}
+    #legend{display:none;}
+    #hint{display:none;}
+  }
+  @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;}}
+</style>
+</head>
+<body>
+
+<canvas id="scene"></canvas>
+<div id="alertVignette"></div>
+
+<div id="titleCard">
+  <h1>Mô phỏng 3D · Chân không bình ngưng</h1>
+  <p>Nhà máy Nhiệt điện Mông Dương — Làm mát bằng nước biển một lần qua</p>
+  <span class="tag">SEAWATER ONCE-THROUGH</span>
+  <span class="tag2">CONDENSATE FLOW</span>
+  <span class="tag2" style="background:#624b13;color:#ffe7a3">MÔ PHỎNG ĐÀO TẠO · KHÔNG PHẢI DCS THẬT</span>
+</div>
+
+<div id="panel">
+  <div class="badge" id="statusBadge">ĐANG KHỞI TẠO…</div>
+
+  <div class="sect-title">Thông số vận hành</div>
+  <div class="grid">
+    <div class="cell" id="c-pk"><span>Pₖ bình ngưng</span><b id="v-pk">0.084</b><i>bar</i></div>
+    <div class="cell" id="c-vac"><span>Độ chân không</span><b id="v-vac">697</b><i>mmHg</i></div>
+    <div class="cell" id="c-temp"><span>Nhiệt độ hơi thoát</span><b id="v-temp">42.5</b><i>°C</i></div>
+    <div class="cell" id="c-moist"><span>Độ ẩm hơi thoát</span><b id="v-moist">13.1</b><i>%</i></div>
+    <div class="cell"><span>Nhiệt giáng H₀</span><b id="v-h0">1426</b><i>kJ/kg</i></div>
+    <div class="cell"><span>Tự dùng</span><b id="v-aux">4.0</b><i>%</i></div>
+    <div class="cell" id="c-pt"><span>Công suất tuabin</span><b id="v-pt">100.5</b><i>%</i></div>
+    <div class="cell" id="c-pn"><span>Công suất thực</span><b id="v-pn">100.0</b><i>%</i></div>
+  </div>
+
+  <div class="sect-title">Dòng nước ngưng (Condensate)</div>
+  <div class="grid">
+    <div class="cell cond"><span>Lưu lượng nước ngưng</span><b id="v-condflow">1520</b><i>t/h</i></div>
+    <div class="cell cond"><span>Nhiệt độ nước ngưng</span><b id="v-condtemp">42.5</b><i>°C</i></div>
+    <div class="cell cond"><span>Độ quá lạnh</span><b id="v-subcool">0.5</b><i>°C</i></div>
+    <div class="cell cond"><span>Mức hotwell</span><b id="v-hotlevel">65</b><i>%</i></div>
+  </div>
+
+  <div class="sect-title">Thông số nước biển làm mát</div>
+  <div class="grid">
+    <div class="cell"><span>Nhiệt độ nước vào</span><b id="v-cwin">31.0</b><i>°C</i></div>
+    <div class="cell"><span>Nhiệt độ nước ra</span><b id="v-cwout">39.0</b><i>°C</i></div>
+    <div class="cell"><span>Chênh nhiệt ΔT</span><b id="v-cwdt">8.0</b><i>°C</i></div>
+    <div class="cell"><span>Lưu lượng CW</span><b id="v-cwflow">12.5</b><i>m³/s</i></div>
+  </div>
+
+  <div class="sect-title">Điều khiển áp suất bình ngưng</div>
+  <div class="slider-row">
+    <div class="lbl"><span>Đặt Pₖ (bar tuyệt đối)</span><b id="v-slider">0.084</b></div>
+    <input type="range" id="pkSlider" min="0.03" max="0.30" step="0.001" value="0.084">
+    <div class="scale"><span>0.03</span><span>0.084 tối ưu</span><span>0.169 H</span><span>0.254 HH</span><span>0.30</span></div>
+  </div>
+
+  <div class="sect-title">Mô phỏng sự cố &amp; khắc phục</div>
+  <label class="chk"><input type="checkbox" id="cbLeak"><span class="txt">Lọt khí vào bình ngưng<em>Air in-leakage — tăng phụ tải khí không ngưng</em></span></label>
+  <label class="chk"><input type="checkbox" id="cbBackup"><span class="txt">Khởi động bơm chân không dự phòng<em>Bơm số 3 — giảm Pₖ</em></span></label>
+  <label class="chk"><input type="checkbox" id="cbCw" checked><span class="txt">Bơm nước biển tuần hoàn làm việc<em>Ngừng → nhiệt độ hơi thoát tăng vọt</em></span></label>
+  <label class="chk"><input type="checkbox" id="cbSilt"><span class="txt">Bám cặn sinh vật biển trong ống<em>Biofouling — giảm hiệu quả truyền nhiệt</em></span></label>
+  <label class="chk"><input type="checkbox" id="cbTide"><span class="txt">Thủy triều thấp / mực nước biển giảm<em>Low tide — giảm lưu lượng bơm</em></span></label>
+  <label class="chk"><input type="checkbox" id="cbSubcool"><span class="txt">Quá lạnh nước ngưng (subcooling)<em>Tăng tổn thất nhiệt — giảm hiệu suất chu trình</em></span></label>
+
+  <div class="sect-title">Góc nhìn</div>
+  <div class="views">
+    <button data-view="overview" class="active">Toàn cảnh</button>
+    <button data-view="turbine">Tuabin</button>
+    <button data-view="condenser">Bình ngưng</button>
+    <button data-view="condensate">Nước ngưng</button>
+    <button id="resetSim" type="button" style="grid-column:1/-1">↺ Đặt lại mô phỏng</button>
+  </div>
+</div>
+
+<div id="legend">
+  <div class="row">
+    <span class="item"><span class="sw" style="background:#e8eef5"></span>Hơi nước (steam)</span>
+    <span class="item"><span class="sw" style="background:#55b7ff"></span>Nước ngưng (condensate)</span>
+    <span class="item"><span class="sw" style="background:#27ae60"></span>Tối ưu</span>
+    <span class="item"><span class="sw" style="background:#f39c12"></span>Cảnh báo</span>
+    <span class="item"><span class="sw" style="background:#e67e22"></span>Giảm tải</span>
+    <span class="item"><span class="sw" style="background:#c0392b"></span>Trip</span>
+  </div>
+</div>
+
+<div id="hint">Kéo chuột để xoay · Lăn chuột để thu phóng · Chuột phải để dịch chuyển</div>
+<div id="loader">ĐANG KHỞI TẠO MÔ HÌNH 3D…</div>
+<div id="fatalError" role="alert"><strong>Không thể khởi tạo mô hình 3D</strong><span id="fatalMessage">Kiểm tra trình duyệt, WebGL và kết nối tải thư viện Three.js.</span></div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+/* ============================================================
+   0. DỮ LIỆU KỸ THUẬT — MÔNG DƯƠNG
+   ============================================================ */
+const PK_PTS = [0.030, 0.050, 0.084, 0.100, 0.150, 0.169, 0.200, 0.254, 0.300];
+const PTURB  = [104.0, 102.0, 100.5,  99.5,  96.0,  94.0,  90.0,  82.0,  74.0];
+const PNET   = [ 94.0,  98.5, 100.0,  98.0,  92.5,  89.5,  85.0,  77.0,  68.0];
+const MOIST  = [ 14.2,  13.7,  13.1,  12.8,  11.7,  11.1,  10.3,   9.1,   7.9];
+const H0ARR  = [1486.0,1460.0,1426.0,1407.0,1350.0,1320.0,1271.0,1204.0,1129.0];
+const TSAT   = [ 24.1,  32.9,  42.5,  45.8,  54.0,  56.6,  60.1,  65.9,  69.1];
+const CONDFLOW = [1580, 1560, 1520, 1500, 1460, 1440, 1400, 1330, 1260];
+
+const SEAWATER = { inletTemp:31.0, outletTemp:39.0, deltaT:8.0, flowPerUnit:12.5, maxOutlet:40.0 };
+
+function interp(arr, x){
+  if (x <= PK_PTS[0]) return arr[0];
+  const n = PK_PTS.length;
+  if (x >= PK_PTS[n-1]) return arr[n-1];
+  for (let i = 0; i < n-1; i++){
+    if (x >= PK_PTS[i] && x <= PK_PTS[i+1]){
+      const f = (x - PK_PTS[i]) / (PK_PTS[i+1] - PK_PTS[i]);
+      return arr[i] + f * (arr[i+1] - arr[i]);
+    }
+  }
+  return arr[0];
+}
+
+/* ============================================================
+   1. TRẠNG THÁI
+   ============================================================ */
+const state = {
+  sliderPk : 0.084,
+  pk       : 0.084,
+  airLeak  : false,
+  backup   : false,
+  cwOn     : true,
+  silt     : false,
+  tide     : false,
+  subcool  : false,
+  time     : 0,
+  rotorSpd : 1.4,
+  view     : 'overview'
+};
+
+/* ============================================================
+   2. RENDERER / SCENE / CAMERA
+   ============================================================ */
+const canvas = document.getElementById('scene');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, powerPreference:'high-performance' });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.15;
+
+const scene = new THREE.Scene();
+const BASE_BG = 0x071421;
+scene.background = new THREE.Color(BASE_BG);
+scene.fog = new THREE.Fog(BASE_BG, 95, 235);
+
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 600);
+camera.position.set(34, 24, 38);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(0, 0.5, 0);
+controls.enableDamping = true;
+controls.dampingFactor = 0.07;
+controls.maxPolarAngle = Math.PI * 0.492;
+controls.minDistance = 10;
+controls.maxDistance = 130;
+
+(function buildEnv(){
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  const envScene = new THREE.Scene();
+  const skyMat = new THREE.ShaderMaterial({
+    side: THREE.BackSide,
+    uniforms:{ top:{value:new THREE.Color(0x5a8ab5)}, bot:{value:new THREE.Color(0x2a4a6a)} },
+    vertexShader:`varying vec3 vP; void main(){ vP = position; gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
+    fragmentShader:`varying vec3 vP; uniform vec3 top; uniform vec3 bot;
+      void main(){ float h = normalize(vP).y*0.5+0.5; gl_FragColor = vec4(mix(bot, top, h), 1.0); }`
+  });
+  envScene.add(new THREE.Mesh(new THREE.SphereGeometry(60, 24, 16), skyMat));
+  const lightPanel = new THREE.Mesh(new THREE.BoxGeometry(30, 0.5, 30), new THREE.MeshBasicMaterial({ color:0xaaccee }));
+  lightPanel.position.set(0, 30, 0);
+  envScene.add(lightPanel);
+  const sidePanel = new THREE.Mesh(new THREE.BoxGeometry(0.5, 18, 22), new THREE.MeshBasicMaterial({ color:0x5577aa }));
+  sidePanel.position.set(-32, 8, 0);
+  envScene.add(sidePanel);
+  scene.environment = pmrem.fromScene(envScene, 0.03).texture;
+  pmrem.dispose();
+})();
+
+scene.add(new THREE.HemisphereLight(0x9fcde8, 0x14283a, 1.25));
+const sun = new THREE.DirectionalLight(0xffffff, 2.4);
+sun.position.set(30, 42, 22);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+sun.shadow.camera.left = -45; sun.shadow.camera.right = 45;
+sun.shadow.camera.top = 45;   sun.shadow.camera.bottom = -45;
+sun.shadow.camera.near = 1;   sun.shadow.camera.far = 130;
+sun.shadow.bias = -0.0006;
+scene.add(sun);
+const fillLight = new THREE.DirectionalLight(0xaaccff, 0.9);
+fillLight.position.set(-28, 16, -26);
+scene.add(fillLight);
+const rimLight = new THREE.DirectionalLight(0xffffff, 0.7);
+rimLight.position.set(6, 10, -40);
+scene.add(rimLight);
+
+const ground = new THREE.Mesh(
+  new THREE.PlaneGeometry(400, 400),
+  new THREE.MeshStandardMaterial({ color:0x142536, roughness:0.92, metalness:0.12 })
+);
+ground.rotation.x = -Math.PI/2;
+ground.position.y = -5.6;
+ground.receiveShadow = true;
+scene.add(ground);
+
+const grid = new THREE.GridHelper(240, 120, 0x1b6b8b, 0x12384e);
+grid.position.y = -5.57;
+grid.material.transparent = true;
+grid.material.opacity = 0.42;
+scene.add(grid);
+
+const seaMat = new THREE.MeshStandardMaterial({
+  color:0x07516f, metalness:0.3, roughness:0.08, transparent:true, opacity:0.85
+});
+const sea = new THREE.Mesh(new THREE.PlaneGeometry(200, 90), seaMat);
+sea.rotation.x = -Math.PI/2;
+sea.position.set(60, -5.4, 0);
+sea.receiveShadow = true;
+scene.add(sea);
+
+/* ============================================================
+   3. VẬT LIỆU
+   ============================================================ */
+const MAT = {
+  casing     : new THREE.MeshStandardMaterial({ color:0xb0bcc9, metalness:0.95, roughness:0.25 }),
+  casingDark : new THREE.MeshStandardMaterial({ color:0x7a8896, metalness:0.92, roughness:0.35 }),
+  glassShell : new THREE.MeshStandardMaterial({ color:0x8ec4f0, metalness:0.4, roughness:0.12,
+                    transparent:true, opacity:0.18, side:THREE.DoubleSide, depthWrite:false }),
+  condShell  : new THREE.MeshStandardMaterial({ color:0x7fb3e8, metalness:0.5, roughness:0.15,
+                    transparent:true, opacity:0.15, side:THREE.DoubleSide, depthWrite:false,
+                    emissive:0x000000, emissiveIntensity:0 }),
+  tube       : new THREE.MeshStandardMaterial({ color:0xd4a050, metalness:1.0, roughness:0.30,
+                    transparent:true, opacity:0.38, depthWrite:false }),
+  rotor      : new THREE.MeshStandardMaterial({ color:0x4a5560, metalness:1.0, roughness:0.28 }),
+  blade      : new THREE.MeshStandardMaterial({ color:0xe8eef5, metalness:1.0, roughness:0.18 }),
+  steel      : new THREE.MeshStandardMaterial({ color:0x6a7a8a, metalness:0.9, roughness:0.42 }),
+  concrete   : new THREE.MeshStandardMaterial({ color:0xa8b0b8, metalness:0.02, roughness:0.94 }),
+  motor      : new THREE.MeshStandardMaterial({ color:0x3a8060, metalness:0.55, roughness:0.45 }),
+  pipeBlue   : new THREE.MeshStandardMaterial({ color:0x3a7fc4, metalness:0.75, roughness:0.30 }),
+  pipeCyan   : new THREE.MeshStandardMaterial({ color:0x2fa8d0, metalness:0.75, roughness:0.30 }),
+  pipeRed    : new THREE.MeshStandardMaterial({ color:0xc05a48, metalness:0.75, roughness:0.30 }),
+  pipeYellow : new THREE.MeshStandardMaterial({ color:0xd4b030, metalness:0.75, roughness:0.30 }),
+  condensate : new THREE.MeshStandardMaterial({ color:0x3a7fc4, metalness:0.85, roughness:0.25 }),
+  intake     : new THREE.MeshStandardMaterial({ color:0x5a6a78, metalness:0.8, roughness:0.4 })
+};
+
+/* ============================================================
+   4. HÀM DỰNG HÌNH
+   ============================================================ */
+function cylX(radius, length, material, segments = 40, open = false){
+  const g = new THREE.CylinderGeometry(radius, radius, length, segments, 1, open);
+  g.rotateZ(Math.PI / 2);
+  const m = new THREE.Mesh(g, material);
+  m.castShadow = true; m.receiveShadow = true; return m;
+}
+function cylY(radius, height, material, segments = 28){
+  const m = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, height, segments), material);
+  m.castShadow = true; m.receiveShadow = true; return m;
+}
+function box(w, h, d, material){
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), material);
+  m.castShadow = true; m.receiveShadow = true; return m;
+}
+function makePipe(points, radius, material, tubularSeg = 90){
+  const curve = new THREE.CatmullRomCurve3(points.map(p => new THREE.Vector3(p[0], p[1], p[2])));
+  const geo = new THREE.TubeGeometry(curve, tubularSeg, radius, 12, false);
+  const m = new THREE.Mesh(geo, material);
+  m.castShadow = true; m.receiveShadow = true; return m;
+}
+function roundRect(ctx, x, y, w, h, r){
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+function makeLabel(text, color = '#d9f3ff', bg = 'rgba(7,20,34,0.94)', border = 'rgba(65,155,201,0.75)'){
+  const fontSize = 44, padX = 26, padY = 14;
+  const c = document.createElement('canvas');
+  let ctx = c.getContext('2d');
+  const font = `700 ${fontSize}px "Segoe UI", Arial, sans-serif`;
+  ctx.font = font;
+  const tw = ctx.measureText(text).width;
+  c.width  = Math.ceil(tw + padX * 2);
+  c.height = Math.ceil(fontSize * 1.5 + padY * 2);
+  ctx = c.getContext('2d');
+  ctx.font = font; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillStyle = bg;
+  roundRect(ctx, 3, 3, c.width - 6, c.height - 6, 18);
+  ctx.fill();
+  ctx.strokeStyle = border; ctx.lineWidth = 3;
+  roundRect(ctx, 3, 3, c.width - 6, c.height - 6, 18);
+  ctx.stroke();
+  ctx.fillStyle = color;
+  ctx.fillText(text, c.width / 2, c.height / 2 + 2);
+  const tex = new THREE.CanvasTexture(c);
+  tex.anisotropy = 4;
+  const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false, depthWrite: false });
+  const sp = new THREE.Sprite(mat);
+  const h = 1.15;
+  sp.scale.set(h * c.width / c.height, h, 1);
+  sp.renderOrder = 999;
+  return sp;
+}
+
+/* ============================================================
+   5. CỤM TUABIN
+   ============================================================ */
+const CY = 4.5;
+const turbineGroup = new THREE.Group();
+scene.add(turbineGroup);
+
+function addCasing(x, r, len, material, open = false, ribs = true){
+  const m = cylX(r, len, material, 44, open);
+  m.position.set(x, CY, 0);
+  turbineGroup.add(m);
+  if (ribs){
+    const n = Math.max(2, Math.round(len / 1.1));
+    for (let i = 0; i <= n; i++){
+      const px = x - len/2 + (len * i / n);
+      const g = new THREE.TorusGeometry(r + 0.07, 0.075, 8, 44);
+      g.rotateY(Math.PI/2);
+      const ring = new THREE.Mesh(g, MAT.casingDark);
+      ring.position.set(px, CY, 0);
+      ring.castShadow = true;
+      turbineGroup.add(ring);
+    }
+  }
+  return m;
+}
+addCasing(-12.0, 1.50, 4.5, MAT.casing);
+addCasing(-7.0, 2.00, 5.5, MAT.casing);
+addCasing(-0.5, 3.00, 6.5, MAT.glassShell, true, false);
+[-3.4, -1.4, 0.6, 2.4].forEach(px => {
+  const g = new THREE.TorusGeometry(3.07, 0.09, 8, 44);
+  g.rotateY(Math.PI/2);
+  const ring = new THREE.Mesh(g, MAT.casingDark);
+  ring.position.set(px, CY, 0);
+  turbineGroup.add(ring);
+});
+
+const hoodMat = new THREE.MeshStandardMaterial({
+  color:0x8fbde8, metalness:0.5, roughness:0.18,
+  transparent:true, opacity:0.15, side:THREE.DoubleSide, depthWrite:false,
+  emissive:0x000000, emissiveIntensity:0
+});
+const hood = box(5.6, 2.2, 6.6, hoodMat);
+hood.position.set(-0.5, 2.5, 0);
+turbineGroup.add(hood);
+
+/* Hot glow bên trong LP — sáng đỏ khi quá nhiệt */
+const lpHotGlowMat = new THREE.MeshBasicMaterial({
+  color: 0xff3300, transparent:true, opacity:0,
+  blending: THREE.AdditiveBlending, depthWrite:false
+});
+const lpHotGlow = new THREE.Mesh(new THREE.SphereGeometry(3.0, 24, 16), lpHotGlowMat);
+lpHotGlow.position.set(-0.5, 3.2, 0);
+turbineGroup.add(lpHotGlow);
+
+const genBody = cylX(2.2, 7.0, MAT.casingDark, 40);
+genBody.position.set(7.5, CY, 0);
+turbineGroup.add(genBody);
+for (let i = 0; i < 9; i++){
+  const g = new THREE.TorusGeometry(2.26, 0.07, 8, 40);
+  g.rotateY(Math.PI/2);
+  const ring = new THREE.Mesh(g, MAT.steel);
+  ring.position.set(4.6 + i * 0.72, CY, 0);
+  turbineGroup.add(ring);
+}
+const genCap = cylX(1.6, 0.6, MAT.casing, 32);
+genCap.position.set(11.1, CY, 0);
+turbineGroup.add(genCap);
+
+const rotor = new THREE.Group();
+rotor.position.y = CY;
+scene.add(rotor);
+const shaft = cylX(0.55, 29, MAT.rotor, 28);
+shaft.position.x = -2.0;
+rotor.add(shaft);
+
+function addBladeStage(x, rInner, bladeLen, count){
+  const geo = new THREE.BoxGeometry(0.42, bladeLen, 0.16);
+  const inst = new THREE.InstancedMesh(geo, MAT.blade, count);
+  inst.castShadow = true;
+  const dummy = new THREE.Object3D();
+  for (let i = 0; i < count; i++){
+    const a = (i / count) * Math.PI * 2;
+    dummy.position.set(x, Math.cos(a) * (rInner + bladeLen/2), Math.sin(a) * (rInner + bladeLen/2));
+    dummy.rotation.set(a, 0, 0);
+    dummy.updateMatrix();
+    inst.setMatrixAt(i, dummy.matrix);
+  }
+  inst.instanceMatrix.needsUpdate = true;
+  rotor.add(inst);
+}
+for (let i = 0; i < 5; i++) addBladeStage(-13.6 + i * 0.72, 1.10, 0.30, 30);
+for (let i = 0; i < 6; i++) addBladeStage(-9.2 + i * 0.78, 1.50, 0.40, 34);
+const lpR = [1.20, 1.60, 1.95, 2.20, 2.42, 2.58, 2.68];
+for (let i = 0; i < 7; i++) addBladeStage(-3.3 + i * 0.82, lpR[i], 0.42, 42);
+
+const pedestalX = [-15.0, -9.9, -4.4, 3.3, 4.6, 11.4];
+pedestalX.forEach(px => {
+  const h = CY + 5.6 - 0.9;
+  const p = box(1.7, h, 2.8, MAT.concrete);
+  p.position.set(px, -5.6 + h/2, 0);
+  turbineGroup.add(p);
+  const cap = box(2.1, 0.5, 3.2, MAT.steel);
+  cap.position.set(px, CY - 0.9, 0);
+  turbineGroup.add(cap);
+});
+
+/* ============================================================
+   6. BÌNH NGƯNG
+   ============================================================ */
+const condenserGroup = new THREE.Group();
+scene.add(condenserGroup);
+
+const COND = { x:-0.5, y:-0.75, w:9.0, h:4.5, d:7.4 };
+
+const condShell = new THREE.Mesh(new THREE.BoxGeometry(COND.w, COND.h, COND.d), MAT.condShell);
+condShell.position.set(COND.x, COND.y, 0);
+condShell.renderOrder = 4;
+condenserGroup.add(condShell);
+
+const edges = new THREE.LineSegments(
+  new THREE.EdgesGeometry(new THREE.BoxGeometry(COND.w, COND.h, COND.d)),
+  new THREE.LineBasicMaterial({ color:0x4a8fd4, transparent:true, opacity:0.5 })
+);
+edges.position.copy(condShell.position);
+condenserGroup.add(edges);
+
+/* Hot glow bên trong condenser — sáng mạnh khi Pk cao */
+const condHotGlowMat = new THREE.MeshBasicMaterial({
+  color: 0xff2200, transparent:true, opacity:0,
+  blending: THREE.AdditiveBlending, depthWrite:false
+});
+const condHotGlow = new THREE.Mesh(new THREE.SphereGeometry(4.6, 24, 16), condHotGlowMat);
+condHotGlow.position.set(COND.x, -0.4, 0);
+condenserGroup.add(condHotGlow);
+
+const hotwell = box(8.2, 1.8, 6.4, new THREE.MeshStandardMaterial({
+  color:0x3a6f9a, metalness:0.7, roughness:0.35, transparent:true, opacity:0.5
+}));
+hotwell.position.set(COND.x, -3.85, 0);
+condenserGroup.add(hotwell);
+
+const waterLevel = new THREE.Mesh(
+  new THREE.BoxGeometry(7.9, 0.9, 6.1),
+  new THREE.MeshStandardMaterial({ color:0x3a9fd0, metalness:0.3, roughness:0.15,
+    transparent:true, opacity:0.65, emissive:0x0a4a6c, emissiveIntensity:0.5 })
+);
+waterLevel.position.set(COND.x, -4.15, 0);
+condenserGroup.add(waterLevel);
+
+(function buildTubes(){
+  const rows = [];
+  for (let y = -2.35; y <= 0.95; y += 0.30){
+    for (let x = -4.35; x <= 3.35; x += 0.30){
+      const inBundle = (x < -0.9) || (x > 1.4);
+      if (!inBundle) continue;
+      rows.push([x, y]);
+    }
+  }
+  const tubeGeo = new THREE.CylinderGeometry(0.055, 0.055, COND.d + 0.4, 8, 1, true);
+  tubeGeo.rotateX(Math.PI/2);
+  const inst = new THREE.InstancedMesh(tubeGeo, MAT.tube, rows.length);
+  const dummy = new THREE.Object3D();
+  rows.forEach(([x, y], i) => {
+    dummy.position.set(x, y, 0);
+    dummy.updateMatrix();
+    inst.setMatrixAt(i, dummy.matrix);
+  });
+  inst.instanceMatrix.needsUpdate = true;
+  inst.renderOrder = 3;
+  condenserGroup.add(inst);
+})();
+
+const wbIn  = box(9.4, 4.9, 0.7, MAT.pipeBlue);
+wbIn.position.set(COND.x, COND.y, -3.9);
+condenserGroup.add(wbIn);
+const wbOut = box(9.4, 4.9, 0.7, MAT.pipeRed);
+wbOut.position.set(COND.x, COND.y, 3.9);
+condenserGroup.add(wbOut);
+
+/* ============================================================
+   7. HỆ THỐNG NƯỚC BIỂN
+   ============================================================ */
+const intakeGroup = new THREE.Group();
+scene.add(intakeGroup);
+
+const intakeTower = cylY(3.0, 2.5, MAT.intake, 24);
+intakeTower.position.set(28, -4.0, -12);
+intakeGroup.add(intakeTower);
+const intakeCap = new THREE.Mesh(new THREE.CylinderGeometry(3.5, 3.5, 0.4, 24), MAT.intake);
+intakeCap.position.set(28, -2.7, -12);
+intakeGroup.add(intakeCap);
+for (let i = 0; i < 8; i++){
+  const bar = box(0.08, 2.2, 0.08, MAT.steel);
+  bar.position.set(28 + Math.cos(i * Math.PI/4) * 2.8, -4.0, -12 + Math.sin(i * Math.PI/4) * 2.8);
+  intakeGroup.add(bar);
+}
+
+scene.add(makePipe([[28, -4.5, -12], [22, -4.8, -10], [16, -4.8, -8], [10, -4.5, -6],
+                     [5, -3.8, -5], [0, -3.2, -4.2]], 0.9, MAT.pipeBlue));
+
+function createSeawaterPump(x, z, isStandby){
+  const g = new THREE.Group();
+  const base = box(3.5, 0.6, 2.8, MAT.concrete);
+  base.position.y = -5.3;
+  g.add(base);
+  const volute = cylY(1.3, 1.4, MAT.pipeBlue, 28);
+  volute.position.y = -3.5;
+  g.add(volute);
+  const motor = cylY(1.0, 2.8, MAT.motor, 26);
+  motor.position.y = -1.6;
+  g.add(motor);
+  const coupl = cylY(0.35, 0.8, MAT.steel, 16);
+  coupl.position.y = -0.3;
+  g.add(coupl);
+  const ledMat = new THREE.MeshStandardMaterial({
+    color: isStandby ? 0x8899aa : 0x00cc66,
+    emissive: isStandby ? 0x223344 : 0x00cc66,
+    emissiveIntensity: isStandby ? 0.2 : 1.8
+  });
+  const led = new THREE.Mesh(new THREE.SphereGeometry(0.22, 16, 12), ledMat);
+  led.position.set(0, -0.1, 1.6);
+  g.add(led);
+  g.position.set(x, 0, z);
+  g.userData.led = ledMat;
+  g.userData.isStandby = !!isStandby;
+  scene.add(g);
+  return g;
+}
+const cwPumps = [
+  createSeawaterPump(-8, -14, false),
+  createSeawaterPump(-3, -14, false),
+  createSeawaterPump(2, -14, true)
+];
+scene.add(makePipe([[-8, -3.0, -14], [-8, -3.0, -10], [-6, -2.8, -7], [-2, -2.6, -5], [0, -2.6, -4.4]], 0.5, MAT.pipeBlue));
+scene.add(makePipe([[-3, -3.0, -14], [-3, -3.0, -10], [-1.5, -2.8, -7], [0, -2.6, -5], [0, -2.6, -4.4]], 0.5, MAT.pipeBlue));
+scene.add(makePipe([[3.5, -2.4, 4.4], [3.5, -2.4, 10], [3.0, -2.0, 16],
+                     [3.0, -1.5, 22], [4.0, -1.0, 30], [6.0, -0.5, 38]], 0.55, MAT.pipeRed));
+
+const outfall = new THREE.Mesh(
+  new THREE.BoxGeometry(6, 1.2, 4),
+  new THREE.MeshStandardMaterial({ color:0xc05a48, metalness:0.3, roughness:0.6, transparent:true, opacity:0.6 })
+);
+outfall.position.set(10, -4.6, 42);
+scene.add(outfall);
+
+const plumeGeo = new THREE.CircleGeometry(12, 32);
+const plumeMat = new THREE.MeshBasicMaterial({
+  color:0xff8844, transparent:true, opacity:0.12, side:THREE.DoubleSide, depthWrite:false
+});
+const thermalPlume = new THREE.Mesh(plumeGeo, plumeMat);
+thermalPlume.rotation.x = -Math.PI/2;
+thermalPlume.position.set(14, -5.35, 44);
+scene.add(thermalPlume);
+
+/* ============================================================
+   8. BƠM CHÂN KHÔNG
+   ============================================================ */
+const vacuumPumps = [];
+function createVacuumSkid(z, isStandby){
+  const g = new THREE.Group();
+  const base = box(7.4, 0.4, 3.0, MAT.steel);
+  base.position.set(12.5, -5.35, 0);
+  g.add(base);
+  const sep = cylY(1.0, 3.2, MAT.pipeCyan, 26);
+  sep.position.set(10.6, -3.9, 0);
+  g.add(sep);
+  const sepCap = new THREE.Mesh(new THREE.SphereGeometry(1.0, 24, 12, 0, Math.PI*2, 0, Math.PI/2), MAT.pipeCyan);
+  sepCap.position.set(10.6, -2.3, 0);
+  g.add(sepCap);
+  const pump = cylX(0.85, 2.3, MAT.casing, 28);
+  pump.position.set(13.4, -3.2, 0);
+  g.add(pump);
+  const motor = cylX(0.68, 2.0, MAT.motor, 24);
+  motor.position.set(15.6, -3.2, 0);
+  g.add(motor);
+  const shaftC = cylX(0.18, 0.7, MAT.steel, 12);
+  shaftC.position.set(14.8, -3.2, 0);
+  g.add(shaftC);
+  g.add(makePipe([[12.3,-2.6,0],[12.3,-3.2,0],[12.6,-3.2,0]], 0.30, MAT.pipeCyan, 20));
+  g.add(makePipe([[13.4,-2.35,0],[13.4,-1.9,0],[11.6,-1.9,0],[10.6,-2.4,0]], 0.26, MAT.pipeYellow, 30));
+  const vent = cylY(0.20, 4.4, MAT.pipeYellow, 14);
+  vent.position.set(10.6, 0.4, 0);
+  g.add(vent);
+  const ventCap = new THREE.Mesh(new THREE.ConeGeometry(0.38, 0.5, 14), MAT.pipeYellow);
+  ventCap.position.set(10.6, 2.6, 0);
+  g.add(ventCap);
+  const ledMat = new THREE.MeshStandardMaterial({
+    color: isStandby ? 0x8899aa : 0x00cc66,
+    emissive: isStandby ? 0x223344 : 0x00cc66,
+    emissiveIntensity: isStandby ? 0.2 : 1.8
+  });
+  const led = new THREE.Mesh(new THREE.SphereGeometry(0.22, 16, 12), ledMat);
+  led.position.set(10.6, -2.6, 1.15);
+  g.add(led);
+  g.position.set(0, 0, z);
+  g.userData.led = ledMat;
+  g.userData.isStandby = !!isStandby;
+  scene.add(g);
+  vacuumPumps.push(g);
+  return g;
+}
+createVacuumSkid(-8,  false);
+createVacuumSkid(-13, false);
+createVacuumSkid(-19, true);
+
+scene.add(makePipe([[2.6,0.6,-2.6],[4.2,2.7,-3.8],[8.0,2.7,-6.2],[12.0,2.7,-8.0],[12.3,2.7,-8.0],[12.3,-3.2,-8.0]], 0.32, MAT.pipeCyan));
+scene.add(makePipe([[2.6,0.6,-2.6],[4.2,2.9,-4.4],[8.0,2.9,-10.5],[12.3,2.9,-13.0],[12.3,-3.2,-13.0]], 0.30, MAT.pipeCyan));
+scene.add(makePipe([[2.6,0.6,-2.6],[4.6,3.3,-5.0],[8.5,3.3,-15.5],[12.3,3.3,-19.0],[12.3,-3.2,-19.0]], 0.28, MAT.pipeCyan));
+
+/* ============================================================
+   9. BƠM NƯỚC NGƯNG
+   ============================================================ */
+const condensatePumps = [];
+function createCondensatePump(x, z, isStandby){
+  const g = new THREE.Group();
+  const base = box(2.4, 0.5, 2.0, MAT.concrete);
+  base.position.y = -5.35;
+  g.add(base);
+  const pumpBody = cylY(0.85, 2.0, MAT.condensate, 26);
+  pumpBody.position.y = -4.0;
+  g.add(pumpBody);
+  const motor = cylY(0.75, 1.6, MAT.motor, 26);
+  motor.position.y = -2.2;
+  g.add(motor);
+  const coupl = cylY(0.28, 0.5, MAT.steel, 14);
+  coupl.position.y = -1.25;
+  g.add(coupl);
+  g.add(makePipe([[0, -4.7, 0], [0, -4.7, -1.2], [0, -4.7, -2.0]], 0.22, MAT.pipeBlue, 20));
+  g.add(makePipe([[0, -3.6, 0], [1.2, -3.6, 0], [1.5, -3.6, 0.4]], 0.24, MAT.pipeBlue, 20));
+  const ledMat = new THREE.MeshStandardMaterial({
+    color: isStandby ? 0x8899aa : 0x00cc66,
+    emissive: isStandby ? 0x223344 : 0x00cc66,
+    emissiveIntensity: isStandby ? 0.2 : 1.8
+  });
+  const led = new THREE.Mesh(new THREE.SphereGeometry(0.18, 14, 10), ledMat);
+  led.position.set(0, -1.35, 0.85);
+  g.add(led);
+  g.position.set(x, 0, z);
+  g.userData.led = ledMat;
+  g.userData.isStandby = !!isStandby;
+  scene.add(g);
+  condensatePumps.push(g);
+  return g;
+}
+createCondensatePump(-5.5, -2.0, false);
+createCondensatePump(-5.5,  2.0, false);
+createCondensatePump(-7.5,  0.0, true);
+scene.add(makePipe([[-4.0, -4.7, -2.0], [-4.0, -4.7, -6.0], [-5.0, -4.5, -10.0],
+                    [-6.5, -4.0, -14.0], [-8.0, -3.5, -18.0], [-9.0, -3.0, -22.0]], 0.55, MAT.pipeBlue, 120));
+
+/* ============================================================
+   10. HƠI CHÈN TRỤC
+   ============================================================ */
+scene.add(makePipe([[-9.9,9.5,3.5],[-9.9,7.6,2.6],[-9.9,6.2,0.9]], 0.24, MAT.pipeYellow));
+scene.add(makePipe([[3.3,9.5,3.5],[3.3,7.6,2.6],[3.3,6.2,0.9]], 0.24, MAT.pipeYellow));
+scene.add(makePipe([[-9.9,9.5,3.5],[3.3,9.5,3.5]], 0.26, MAT.pipeYellow));
+
+/* ============================================================
+   11. HỆ THỐNG HẠT
+   ============================================================ */
+function makeDotTexture(){
+  const c = document.createElement('canvas');
+  c.width = c.height = 64;
+  const ctx = c.getContext('2d');
+  const grd = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+  grd.addColorStop(0.0, 'rgba(255,255,255,1)');
+  grd.addColorStop(0.35, 'rgba(255,255,255,0.55)');
+  grd.addColorStop(1.0, 'rgba(255,255,255,0)');
+  ctx.fillStyle = grd;
+  ctx.fillRect(0, 0, 64, 64);
+  const t = new THREE.CanvasTexture(c);
+  t.needsUpdate = true;
+  return t;
+}
+const DOT_TEX = makeDotTexture();
+
+/* ---------- 11.1 Hơi nước qua tuabin ---------- */
+const steamCurve = new THREE.CatmullRomCurve3([
+  new THREE.Vector3(-17.0, CY, 0),
+  new THREE.Vector3(-12.0, CY, 0),
+  new THREE.Vector3( -7.0, CY, 0),
+  new THREE.Vector3( -2.0, CY, 0),
+  new THREE.Vector3(  1.4, CY - 0.9, 0),
+  new THREE.Vector3(  1.4, 2.0, 0),
+  new THREE.Vector3(  0.6, -0.6, 0),
+  new THREE.Vector3( -0.5, -2.6, 0)
+]);
+const steamPts = steamCurve.getSpacedPoints(320);
+
+const STEAM_N = 850;
+const steamPos   = new Float32Array(STEAM_N * 3);
+const steamCol   = new Float32Array(STEAM_N * 3);
+const steamT     = new Float32Array(STEAM_N);
+const steamSpd   = new Float32Array(STEAM_N);
+const steamOff   = new Float32Array(STEAM_N * 3);
+
+for (let i = 0; i < STEAM_N; i++){
+  steamT[i] = Math.random();
+  steamSpd[i] = 0.055 + Math.random() * 0.045;
+  const u = Math.random()*2 - 1, v = Math.random()*2 - 1, w = Math.random()*2 - 1;
+  const n = Math.hypot(u, v, w) || 1;
+  steamOff[i*3]   = u / n;
+  steamOff[i*3+1] = v / n;
+  steamOff[i*3+2] = w / n;
+}
+
+const steamGeo = new THREE.BufferGeometry();
+steamGeo.setAttribute('position', new THREE.BufferAttribute(steamPos, 3));
+steamGeo.setAttribute('color',    new THREE.BufferAttribute(steamCol, 3));
+const steamMat = new THREE.PointsMaterial({
+  size: 0.48, map: DOT_TEX, vertexColors: true, transparent: true,
+  opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true
+});
+const steamPoints = new THREE.Points(steamGeo, steamMat);
+steamPoints.frustumCulled = false;
+scene.add(steamPoints);
+
+/* ---------- 11.2 NƯỚC NGƯNG ---------- */
+const COND_TOP    = 1.30;
+const COND_BOTTOM = -2.85;
+const COND_N      = 700;
+
+const condPos = new Float32Array(COND_N * 3);
+const condCol = new Float32Array(COND_N * 3);
+const condSiz = new Float32Array(COND_N);
+const condDat = [];
+
+for (let i = 0; i < COND_N; i++){
+  const x0 = -3.8 + Math.random() * 7.2;
+  const z0 = -3.0 + Math.random() * 6.0;
+  condDat.push({
+    x: x0,
+    z: z0,
+    y: COND_TOP - Math.random() * (COND_TOP - COND_BOTTOM),
+    speed: 0.45 + Math.random() * 0.85,
+    wobblePh: Math.random() * Math.PI * 2,
+    wobbleAmp: 0.04 + Math.random() * 0.12,
+    wobbleSpd: 0.8 + Math.random() * 1.6,
+    sizeBase: 0.55 + Math.random() * 0.45
+  });
+}
+
+const condGeo = new THREE.BufferGeometry();
+condGeo.setAttribute('position', new THREE.BufferAttribute(condPos, 3));
+condGeo.setAttribute('color',    new THREE.BufferAttribute(condCol, 3));
+condGeo.setAttribute('size',     new THREE.BufferAttribute(condSiz, 1));
+
+const condMat = new THREE.ShaderMaterial({
+  uniforms: {
+    uTex:   { value: DOT_TEX },
+    uScale: { value: (window.innerHeight * renderer.getPixelRatio()) / 2 }
+  },
+  vertexShader: `
+    attribute float size;
+    varying vec3 vColor;
+    uniform float uScale;
+    void main(){
+      vColor = color;
+      vec4 mv = modelViewMatrix * vec4(position, 1.0);
+      gl_Position = projectionMatrix * mv;
+      gl_PointSize = size * uScale / -mv.z;
+    }
+  `,
+  fragmentShader: `
+    uniform sampler2D uTex;
+    varying vec3 vColor;
+    void main(){
+      vec4 t = texture2D(uTex, gl_PointCoord);
+      if (t.a < 0.05) discard;
+      gl_FragColor = vec4(vColor, t.a);
+    }
+  `,
+  vertexColors: true,
+  transparent: true,
+  depthWrite: false,
+  blending: THREE.NormalBlending
+});
+
+const condPoints = new THREE.Points(condGeo, condMat);
+condPoints.frustumCulled = false;
+condPoints.renderOrder = 6;
+scene.add(condPoints);
+
+/* ---------- 11.3 Nước biển trong condenser ---------- */
+const CW_N = 500;
+const cwPos = new Float32Array(CW_N * 3);
+const cwCol = new Float32Array(CW_N * 3);
+const cwZ   = new Float32Array(CW_N);
+
+for (let i = 0; i < CW_N; i++){
+  const x = -4.3 + Math.random() * 7.6;
+  const y = -2.35 + Math.random() * 3.2;
+  const inBundle = (x < -0.9) || (x > 1.4);
+  cwPos[i*3]   = inBundle ? x : (x < 0.25 ? -1.6 : 2.1);
+  cwPos[i*3+1] = y;
+  cwZ[i] = -3.6 + Math.random() * 7.2;
+  cwPos[i*3+2] = cwZ[i];
+}
+const cwGeo = new THREE.BufferGeometry();
+cwGeo.setAttribute('position', new THREE.BufferAttribute(cwPos, 3));
+cwGeo.setAttribute('color',    new THREE.BufferAttribute(cwCol, 3));
+const cwMat = new THREE.PointsMaterial({
+  size: 0.30, map: DOT_TEX, vertexColors: true, transparent: true,
+  opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true
+});
+const cwPoints = new THREE.Points(cwGeo, cwMat);
+cwPoints.frustumCulled = false;
+cwPoints.renderOrder = 5;
+scene.add(cwPoints);
+
+/* ---------- 11.4 Khí không ngưng ---------- */
+const airCurve = new THREE.CatmullRomCurve3([
+  new THREE.Vector3(2.6, 0.6, -2.6),
+  new THREE.Vector3(4.2, 2.7, -3.8),
+  new THREE.Vector3(8.0, 2.7, -6.2),
+  new THREE.Vector3(12.3, 2.7, -8.0),
+  new THREE.Vector3(12.3, -3.2, -8.0)
+]);
+const airPts = airCurve.getSpacedPoints(120);
+const AIR_N = 180;
+const airPos = new Float32Array(AIR_N * 3);
+const airCol = new Float32Array(AIR_N * 3);
+const airT   = new Float32Array(AIR_N);
+const airSpd = new Float32Array(AIR_N);
+for (let i = 0; i < AIR_N; i++){
+  airT[i] = Math.random();
+  airSpd[i] = 0.16 + Math.random() * 0.12;
+  airCol[i*3] = 1.0; airCol[i*3+1] = 0.85; airCol[i*3+2] = 0.30;
+}
+const airGeo = new THREE.BufferGeometry();
+airGeo.setAttribute('position', new THREE.BufferAttribute(airPos, 3));
+airGeo.setAttribute('color',    new THREE.BufferAttribute(airCol, 3));
+const airMat = new THREE.PointsMaterial({
+  size: 0.26, map: DOT_TEX, vertexColors: true, transparent: true,
+  opacity: 0.85, blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true
+});
+const airPoints = new THREE.Points(airGeo, airMat);
+airPoints.frustumCulled = false;
+scene.add(airPoints);
+
+/* ---------- 11.5 Dòng nước ngưng trong ống ---------- */
+const PIPE_COND_N = 90;
+const pipeCondPos = new Float32Array(PIPE_COND_N * 3);
+const pipeCondCol = new Float32Array(PIPE_COND_N * 3);
+const pipeCondT   = new Float32Array(PIPE_COND_N);
+
+const pipeCondCurve = new THREE.CatmullRomCurve3([
+  new THREE.Vector3(-4.0, -4.7, -2.0),
+  new THREE.Vector3(-4.0, -4.7, -6.0),
+  new THREE.Vector3(-5.0, -4.5, -10.0),
+  new THREE.Vector3(-6.5, -4.0, -14.0),
+  new THREE.Vector3(-8.0, -3.5, -18.0),
+  new THREE.Vector3(-9.0, -3.0, -22.0)
+]);
+const pipeCondPts = pipeCondCurve.getSpacedPoints(PIPE_COND_N * 2);
+
+for (let i = 0; i < PIPE_COND_N; i++) pipeCondT[i] = Math.random();
+
+const pipeCondGeo = new THREE.BufferGeometry();
+pipeCondGeo.setAttribute('position', new THREE.BufferAttribute(pipeCondPos, 3));
+pipeCondGeo.setAttribute('color',    new THREE.BufferAttribute(pipeCondCol, 3));
+const pipeCondMat = new THREE.PointsMaterial({
+  size: 0.32, map: DOT_TEX, vertexColors: true, transparent: true,
+  opacity: 0.95, blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true
+});
+const pipeCondPoints = new THREE.Points(pipeCondGeo, pipeCondMat);
+pipeCondPoints.frustumCulled = false;
+scene.add(pipeCondPoints);
+
+/* ---------- 11.6 Sinh vật biển ---------- */
+const MARINE_N = 120;
+const marinePos = new Float32Array(MARINE_N * 3);
+const marineCol = new Float32Array(MARINE_N * 3);
+const marineData = [];
+for (let i = 0; i < MARINE_N; i++){
+  marineData.push({
+    angle: Math.random() * Math.PI * 2,
+    radius: 2 + Math.random() * 6,
+    y: -5.0 + Math.random() * 1.5,
+    speed: 0.1 + Math.random() * 0.2
+  });
+}
+const marineGeo = new THREE.BufferGeometry();
+marineGeo.setAttribute('position', new THREE.BufferAttribute(marinePos, 3));
+marineGeo.setAttribute('color',    new THREE.BufferAttribute(marineCol, 3));
+const marineMat = new THREE.PointsMaterial({
+  size: 0.25, map: DOT_TEX, vertexColors: true, transparent: true,
+  opacity: 0.7, depthWrite: false, sizeAttenuation: true
+});
+const marinePoints = new THREE.Points(marineGeo, marineMat);
+marinePoints.frustumCulled = false;
+scene.add(marinePoints);
+
+/* ============================================================
+   12. NHÃN 3D
+   ============================================================ */
+const labels = [
+  ['TUA BIN CAO ÁP (HP)',  -12.0,  8.4,  0, '#d9f3ff'],
+  ['TUA BIN TRUNG ÁP (IP)', -7.0,  9.0,  0, '#d9f3ff'],
+  ['TUA BIN HẠ ÁP (LP)',    -0.5, 10.4,  0, '#65f0ad'],
+  ['MÁY PHÁT ĐIỆN',          7.5,  8.4,  0, '#d9f3ff'],
+  ['BÌNH NGƯNG',             4.9, -0.7,  5.2, '#63d7ff'],
+  ['BƠM CHÂN KHÔNG',        13.0,  3.6, -12.0, '#ffd166'],
+  ['BƠM NƯỚC BIỂN (CWP)',   -5.5,  1.0, -16.0, '#63d7ff'],
+  ['BƠM NƯỚC NGƯNG',        -8.5,  2.0,  2.0, '#7dcaff'],
+  ['CỬA LẤY NƯỚC BIỂN',     28.0,  1.5, -12.0, '#63d7ff'],
+  ['KÊNH XẢ NƯỚC RA',       8.0,  2.0,  42.0, '#ff8a75'],
+  ['NƯỚC NGƯNG RA',        -9.0,  0.0, -22.0, '#7dcaff']
+];
+labels.forEach(([txt, x, y, z, col]) => {
+  const sp = makeLabel(txt, col);
+  sp.position.set(x, y, z);
+  scene.add(sp);
+});
+
+/* ---- Đèn báo động ---- */
+const alarmMat = new THREE.MeshStandardMaterial({
+  color: 0x330000, emissive: 0x000000, emissiveIntensity: 0
+});
+const alarmLight = new THREE.Mesh(new THREE.SphereGeometry(0.5, 20, 14), alarmMat);
+alarmLight.position.set(4.2, 1.9, 0);
+scene.add(alarmLight);
+const alarmPole = cylY(0.09, 1.6, MAT.steel, 10);
+alarmPole.position.set(4.2, 1.0, 0);
+scene.add(alarmPole);
+
+/* ---- Đèn báo trên nóc bình ngưng (thêm) ---- */
+const beaconMat = new THREE.MeshStandardMaterial({
+  color: 0x330000, emissive: 0x000000, emissiveIntensity: 0
+});
+const beacon = new THREE.Mesh(new THREE.SphereGeometry(0.6, 20, 14), beaconMat);
+beacon.position.set(COND.x, 2.4, 3.6);
+scene.add(beacon);
+const beaconPole = cylY(0.09, 1.2, MAT.steel, 10);
+beaconPole.position.set(COND.x, 1.5, 3.6);
+scene.add(beaconPole);
+
+/* ============================================================
+   13. LOGIC — ĐÃ TĂNG MỨC ẢNH HƯỞNG
+   ============================================================ */
+function computeEffectivePk(){
+  let pk = state.sliderPk;
+  // Tăng mạnh hệ số ảnh hưởng để dễ thấy
+  if (state.airLeak) pk += 0.085;      // was 0.052 → +0.033
+  if (!state.cwOn)   pk += 0.095;      // was 0.055 → +0.040
+  if (state.silt)    pk += 0.048;      // was 0.028 → +0.020
+  if (state.tide)    pk += 0.055;      // was 0.035 → +0.020
+  if (state.backup)  pk -= 0.028;      // was 0.022
+  return Math.min(0.42, Math.max(0.020, pk));
+}
+
+function statusOf(pk){
+  if (pk >= 0.254) return { key:'trip', label:'TRIP TUABIN KHẨN CẤP', color:'#c0392b' };
+  if (pk >= 0.169) return { key:'load', label:'GIẢM TẢI TỔ MÁY',      color:'#e67e22' };
+  if (pk >  0.110) return { key:'warn', label:'CẢNH BÁO – CHÂN KHÔNG SUY GIẢM', color:'#f39c12' };
+  if (pk <  0.050) return { key:'deep', label:'CHÂN KHÔNG QUÁ SÂU – ẨM CAO',    color:'#8e44ad' };
+  return { key:'ok', label:'VẬN HÀNH TỐI ƯU', color:'#27ae60' };
+}
+
+const el = {
+  badge  : document.getElementById('statusBadge'),
+  pk     : document.getElementById('v-pk'),
+  vac    : document.getElementById('v-vac'),
+  temp   : document.getElementById('v-temp'),
+  moist  : document.getElementById('v-moist'),
+  h0     : document.getElementById('v-h0'),
+  aux    : document.getElementById('v-aux'),
+  pt     : document.getElementById('v-pt'),
+  pn     : document.getElementById('v-pn'),
+  cwin   : document.getElementById('v-cwin'),
+  cwout  : document.getElementById('v-cwout'),
+  cwdt   : document.getElementById('v-cwdt'),
+  cwflow : document.getElementById('v-cwflow'),
+  condflow: document.getElementById('v-condflow'),
+  condtemp: document.getElementById('v-condtemp'),
+  subcool : document.getElementById('v-subcool'),
+  hotlevel: document.getElementById('v-hotlevel'),
+  slider : document.getElementById('v-slider'),
+  c_pk   : document.getElementById('c-pk'),
+  c_vac  : document.getElementById('c-vac'),
+  c_temp : document.getElementById('c-temp'),
+  c_moist: document.getElementById('c-moist'),
+  c_pt   : document.getElementById('c-pt'),
+  c_pn   : document.getElementById('c-pn'),
+  vign   : document.getElementById('alertVignette')
+};
+
+function updateHUD(){
+  const pk = state.pk;
+  const st = statusOf(pk);
+
+  const pturb = interp(PTURB, pk);
+  const pnet  = interp(PNET,  pk);
+  const aux   = Math.max(0, pturb - pnet);
+  const tSat  = interp(TSAT,  pk);
+  const moist = interp(MOIST, pk);
+  const h0    = interp(H0ARR, pk);
+  const vacMm = (1.01325 - pk) * 750.06;
+  const condFlow = interp(CONDFLOW, pk) * (state.cwOn ? 1.0 : 0.4) * (state.silt ? 0.92 : 1.0);
+
+  const subcool = state.subcool ? 3.5 : 0.5;
+  const condTemp = tSat - subcool;
+  const hotLevel = state.cwOn ? 65 : 12;   // hạ sâu hơn: 22 → 12
+
+  const cwIn  = SEAWATER.inletTemp;
+  const cwOut = Math.min(SEAWATER.maxOutlet + 3, cwIn + SEAWATER.deltaT * (state.cwOn ? 1.0 : 2.6));
+  const cwDt  = cwOut - cwIn;
+  const cwFlow = SEAWATER.flowPerUnit * (state.cwOn ? 1.0 : 0.0) * (state.tide ? 0.55 : 1.0);
+
+  el.pk.textContent    = pk.toFixed(3);
+  el.vac.textContent   = vacMm.toFixed(0);
+  el.temp.textContent  = tSat.toFixed(1);
+  el.moist.textContent = moist.toFixed(1);
+  el.h0.textContent    = h0.toFixed(0);
+  el.aux.textContent   = aux.toFixed(1);
+  el.pt.textContent    = pturb.toFixed(1);
+  el.pn.textContent    = pnet.toFixed(1);
+  el.cwin.textContent  = cwIn.toFixed(1);
+  el.cwout.textContent = cwOut.toFixed(1);
+  el.cwdt.textContent  = cwDt.toFixed(1);
+  el.cwflow.textContent = cwFlow.toFixed(1);
+  el.condflow.textContent = condFlow.toFixed(0);
+  el.condtemp.textContent = condTemp.toFixed(1);
+  el.subcool.textContent  = subcool.toFixed(1);
+  el.hotlevel.textContent = hotLevel.toFixed(0);
+
+  el.badge.textContent = st.label;
+  el.badge.style.background = st.color;
+  el.badge.classList.toggle('pulse', st.key !== 'ok');
+
+  const setCls = (node, cls) => { node.className = 'cell' + (cls ? ' ' + cls : ''); };
+  setCls(el.c_pk,   st.key === 'ok' ? 'ok' : (st.key === 'warn' ? 'warn' : 'bad'));
+  setCls(el.c_vac,  st.key === 'ok' ? 'ok' : '');
+  setCls(el.c_temp, pk >= 0.169 ? 'bad' : (pk > 0.11 ? 'warn' : 'ok'));
+  setCls(el.c_moist,pk < 0.05 ? 'warn' : 'ok');
+  setCls(el.c_pt,   '');
+  setCls(el.c_pn,   st.key === 'ok' ? 'ok' : (st.key === 'warn' ? 'warn' : 'bad'));
+
+  el.vign.classList.toggle('on', st.key === 'trip' || st.key === 'load');
+
+  state._pturb = pturb;
+  state._pnet  = pnet;
+  state._tSat  = tSat;
+  state._moist = moist;
+  state._st    = st;
+  state._cwOut = cwOut;
+  state._condFlow = condFlow;
+  state._hotLevel = hotLevel;
+}
+
+/* ============================================================
+   14. CẬP NHẬT HIỆU ỨNG 3D — TĂNG MỨC ẢNH HƯỞNG
+   ============================================================ */
+const _v = new THREE.Vector3();
+
+function samplePath(pts, t, out){
+  const f = t * (pts.length - 1);
+  const i = Math.floor(f);
+  const j = Math.min(i + 1, pts.length - 1);
+  const a = f - i;
+  return out.copy(pts[i]).lerp(pts[j], a);
+}
+
+/* ---------- 14.1 HƠI NƯỚC — đỏ rực khi quá nhiệt ---------- */
+function updateSteam(dt){
+  const flow = state.cwOn ? 1.0 : 0.55;
+  // tempNorm saturate nhanh hơn để thấy rõ: chia 28 thay vì 45
+  const tempNorm = THREE.MathUtils.clamp((state._tSat - 30) / 28, 0, 1.4);
+  const isTrip = state._st && state._st.key === 'trip';
+
+  for (let i = 0; i < STEAM_N; i++){
+    steamT[i] += dt * steamSpd[i] * flow * 3.2;
+    if (steamT[i] > 1) steamT[i] -= 1;
+
+    const t = steamT[i];
+    samplePath(steamPts, t, _v);
+
+    const spread = t < 0.62 ? 0.55 : 0.55 + ((t - 0.62) / 0.38) * 2.7;
+    const i3 = i * 3;
+    steamPos[i3]     = _v.x + steamOff[i3]     * spread;
+    steamPos[i3 + 1] = _v.y + steamOff[i3 + 1] * spread * 0.9;
+    steamPos[i3 + 2] = _v.z + steamOff[i3 + 2] * spread;
+
+    let r, g, b;
+    if (t < 0.55){
+      const k = t / 0.55;
+      r = 1.00 - 0.30 * k;
+      g = 0.80 + 0.05 * k;
+      b = 0.55 + 0.40 * k;
+    } else {
+      const k = (t - 0.55) / 0.45;
+      r = 0.70 - 0.30 * k;
+      g = 0.85 - 0.10 * k;
+      b = 0.95 + 0.02 * k;
+    }
+
+    // KHUẾCH ĐẠI: đỏ mạnh hơn nhiều khi quá nhiệt, đặc biệt ở tầng cuối LP
+    if (t > 0.55){
+      const k = (t - 0.55) / 0.45;
+      r += tempNorm * 1.4 * k;
+      g -= tempNorm * 0.65 * k;
+      b -= tempNorm * 0.55 * k;
+    }
+
+    if (isTrip && t > 0.55){
+      const k = (t - 0.55) / 0.45;
+      r = 1.0;
+      g = 0.20 - 0.10 * k;
+      b = 0.10 - 0.05 * k;
+    }
+
+    const inten = 0.9;
+    steamCol[i3]     = THREE.MathUtils.clamp(r * inten, 0, 1);
+    steamCol[i3 + 1] = THREE.MathUtils.clamp(g * inten, 0, 1);
+    steamCol[i3 + 2] = THREE.MathUtils.clamp(b * inten, 0, 1);
+  }
+  steamGeo.attributes.position.needsUpdate = true;
+  steamGeo.attributes.color.needsUpdate = true;
+
+  // Tăng kích thước hạt khi quá nhiệt
+  steamMat.size = 0.48 + tempNorm * 0.35;
+  // Khi mất bơm CW, hơi bốc mạnh hơn → opacity cao hơn
+  steamMat.opacity = 0.85 + (state.cwOn ? 0 : 0.15);
+}
+
+/* ---------- 14.2 NƯỚC NGƯNG — đóng băng + đổi màu rõ ---------- */
+function updateCondensate(dt){
+  // KHUẾCH ĐẠI: giảm mạnh hơn khi mất làm mát
+  let coolingEff = 1.0;
+  if (!state.cwOn) coolingEff = 0.06;     // was 0.18
+  if (state.silt)  coolingEff *= 0.42;    // was 0.72
+  if (state.tide)  coolingEff *= 0.58;    // was 0.85
+
+  const tempPenalty = THREE.MathUtils.clamp((state._tSat - 38) / 18, 0, 0.92);
+  const effRate = coolingEff * (1 - tempPenalty);
+
+  // Trạng thái "ngưng tụ kém": CW off hoặc Pk quá cao
+  const poorCondensation = !state.cwOn || state._tSat > 52;
+  const isTrip = state._st && state._st.key === 'trip';
+  const isDeep = state._st && state._st.key === 'deep';
+
+  for (let i = 0; i < COND_N; i++){
+    const d = condDat[i];
+
+    d.y -= d.speed * effRate * dt * 2.2;
+    d.wobblePh += dt * d.wobbleSpd;
+
+    if (d.y < COND_BOTTOM){
+      d.y = COND_TOP + Math.random() * 0.4;
+      d.x = -3.8 + Math.random() * 7.2;
+      d.z = -3.0 + Math.random() * 6.0;
+      d.speed = 0.45 + Math.random() * 0.85;
+    }
+
+    const i3 = i * 3;
+    condPos[i3]     = COND.x + d.x + Math.sin(d.wobblePh) * d.wobbleAmp;
+    condPos[i3 + 1] = d.y;
+    condPos[i3 + 2] = COND.z + d.z + Math.cos(d.wobblePh) * d.wobbleAmp;
+
+    const t = THREE.MathUtils.clamp(
+      (COND_TOP - d.y) / (COND_TOP - COND_BOTTOM),
+      0, 1
+    );
+
+    let r, g, b;
+    if (isDeep){
+      // Chân không quá sâu: ẩm cao, hạt ngả tím
+      r = 0.55 - t * 0.15;
+      g = 0.35 - t * 0.10;
+      b = 0.85 + t * 0.10;
+    } else if (isTrip || poorCondensation){
+      // Ngưng kém: hạt không chuyển thành nước — ở lại trắng rồi ngả đỏ
+      r = 0.98 - t * 0.05;
+      g = 0.92 - t * 0.70;
+      b = 0.92 - t * 0.80;
+    } else {
+      // Bình thường: trắng → xanh
+      r = 0.96 - t * 0.72;
+      g = 0.96 - t * 0.46;
+      b = 1.00;
+    }
+
+    condCol[i3]     = r;
+    condCol[i3 + 1] = g;
+    condCol[i3 + 2] = b;
+
+    // Kích thước: hạt nước to hơn khi ngưng tụ tốt; hơi giữ nhỏ khi ngưng kém
+    const sizeFactor = (isTrip || poorCondensation) ? (0.55 + t * 0.15) : (0.55 + t * 0.65);
+    condSiz[i] = sizeFactor * d.sizeBase;
+  }
+
+  condGeo.attributes.position.needsUpdate = true;
+  condGeo.attributes.color.needsUpdate = true;
+  condGeo.attributes.size.needsUpdate = true;
+
+  condMat.uniforms.uScale.value = (window.innerHeight * renderer.getPixelRatio()) / 2;
+}
+
+/* ---------- 14.3 NƯỚC NGƯNG TRONG ỐNG ---------- */
+function updatePipeCondensate(dt){
+  const speed = state.cwOn ? 2.2 : 0.25;
+  for (let i = 0; i < PIPE_COND_N; i++){
+    pipeCondT[i] += dt * speed * 0.35;
+    if (pipeCondT[i] > 1) pipeCondT[i] -= 1;
+    samplePath(pipeCondPts, pipeCondT[i], _v);
+    const i3 = i * 3;
+    pipeCondPos[i3]     = _v.x;
+    pipeCondPos[i3 + 1] = _v.y;
+    pipeCondPos[i3 + 2] = _v.z;
+
+    const fade = Math.sin(pipeCondT[i] * Math.PI);
+    if (state.cwOn){
+      pipeCondCol[i3]     = 0.20 * fade;
+      pipeCondCol[i3 + 1] = 0.50 * fade;
+      pipeCondCol[i3 + 2] = 0.90 * fade;
+    } else {
+      pipeCondCol[i3]     = 0.60 * fade;
+      pipeCondCol[i3 + 1] = 0.20 * fade;
+      pipeCondCol[i3 + 2] = 0.15 * fade;
+    }
+  }
+  pipeCondGeo.attributes.position.needsUpdate = true;
+  pipeCondGeo.attributes.color.needsUpdate = true;
+}
+
+/* ---------- 14.4 NƯỚC BIỂN — đóng băng + đổi màu ---------- */
+function updateCoolingWater(dt){
+  const speed = state.cwOn ? 3.6 : 0.08;  // gần như đứng yên khi ngừng bơm
+  for (let i = 0; i < CW_N; i++){
+    cwZ[i] += dt * speed;
+    if (cwZ[i] > 3.7) cwZ[i] -= 7.3;
+    const i3 = i * 3;
+    cwPos[i3 + 2] = cwZ[i];
+
+    const k = (cwZ[i] + 3.6) / 7.2;
+
+    if (state.cwOn){
+      // Bình thường: lạnh (xanh) → nóng (cam)
+      const heat = k;
+      cwCol[i3]     = 0.15 + 0.95 * heat;
+      cwCol[i3 + 1] = 0.62 - 0.28 * heat;
+      cwCol[i3 + 2] = 1.00 - 0.72 * heat;
+    } else {
+      // Mất bơm: nước tù đọng, ngả nâu đỏ
+      cwCol[i3]     = 0.55 * (0.4 + k * 0.6);
+      cwCol[i3 + 1] = 0.18 * (0.4 + k * 0.6);
+      cwCol[i3 + 2] = 0.12 * (0.4 + k * 0.6);
+    }
+  }
+  cwGeo.attributes.position.needsUpdate = true;
+  cwGeo.attributes.color.needsUpdate = true;
+  // Mờ hẳn khi mất bơm
+  cwMat.opacity = state.cwOn ? 0.9 : 0.25;
+}
+
+/* ---------- 14.5 KHÍ KHÔNG NGƯNG — phun mạnh khi lọt khí ---------- */
+function updateAirExtraction(dt){
+  const rate = state.airLeak ? 4.0 : 0.65;  // was 1.9
+  for (let i = 0; i < AIR_N; i++){
+    airT[i] += dt * airSpd[i] * rate;
+    if (airT[i] > 1) airT[i] -= 1;
+    samplePath(airPts, airT[i], _v);
+    const i3 = i * 3;
+    airPos[i3]     = _v.x;
+    airPos[i3 + 1] = _v.y;
+    airPos[i3 + 2] = _v.z;
+
+    const fade = Math.sin(airT[i] * Math.PI);
+    airCol[i3]     = 1.00 * fade;
+    airCol[i3 + 1] = (state.airLeak ? 0.55 : 0.85) * fade;
+    airCol[i3 + 2] = 0.18 * fade;
+  }
+  airGeo.attributes.position.needsUpdate = true;
+  airGeo.attributes.color.needsUpdate = true;
+  // Hạt to và sáng hơn rõ rệt khi lọt khí
+  airMat.size = state.airLeak ? 0.55 : 0.26;
+  airMat.opacity = state.airLeak ? 1.0 : 0.45;
+}
+
+function updateMarine(dt){
+  for (let i = 0; i < MARINE_N; i++){
+    const d = marineData[i];
+    d.angle += dt * d.speed;
+    const i3 = i * 3;
+    marinePos[i3]     = 28 + Math.cos(d.angle) * d.radius;
+    marinePos[i3 + 1] = d.y;
+    marinePos[i3 + 2] = -12 + Math.sin(d.angle) * d.radius;
+    const visible = state.silt || state.tide ? 1.0 : 0.3;
+    marineCol[i3]     = 0.3 * visible;
+    marineCol[i3 + 1] = 0.6 * visible;
+    marineCol[i3 + 2] = 0.25 * visible;
+  }
+  marineGeo.attributes.position.needsUpdate = true;
+  marineGeo.attributes.color.needsUpdate = true;
+  marineMat.opacity = state.silt || state.tide ? 0.85 : 0.25;
+}
+
+function updateThermalPlume(dt){
+  // KHUẾCH ĐẠI: vệt nước ấm rực rỡ hơn nhiều khi mất bơm CW
+  const heat = state.cwOn ? THREE.MathUtils.clamp((state._cwOut - 31) / 9, 0, 1) : 1.0;
+  const baseOpacity = state.cwOn ? 0.12 : 0.45;
+  plumeMat.opacity = baseOpacity * (0.6 + heat * 1.8);
+  const scale = 1.0 + heat * 1.5;
+  thermalPlume.scale.set(scale, scale, 1);
+  // Đổi màu: cam → đỏ khi càng nóng
+  if (state.cwOn){
+    plumeMat.color.setHex(0xff8844);
+  } else {
+    plumeMat.color.setHex(0xff3300);
+  }
+}
+
+function updateHotwell(dt){
+  const targetY = -4.15 + (state._hotLevel - 65) * 0.006;  // biên độ lớn hơn
+  waterLevel.position.y += (targetY - waterLevel.position.y) * Math.min(1, dt * 1.8);
+  waterLevel.scale.y = 1 + Math.sin(state.time * 2) * 0.06;
+  // Đổi màu nước trong hotwell: xanh → đỏ khi quá nhiệt
+  const hotFactor = THREE.MathUtils.clamp((state._tSat - 42) / 25, 0, 1);
+  waterLevel.material.color.setRGB(
+    0.23 + hotFactor * 0.6,
+    0.62 - hotFactor * 0.45,
+    0.82 - hotFactor * 0.65
+  );
+}
+
+/* ---------- 14.6 HIỆU ỨNG CHÍNH — tăng cường glow, màu nền, đèn ---------- */
+function updateVisuals(dt){
+  const st = state._st;
+  const pk = state.pk;
+
+  // RÔTO: dừng nhanh khi trip
+  if (st.key === 'trip'){
+    state.rotorSpd = Math.max(0.03, state.rotorSpd * Math.pow(0.25, dt));
+  } else {
+    state.rotorSpd = 1.0 + (state._pturb - 70) / 40;
+  }
+  rotor.rotation.x += dt * state.rotorSpd;
+
+  // GLOW: mạnh hơn rất nhiều
+  let glow = 0;
+  let glowColor = 0xc0392b;
+  if (st.key === 'trip'){ glow = 2.8; glowColor = 0xff2200; }
+  else if (st.key === 'load'){ glow = 2.0; glowColor = 0xff4400; }
+  else if (st.key === 'warn'){ glow = 1.1; glowColor = 0xf39c12; }
+  else if (st.key === 'deep'){ glow = 0.9; glowColor = 0x8e44ad; }
+  else if (state._tSat > 46){
+    glow = 0.35 + (state._tSat - 46) / 25;
+    glowColor = 0xff4400;
+  }
+
+  const _c1 = new THREE.Color(glowColor);
+  MAT.condShell.emissive.copy(_c1);
+  MAT.condShell.emissiveIntensity = glow;
+  hoodMat.emissive.copy(_c1);
+  hoodMat.emissiveIntensity = glow * 1.6;
+
+  // Vỏ condenser đổi màu trực tiếp (không chỉ emissive)
+  const shellBase = new THREE.Color(0x7fb3e8);
+  const shellHot = new THREE.Color(0xff5533);
+  const shellColor = shellBase.clone().lerp(shellHot, Math.min(1, glow * 0.6));
+  MAT.condShell.color.copy(shellColor);
+  hoodMat.color.copy(shellColor);
+
+  // HOT GLOW bên trong LP và condenser
+  lpHotGlowMat.opacity = Math.min(0.7, glow * 0.35);
+  lpHotGlowMat.color.setHex(glowColor);
+  condHotGlowMat.opacity = Math.min(0.8, glow * 0.40);
+  condHotGlowMat.color.setHex(glowColor);
+
+  // NỀN VÀ SƯƠNG: ngả đỏ khi sự cố
+  let bgHex = 0x071421;
+  if (st.key === 'trip') bgHex = 0x2a0808;
+  else if (st.key === 'load') bgHex = 0x200c08;
+  else if (st.key === 'warn') bgHex = 0x1a1408;
+  else if (st.key === 'deep') bgHex = 0x120a1c;
+  scene.background.setHex(bgHex);
+  scene.fog.color.setHex(bgHex);
+
+  // Ánh sáng mặt trời ngả đỏ khi trip
+  if (st.key === 'trip'){
+    sun.color.setHex(0xff8866);
+    sun.intensity = 2.8;
+    fillLight.color.setHex(0xff5533);
+  } else if (st.key === 'load'){
+    sun.color.setHex(0xffaa88);
+    sun.intensity = 2.5;
+    fillLight.color.setHex(0xff8866);
+  } else {
+    sun.color.setHex(0xffffff);
+    sun.intensity = 2.4;
+    fillLight.color.setHex(0xaaccff);
+  }
+
+  // ĐÈN BÁO ĐỘNG — to và nhấp nháy mạnh hơn
+  const isAlarm = (st.key === 'trip' || st.key === 'load' || st.key === 'warn');
+  if (isAlarm){
+    const freq = st.key === 'trip' ? 9 : (st.key === 'load' ? 5 : 2.4);
+    const k = 0.5 + 0.5 * Math.sin(state.time * freq);
+    const col = st.key === 'warn' ? 0xf39c12 : 0xff2200;
+    alarmMat.emissive.setHex(col);
+    alarmMat.emissiveIntensity = 1.5 + k * 5.0;
+    alarmMat.color.setHex(st.key === 'warn' ? 0x664400 : 0x660000);
+    const s = 1.0 + k * 0.7;
+    alarmLight.scale.set(s, s, s);
+
+    beaconMat.emissive.setHex(col);
+    beaconMat.emissiveIntensity = 1.2 + k * 4.0;
+    beaconMat.color.setHex(st.key === 'warn' ? 0x664400 : 0x660000);
+    const sb = 1.0 + k * 0.8;
+    beacon.scale.set(sb, sb, sb);
+  } else if (st.key === 'deep'){
+    const k = 0.5 + 0.5 * Math.sin(state.time * 2);
+    alarmMat.emissive.setHex(0x8e44ad);
+    alarmMat.emissiveIntensity = 1.0 + k * 2.0;
+    alarmMat.color.setHex(0x2a0a3a);
+    alarmLight.scale.set(1, 1, 1);
+    beaconMat.emissive.setHex(0x8e44ad);
+    beaconMat.emissiveIntensity = 0.8 + k * 1.5;
+    beaconMat.color.setHex(0x2a0a3a);
+    beacon.scale.set(1, 1, 1);
+  } else {
+    alarmMat.emissiveIntensity = 0.0;
+    alarmMat.color.setHex(0x0d2a1a);
+    alarmLight.scale.set(1, 1, 1);
+    beaconMat.emissiveIntensity = 0.0;
+    beaconMat.color.setHex(0x0d2a1a);
+    beacon.scale.set(1, 1, 1);
+  }
+
+  // Đèn LED bơm
+  vacuumPumps.forEach((p, idx) => {
+    const isStandby = p.userData.isStandby;
+    const on = isStandby ? state.backup : true;
+    const led = p.userData.led;
+    if (on){
+      led.color.setHex(0x00cc66);
+      led.emissive.setHex(0x00cc66);
+      led.emissiveIntensity = 1.6 + 0.5 * Math.sin(state.time * 3 + idx);
+    } else {
+      led.color.setHex(0x8899aa);
+      led.emissive.setHex(0x223344);
+      led.emissiveIntensity = 0.15;
+    }
+  });
+  cwPumps.forEach((p, idx) => {
+    const isStandby = p.userData.isStandby;
+    const on = isStandby ? false : state.cwOn;
+    const led = p.userData.led;
+    if (on){
+      led.color.setHex(0x00cc66);
+      led.emissive.setHex(0x00cc66);
+      led.emissiveIntensity = 1.6 + 0.5 * Math.sin(state.time * 3 + idx);
+    } else {
+      led.color.setHex(0x8899aa);
+      led.emissive.setHex(0x223344);
+      led.emissiveIntensity = 0.15;
+    }
+  });
+  condensatePumps.forEach((p, idx) => {
+    const isStandby = p.userData.isStandby;
+    const on = isStandby ? false : state.cwOn;
+    const led = p.userData.led;
+    if (on){
+      led.color.setHex(0x00cc66);
+      led.emissive.setHex(0x00cc66);
+      led.emissiveIntensity = 1.6 + 0.5 * Math.sin(state.time * 3 + idx);
+    } else {
+      led.color.setHex(0x8899aa);
+      led.emissive.setHex(0x223344);
+      led.emissiveIntensity = 0.15;
+    }
+  });
+}
+
+/* ---------- 14.7 RUNG CAMERA khi trip / load ---------- */
+let shakeX = 0, shakeY = 0;
+function computeShake(dt){
+  const st = state._st;
+  let amp = 0, freq = 1;
+  if (st.key === 'trip'){ amp = 0.20; freq = 42; }
+  else if (st.key === 'load'){ amp = 0.08; freq = 24; }
+  else if (st.key === 'warn'){ amp = 0.03; freq = 14; }
+
+  if (amp > 0){
+    shakeX = (Math.random() - 0.5) * amp * (0.7 + 0.3 * Math.sin(state.time * freq));
+    shakeY = (Math.random() - 0.5) * amp * (0.7 + 0.3 * Math.sin(state.time * freq * 1.3));
+  } else {
+    shakeX *= Math.pow(0.02, dt);
+    shakeY *= Math.pow(0.02, dt);
+  }
+}
+
+/* ============================================================
+   15. ĐIỀU KHIỂN CAMERA
+   ============================================================ */
+const VIEWS = {
+  overview   : { pos:[34, 24, 38],  tgt:[0, 0.5, 0] },
+  turbine    : { pos:[-2, 12, 26],  tgt:[-4, 4.0, 0] },
+  condenser  : { pos:[14, 6, 18],   tgt:[-0.5, -1.5, 0] },
+  condensate : { pos:[-14, 2, 12],  tgt:[-4.5, -3.5, 0] },
+  intake     : { pos:[40, 8, -20],  tgt:[28, -3.0, -12] }
+};
+let camAnim = null;
+
+function setView(name){
+  const v = VIEWS[name];
+  if (!v) return;
+  state.view = name;
+  camAnim = {
+    t: 0,
+    fromPos: camera.position.clone(),
+    toPos: new THREE.Vector3(...v.pos),
+    fromTgt: controls.target.clone(),
+    toTgt: new THREE.Vector3(...v.tgt)
+  };
+  document.querySelectorAll('.views button').forEach(b => {
+    b.classList.toggle('active', b.dataset.view === name);
+  });
+}
+document.querySelectorAll('.views button').forEach(btn => {
+  btn.addEventListener('click', () => setView(btn.dataset.view));
+});
+function updateCameraAnim(dt){
+  if (!camAnim) return;
+  camAnim.t = Math.min(1, camAnim.t + dt * 1.6);
+  const e = 1 - Math.pow(1 - camAnim.t, 3);
+  camera.position.lerpVectors(camAnim.fromPos, camAnim.toPos, e);
+  controls.target.lerpVectors(camAnim.fromTgt, camAnim.toTgt, e);
+  if (camAnim.t >= 1) camAnim = null;
+}
+
+/* ============================================================
+   16. UI EVENTS
+   ============================================================ */
+const pkSlider = document.getElementById('pkSlider');
+pkSlider.addEventListener('input', () => {
+  state.sliderPk = parseFloat(pkSlider.value);
+  el.slider.textContent = state.sliderPk.toFixed(3);
+});
+document.getElementById('cbLeak').addEventListener('change', e => { state.airLeak = e.target.checked; });
+document.getElementById('cbBackup').addEventListener('change', e => { state.backup = e.target.checked; });
+document.getElementById('cbCw').addEventListener('change', e => { state.cwOn = e.target.checked; });
+document.getElementById('cbSilt').addEventListener('change', e => { state.silt = e.target.checked; });
+document.getElementById('cbTide').addEventListener('change', e => { state.tide = e.target.checked; });
+document.getElementById('cbSubcool').addEventListener('change', e => { state.subcool = e.target.checked; });
+
+/* ============================================================
+   17. VÒNG LẶP CHÍNH
+   ============================================================ */
+let lastTime = performance.now();
+let hudAccum = 0;
+
+function animate(now){
+  requestAnimationFrame(animate);
+  const dt = Math.min(0.05, (now - lastTime) / 1000);
+  lastTime = now;
+  state.time += dt;
+
+  state.pk = computeEffectivePk();
+
+  hudAccum += dt;
+  if (hudAccum > 0.1){ hudAccum = 0; updateHUD(); }
+  else if (!state._st){ updateHUD(); }
+
+  updateSteam(dt);
+  updateCondensate(dt);
+  updatePipeCondensate(dt);
+  updateCoolingWater(dt);
+  updateAirExtraction(dt);
+  updateMarine(dt);
+  updateThermalPlume(dt);
+  updateHotwell(dt);
+  updateVisuals(dt);
+  updateCameraAnim(dt);
+  computeShake(dt);
+
+  sea.position.y = -5.4 + Math.sin(state.time * 0.8) * 0.03;
+
+  controls.update();
+  // Áp dụng rung SAU controls.update() để không bị ghi đè
+  camera.position.x += shakeX;
+  camera.position.y += shakeY;
+
+  renderer.render(scene, camera);
+}
+
+/* ============================================================
+   18. RESIZE
+   ============================================================ */
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / Math.max(1, window.innerHeight);
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  condMat.uniforms.uScale.value = (window.innerHeight * renderer.getPixelRatio()) / 2;
+});
+document.addEventListener('visibilitychange', () => { lastTime = performance.now(); });
+
+function resetSimulation(){
+  state.sliderPk = 0.084;
+  state.airLeak = false;
+  state.backup = false;
+  state.cwOn = true;
+  state.silt = false;
+  state.tide = false;
+  state.subcool = false;
+  state.rotorSpd = 1.4;
+  pkSlider.value = '0.084';
+  el.slider.textContent = '0.084';
+  ['cbLeak','cbBackup','cbSilt','cbTide','cbSubcool'].forEach(id => { document.getElementById(id).checked = false; });
+  document.getElementById('cbCw').checked = true;
+  state.pk = computeEffectivePk();
+  updateHUD();
+  setView('overview');
+}
+document.getElementById('resetSim').addEventListener('click', resetSimulation);
+
+/* ============================================================
+   19. KHỞI ĐỘNG
+   ============================================================ */
+updateHUD();
+requestAnimationFrame(animate);
+
+setTimeout(() => {
+  const l = document.getElementById('loader');
+  if (l) { l.classList.add('hide'); setTimeout(() => l.remove(), 700); }
+}, 900);
+
+setTimeout(() => setView('overview'), 1000);
+</script>
+<script>
+(function(){
+  const showFailure = (message) => {
+    const panel = document.getElementById('fatalError');
+    const text = document.getElementById('fatalMessage');
+    const loader = document.getElementById('loader');
+    if (text) text.textContent = message;
+    if (panel) panel.style.display = 'block';
+    if (loader) { loader.classList.add('hide'); setTimeout(() => loader.remove(), 650); }
+  };
+  window.addEventListener('error', function(event){
+    const msg = event && event.message ? event.message : 'Lỗi JavaScript hoặc không tải được thư viện 3D.';
+    showFailure(msg + ' — Hãy mở tệp bằng Chrome/Edge và bảo đảm có Internet để tải Three.js.');
+  });
+  window.addEventListener('unhandledrejection', function(event){
+    const reason = event && event.reason;
+    showFailure('Không tải được thành phần mô phỏng: ' + (reason && reason.message ? reason.message : String(reason || 'lỗi không xác định')) + '. Kiểm tra kết nối Internet/WebGL.');
+  });
+  setTimeout(function(){
+    if (document.getElementById('loader')) {
+      showFailure('Mô hình tải quá thời gian. Tệp dùng Three.js từ CDN; hãy kiểm tra kết nối Internet, cho phép WebGL và thử mở bằng máy chủ cục bộ (localhost).');
+    }
+  }, 15000);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mô phỏng 3D – Bình gia nhiệt · Đường hơi zic-zắc liên tục</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:100%; height:100%; overflow:hidden;
+    font-family:"Segoe UI",Roboto,Arial,sans-serif;
+    background:#eef3f8; color:#1e2b3a; }
+  #app { display:grid; grid-template-columns:255px 1fr 275px;
+         grid-template-rows:52px 1fr; width:100vw; height:100vh; }
+  header { grid-column:1/4; display:flex; align-items:center; gap:12px; padding:0 18px;
+    background:#fff; border-bottom:1px solid #d4dfe9;
+    box-shadow:0 1px 6px rgba(30,60,90,.06); z-index:10; }
+  header .logo { width:30px; height:30px; border-radius:7px;
+    background:linear-gradient(135deg,#0a84c8,#00b4d8);
+    display:flex; align-items:center; justify-content:center;
+    font-size:13px; font-weight:800; color:#fff; }
+  header h1 { font-size:13.5px; font-weight:700; letter-spacing:.3px; color:#0b2a44; }
+  header h1 span { color:#0a84c8; }
+  header .sub { margin-left:auto; font-size:10.5px; color:#7089a3;
+    letter-spacing:1.2px; text-transform:uppercase; font-weight:600; }
+  aside { background:#fff; overflow-y:auto; padding:14px; z-index:9; }
+  #left { border-right:1px solid #d4dfe9; }
+  #right { border-left:1px solid #d4dfe9; }
+  main { position:relative; background:linear-gradient(180deg,#dfe9f2 0%,#eef3f8 55%,#e2eaf2 100%); }
+  #view { width:100%; height:100%; display:block; }
+  #labels { position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+  .sec-title { font-size:10px; font-weight:800; letter-spacing:1.5px;
+    text-transform:uppercase; color:#5a7893; margin:14px 0 8px;
+    padding-bottom:5px; border-bottom:1px solid #e2eaf2; }
+  .sec-title:first-child { margin-top:0; }
+  .model-btn { display:flex; align-items:center; gap:8px; width:100%;
+    padding:8px 10px; margin-bottom:5px; background:#f7fafc;
+    border:1px solid #d9e4ee; border-radius:7px; cursor:pointer;
+    color:#3b5570; font-size:12px; font-weight:600; transition:.15s; text-align:left; }
+  .model-btn:hover { background:#eaf3fb; border-color:#a8c8e0; }
+  .model-btn.active { background:linear-gradient(90deg,#e0f2ff,#d0e8fa);
+    border-color:#0a84c8; color:#073a5c;
+    box-shadow:0 0 0 2px rgba(10,132,200,.12); }
+  .model-btn .tag { margin-left:auto; font-size:9px; padding:2px 6px;
+    border-radius:20px; background:#d9e4ee; color:#4e6c88;
+    letter-spacing:.4px; font-weight:800; }
+  .model-btn.active .tag { background:#0a84c8; color:#fff; }
+  .mode-group { display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-bottom:10px; }
+  .mode-btn { padding:7px 4px; font-size:10.5px; background:#f7fafc;
+    border:1px solid #d9e4ee; border-radius:6px; color:#5a7893;
+    cursor:pointer; transition:.15s; font-weight:700; text-align:center; }
+  .mode-btn:hover { border-color:#a8c8e0; color:#1e5a85; }
+  .mode-btn.active { background:#0a84c8; border-color:#0a84c8; color:#fff; }
+  .ctrl-row { display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:7px; font-size:11.5px; color:#4e6c88; }
+  .ctrl-row label { cursor:pointer; user-select:none; font-weight:500; }
+  input[type=checkbox] { appearance:none; width:32px; height:17px;
+    background:#d9e4ee; border-radius:20px; position:relative;
+    cursor:pointer; transition:.18s; border:1px solid #c3d4e3; flex:none; }
+  input[type=checkbox]::after { content:''; position:absolute; top:1.5px;
+    left:2px; width:12px; height:12px; border-radius:50%;
+    background:#fff; transition:.18s; box-shadow:0 1px 2px rgba(0,0,0,.15); }
+  input[type=checkbox]:checked { background:#0a84c8; border-color:#0a84c8; }
+  input[type=checkbox]:checked::after { left:16px; }
+  input[type=range] { -webkit-appearance:none; width:100%; height:4px;
+    background:#d9e4ee; border-radius:4px; outline:none; margin:5px 0 2px; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance:none;
+    width:15px; height:15px; border-radius:50%; background:#0a84c8;
+    cursor:pointer; box-shadow:0 0 0 3px rgba(10,132,200,.18); }
+  .spec { display:flex; justify-content:space-between; padding:5px 0;
+    border-bottom:1px dashed #e2eaf2; font-size:11px; gap:6px; }
+  .spec .k { color:#7089a3; flex:none; }
+  .spec .v { color:#1e2b3a; font-weight:700; text-align:right;
+    font-variant-numeric:tabular-nums; }
+  .legend { display:flex; align-items:center; gap:7px; font-size:11px;
+    color:#4e6c88; margin-bottom:5px; }
+  .dot { width:11px; height:11px; border-radius:3px; flex:none;
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,.08); }
+  .hint { position:absolute; bottom:12px; left:50%; transform:translateX(-50%);
+    font-size:10.5px; color:#7089a3; background:rgba(255,255,255,.9);
+    padding:6px 16px; border-radius:20px; border:1px solid #d4dfe9;
+    white-space:nowrap; pointer-events:none;
+    box-shadow:0 2px 8px rgba(30,60,90,.08); }
+  .label { position:absolute; font-size:10px; color:#073a5c;
+    background:rgba(255,255,255,.95); border:1px solid #a8c8e0;
+    border-left:2.5px solid #0a84c8; padding:2px 7px; border-radius:3px;
+    white-space:nowrap; transform:translate(-50%,-50%); pointer-events:none;
+    box-shadow:0 1px 5px rgba(30,60,90,.14); font-weight:600; }
+  .label.warm   { border-left-color:#e8734a; color:#7a3a1a; }
+  .label.cool   { border-left-color:#1a8fc8; color:#0a4a6b; }
+  .label.steam  { border-left-color:#c0392b; color:#7a1a0a; }
+  .label.drain  { border-left-color:#7f8c8d; color:#3a4245; }
+  .label.baffle { border-left-color:#8e44ad; color:#4a1a5c; }
+  .speed-badge { display:inline-block; font-size:9px; padding:2px 7px;
+    border-radius:20px; background:#0a84c8; color:#fff;
+    font-weight:800; letter-spacing:.4px; margin-left:6px; }
+  .note-box { font-size:10px; line-height:1.45; color:#5a7893;
+    background:#f7fafc; padding:8px 10px; border-radius:6px;
+    border-left:3px solid #0a84c8; margin-top:8px; }
+  .note-box b { color:#0a84c8; }
+  .note-box.warn { border-left-color:#e8734a; }
+  .note-box.warn b { color:#c0392b; }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="logo">FH</div>
+    <h1>MÔ PHỎNG 3D — BÌNH GIA NHIỆT <span>· Z LIÊN TỤC</span></h1>
+    <div class="sub">2 × 500 MW · MÔNG DƯƠNG 1 · U-Tube · 2 Pass</div>
+  </header>
+
+  <aside id="left">
+    <div class="sec-title">Chọn thiết bị</div>
+    <div id="modelList"></div>
+
+    <div class="sec-title">Chế độ mặt cắt</div>
+    <div class="mode-group" id="modeGroup">
+      <div class="mode-btn" data-mode="full">Toàn bộ</div>
+      <div class="mode-btn active" data-mode="cutaway">Cắt dọc</div>
+      <div class="mode-btn" data-mode="cross">Cắt ngang</div>
+      <div class="mode-btn" data-mode="head">Đầu bình</div>
+    </div>
+
+    <div id="crossWrap" style="display:none">
+      <div class="ctrl-row">
+        <label>Vị trí mặt cắt</label>
+        <span id="crossVal" style="color:#0a84c8;font-weight:800">0.00 m</span>
+      </div>
+      <input type="range" id="crossSlider" min="-100" max="100" value="0">
+    </div>
+
+    <div class="sec-title">Tốc độ dòng hơi <span class="speed-badge" id="speedBadge">CHẬM</span></div>
+    <div class="ctrl-row">
+      <label for="speedSlider">Hệ số</label>
+      <span id="speedVal" style="color:#c0392b;font-weight:800">0.35×</span>
+    </div>
+    <input type="range" id="speedSlider" min="10" max="200" value="35">
+
+    <div class="sec-title">Hiển thị lớp</div>
+    <div class="ctrl-row"><label for="cbShell">Vỏ bình</label><input type="checkbox" id="cbShell" checked></div>
+    <div class="ctrl-row"><label for="cbChannel">Kênh nước</label><input type="checkbox" id="cbChannel" checked></div>
+    <div class="ctrl-row"><label for="cbTubes">Chùm ống U</label><input type="checkbox" id="cbTubes" checked></div>
+    <div class="ctrl-row"><label for="cbTS">Vách ống</label><input type="checkbox" id="cbTS" checked></div>
+    <div class="ctrl-row"><label for="cbPart">Vách chia pass (kênh)</label><input type="checkbox" id="cbPart" checked></div>
+    <div class="ctrl-row"><label for="cbBaffle">Baffle chữ Z</label><input type="checkbox" id="cbBaffle" checked></div>
+    <div class="ctrl-row"><label for="cbNoz">Đầu nối</label><input type="checkbox" id="cbNoz" checked></div>
+    <div class="ctrl-row"><label for="cbSup">Gối đỡ</label><input type="checkbox" id="cbSup" checked></div>
+    <div class="ctrl-row"><label for="cbLab">Nhãn</label><input type="checkbox" id="cbLab" checked></div>
+
+    <div class="sec-title">Dòng chảy</div>
+    <div class="ctrl-row"><label for="cbFlow">Mũi tên động</label><input type="checkbox" id="cbFlow" checked></div>
+    <div class="ctrl-row"><label for="cbTrail">Vệt đuôi</label><input type="checkbox" id="cbTrail" checked></div>
+    <div class="ctrl-row"><label for="cbGrad">Gradient nhiệt</label><input type="checkbox" id="cbGrad" checked></div>
+    <div class="ctrl-row"><label for="cbDrops">Giọt ngưng</label><input type="checkbox" id="cbDrops" checked></div>
+
+    <div class="sec-title">Hiển thị</div>
+    <div class="ctrl-row"><label for="cbTrans">Vỏ xuyên sáng</label><input type="checkbox" id="cbTrans"></div>
+    <div class="ctrl-row"><label for="cbAuto">Tự động xoay</label><input type="checkbox" id="cbAuto"></div>
+    <div class="ctrl-row"><label for="cbGrid">Lưới nền</label><input type="checkbox" id="cbGrid" checked></div>
+
+    <div class="note-box warn">
+      <b>⚠ Đã sửa theo tài liệu TEI:</b><br>
+      • <b>XÓA</b> tấm vách ngăn chữ U (không có trong bản vẽ)<br>
+      • <b>GIỮ</b> vách chia pass chỉ trong kênh nước<br>
+      • Đường hơi <b>Z LIÊN TỤC</b> 1 mạch từ đỉnh → đáy<br>
+      • Số baffle: 5 (LP) / 7 (HP) — bậc lẻ để kết thúc ở đáy
+    </div>
+  </aside>
+
+  <main>
+    <canvas id="view"></canvas>
+    <div id="labels"></div>
+    <div class="hint">🖱 Kéo để xoay · Cuộn để thu phóng · Chuột phải để dịch chuyển</div>
+  </main>
+
+  <aside id="right">
+    <div class="sec-title">Thông số kỹ thuật</div>
+    <div id="specBox"></div>
+    <div class="sec-title">Chú thích màu</div>
+    <div class="legend"><span class="dot" style="background:#9fb2c6"></span>Vỏ bình (Shell)</div>
+    <div class="legend"><span class="dot" style="background:#a8bacd"></span>Kênh nước (Channel)</div>
+    <div class="legend"><span class="dot" style="background:#d4a24a"></span>Chùm ống U</div>
+    <div class="legend"><span class="dot" style="background:#7a8fa5"></span>Vách ống (Tubesheet)</div>
+    <div class="legend"><span class="dot" style="background:#e8734a"></span>Vách chia pass (kênh)</div>
+    <div class="legend"><span class="dot" style="background:#8e44ad"></span>Baffle chữ Z</div>
+    <div class="legend"><span class="dot" style="background:#4fb3d9"></span>Đầu nối / Vòi phun</div>
+    <div class="sec-title">Dòng chảy hơi — z liên tục</div>
+    <div class="legend"><span class="dot" style="background:#c0392b"></span>Hơi quá nhiệt (DSH)</div>
+    <div class="legend"><span class="dot" style="background:#e67e22"></span>Hơi bão hòa</div>
+    <div class="legend"><span class="dot" style="background:#7f8c8d"></span>Nước ngưng (DC)</div>
+    <div class="sec-title">Dòng nước cấp</div>
+    <div class="legend"><span class="dot" style="background:#1a8fc8"></span>Nước cấp vào (lạnh)</div>
+    <div class="legend"><span class="dot" style="background:#e8734a"></span>Nước cấp ra (nóng)</div>
+  </aside>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+/* ============================================================
+   DỮ LIỆU THIẾT BỊ — Số baffle luôn là số LẺ (5 hoặc 7)
+   để đường zic-zắc kết thúc ở ĐÁY (nơi có drain outlet)
+   ============================================================ */
+const MODELS = {
+  LP3: { name:'LP-3', kks:'13LCC30AC001', shellID:1524, tubeLen:10160, tubes:1373,
+         surface:1421.3, designP:3.6, designT:186, opP:2.86, opT:123.8,
+         shellW:23840, bundleW:17000, floodedW:43205, steamIn:'2 × DN550',
+         fwIn:'DN450', fwOut:'DN450', drainOut:'DN250', code:'ASME VIII Div.1',
+         mat:'SA 516-70 / SA 266 II', pass:'2 Pass (U-Tube)',
+         zones:['Condensing','Drain Cooling'], nBaffles:5 },
+  LP4: { name:'LP-4', kks:'13LCC40AC001', shellID:1422, tubeLen:9373, tubes:1297,
+         surface:1238.0, designP:7.0, designT:304, opP:5.91, opT:280.8,
+         shellW:40000, bundleW:30000, floodedW:70000, steamIn:'DN300',
+         fwIn:'DN450', fwOut:'DN450', drainOut:'DN200', code:'ASME VIII Div.1',
+         mat:'SA 516-70 / SA 266 II', pass:'2 Pass (U-Tube)',
+         zones:['Desuperheating','Condensing','Drain Cooling'], nBaffles:5 },
+  HP6: { name:'HP-6', kks:'13LAD10AC001', shellID:1854, tubeLen:9906, tubes:1924,
+         surface:1916.4, designP:22.0, designT:220, opP:18.08, opT:214.5,
+         shellW:63406, bundleW:49000, floodedW:89071, steamIn:'DN300',
+         fwIn:'DN600', fwOut:'DN600', drainOut:'DN400', code:'ASME VIII Div.1',
+         mat:'SA 516-70 / SA 350 LF2', pass:'2 Pass (U-Tube)',
+         zones:['Desuperheating','Condensing','Drain Cooling'], nBaffles:7 },
+  HP7: { name:'HP-7', kks:'13LAD20AC001', shellID:1880, tubeLen:10312, tubes:2081,
+         surface:2155.3, designP:54.0, designT:344, opP:43.3, opT:343.2,
+         shellW:79681, bundleW:54000, floodedW:105000, steamIn:'DN300',
+         fwIn:'DN600', fwOut:'DN600', drainOut:'DN350', code:'ASME VIII Div.1',
+         mat:'SA 516-70 / SA 350 LF2', pass:'2 Pass (U-Tube)',
+         zones:['Desuperheating','Condensing','Drain Cooling'], nBaffles:7 },
+  HP8: { name:'HP-8', kks:'13LAD30AC001', shellID:1727, tubeLen:9246, tubes:2051,
+         surface:1909.0, designP:91.0, designT:310, opP:73.67, opT:289.3,
+         shellW:79656, bundleW:54285, floodedW:100095, steamIn:'DN250',
+         fwIn:'DN600', fwOut:'DN600', drainOut:'DN250', code:'ASME VIII Div.1',
+         mat:'SA 516-70 / SA 350 LF2', pass:'2 Pass (U-Tube)',
+         zones:['Desuperheating','Condensing','Drain Cooling'], nBaffles:7 }
+};
+
+/* ============================================================
+   THREE.JS SETUP
+   ============================================================ */
+const canvas = document.getElementById('view');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias:true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+renderer.localClippingEnabled = true;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xeaf1f8);
+const camera = new THREE.PerspectiveCamera(42, canvas.clientWidth/canvas.clientHeight, 0.1, 500);
+
+const labelRenderer = new CSS2DRenderer();
+labelRenderer.setSize(canvas.clientWidth, canvas.clientHeight);
+labelRenderer.domElement.style.position = 'absolute';
+labelRenderer.domElement.style.top = '0';
+labelRenderer.domElement.style.pointerEvents = 'none';
+document.getElementById('labels').appendChild(labelRenderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.07;
+controls.minDistance = 2;
+controls.maxDistance = 80;
+controls.autoRotateSpeed = 0.9;
+
+scene.add(new THREE.HemisphereLight(0xffffff, 0xc8d4e0, 0.95));
+const key = new THREE.DirectionalLight(0xffffff, 1.9);
+key.position.set(10, 22, 14);
+key.castShadow = true;
+key.shadow.mapSize.set(2048, 2048);
+key.shadow.camera.left = -16; key.shadow.camera.right = 16;
+key.shadow.camera.top = 16; key.shadow.camera.bottom = -16;
+key.shadow.camera.near = 0.1; key.shadow.camera.far = 70;
+key.shadow.bias = -0.0005;
+scene.add(key);
+const fill = new THREE.DirectionalLight(0xa8d0ff, 0.55);
+fill.position.set(-14, 8, -10); scene.add(fill);
+const rim = new THREE.DirectionalLight(0xffffff, 0.45);
+rim.position.set(0, -10, 6); scene.add(rim);
+
+const gridHelper = new THREE.GridHelper(50, 50, 0xa8c0d8, 0xd0dce8);
+gridHelper.material.transparent = true;
+gridHelper.material.opacity = 0.6;
+gridHelper.position.y = -3.2;
+scene.add(gridHelper);
+
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(80, 80),
+  new THREE.ShadowMaterial({ opacity:0.10 }));
+floor.rotation.x = -Math.PI/2;
+floor.position.y = -3.2;
+floor.receiveShadow = true;
+scene.add(floor);
+
+/* ============================================================
+   VẬT LIỆU
+   ============================================================ */
+const MAT = {
+  shell: new THREE.MeshStandardMaterial({ color:0x9fb2c6, metalness:0.72, roughness:0.4, side:THREE.DoubleSide }),
+  shellInner: new THREE.MeshStandardMaterial({ color:0x6a7f95, metalness:0.6, roughness:0.6, side:THREE.BackSide }),
+  channel: new THREE.MeshStandardMaterial({ color:0xa8bacd, metalness:0.72, roughness:0.4, side:THREE.DoubleSide }),
+  channelInner: new THREE.MeshStandardMaterial({ color:0x8098ad, metalness:0.55, roughness:0.62, side:THREE.BackSide }),
+  tube: new THREE.MeshStandardMaterial({ color:0xd4a24a, metalness:0.85, roughness:0.26 }),
+  tubeDark: new THREE.MeshStandardMaterial({ color:0xb8883a, metalness:0.8, roughness:0.34 }),
+  tubesheet: new THREE.MeshStandardMaterial({ color:0x7a8fa5, metalness:0.78, roughness:0.38 }),
+  nozzle: new THREE.MeshStandardMaterial({ color:0x4fb3d9, metalness:0.82, roughness:0.28 }),
+  nozzle2: new THREE.MeshStandardMaterial({ color:0x3a94b8, metalness:0.78, roughness:0.32 }),
+  nozzleHot: new THREE.MeshStandardMaterial({ color:0xe8734a, metalness:0.78, roughness:0.3 }),
+  nozzleCold: new THREE.MeshStandardMaterial({ color:0x1a8fc8, metalness:0.78, roughness:0.3 }),
+  nozzleSteam: new THREE.MeshStandardMaterial({ color:0xc0392b, metalness:0.75, roughness:0.35 }),
+  nozzleDrain: new THREE.MeshStandardMaterial({ color:0x7f8c8d, metalness:0.7, roughness:0.45 }),
+  support: new THREE.MeshStandardMaterial({ color:0x6b7f94, metalness:0.5, roughness:0.7 }),
+  flange: new THREE.MeshStandardMaterial({ color:0x8397aa, metalness:0.82, roughness:0.34 }),
+  partition: new THREE.MeshStandardMaterial({ color:0xe8734a, metalness:0.6, roughness:0.5, side:THREE.DoubleSide, emissive:0x4a1a08, emissiveIntensity:0.15 }),
+  baffle: new THREE.MeshStandardMaterial({ color:0x8e44ad, metalness:0.7, roughness:0.42, side:THREE.DoubleSide, emissive:0x2a0a3a, emissiveIntensity:0.12 }),
+  baffleEdge: new THREE.MeshStandardMaterial({ color:0xa855c8, metalness:0.75, roughness:0.35, emissive:0x3a1555, emissiveIntensity:0.2 })
+};
+
+/* ============================================================
+   U-TUBE CURVE
+   ============================================================ */
+class UTubeCurve extends THREE.Curve {
+  constructor(x0, L, y, z) {
+    super();
+    this.x0 = x0; this.L = L; this.y = y; this.z = z;
+    this.bendR = Math.abs(y);
+    this.total = 2 * L + Math.PI * this.bendR;
+  }
+  getPoint(t, target = new THREE.Vector3()) {
+    const s = t * this.total;
+    const arcLen = Math.PI * this.bendR;
+    const xBend = this.x0 + this.L;
+    if (s < this.L) return target.set(this.x0 + s, this.y, this.z);
+    else if (s < this.L + arcLen) {
+      const th = Math.PI/2 - (s - this.L) / this.bendR;
+      return target.set(xBend + this.bendR * Math.cos(th), this.bendR * Math.sin(th), this.z);
+    } else {
+      const s2 = s - this.L - arcLen;
+      return target.set(xBend - s2, -this.y, this.z);
+    }
+  }
+}
+
+function generateTubePositions(R, n) {
+  const positions = [];
+  const maxR = 0.78 * R;
+  const area = Math.PI * maxR * maxR * 0.52;
+  const spacing = Math.sqrt(area / n);
+  const ny = Math.ceil(maxR / (spacing * 0.866)) + 2;
+  const nz = Math.ceil(2 * maxR / spacing) + 3;
+  for (let i = 0; i < ny; i++) {
+    for (let j = 0; j < nz; j++) {
+      const y = i * spacing * 0.866 + spacing * 0.25;
+      const z = (j - nz/2) * spacing + (i % 2) * spacing * 0.5;
+      const r = Math.sqrt(y*y + z*z);
+      if (r > maxR) continue;
+      if (y < 0.10 * R) continue;   // tránh mặt phẳng Y=0
+      positions.push({ y, z });
+    }
+  }
+  if (positions.length > n) {
+    const step = positions.length / n;
+    const out = [];
+    for (let k = 0; k < n; k++) out.push(positions[Math.floor(k * step)]);
+    return out;
+  }
+  return positions;
+}
+
+/* ============================================================
+   GROUPS — ĐÃ XÓA groupUTube
+   ============================================================ */
+let heaterGroup = null;
+let clipPlanes = [];
+let currentModel = null;
+let mode = 'cutaway';
+let crossPos = 0;
+let steamSpeedFactor = 0.35;
+
+const groupShell  = new THREE.Group();
+const groupChannel= new THREE.Group();
+const groupTubes  = new THREE.Group();
+const groupTS     = new THREE.Group();
+const groupPart   = new THREE.Group();
+const groupBaffle = new THREE.Group();
+const groupNoz    = new THREE.Group();
+const groupSup    = new THREE.Group();
+const groupFlow   = new THREE.Group();
+const groupTrail  = new THREE.Group();
+const groupGrad   = new THREE.Group();
+const groupDrops  = new THREE.Group();
+const groupLabel  = new THREE.Group();
+
+const flowArrows = [];
+const trailSegs  = [];
+const drops = [];
+
+function clearGroup(g) {
+  while (g.children.length) {
+    const c = g.children.pop();
+    if (c.geometry) c.geometry.dispose();
+    if (c.element && c.element.parentNode) c.element.parentNode.removeChild(c.element);
+  }
+}
+flowArrows.length = 0;
+trailSegs.length = 0;
+drops.length = 0;
+
+function makeNozzle(r, h, x, y, z, dir, mat) {
+  const g = new THREE.Group();
+  const m = mat || MAT.nozzle;
+  const cyl = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, 16), m);
+  cyl.position.y = h/2; cyl.castShadow = true; g.add(cyl);
+  const fl = new THREE.Mesh(new THREE.CylinderGeometry(r*1.5, r*1.5, h*0.15, 16), MAT.flange);
+  fl.position.y = h * 0.95; fl.castShadow = true; g.add(fl);
+  const hole = new THREE.Mesh(new THREE.CylinderGeometry(r*0.7, r*0.7, h*0.08, 16), MAT.nozzle2);
+  hole.position.y = h * 1.06; g.add(hole);
+  if (dir === 'up') g.position.set(x, y, z);
+  if (dir === 'down') { g.rotation.z = Math.PI; g.position.set(x, y, z); }
+  if (dir === 'front') { g.rotation.x = -Math.PI/2; g.position.set(x, y, z); }
+  if (dir === 'back') { g.rotation.x = Math.PI/2; g.position.set(x, y, z); }
+  return g;
+}
+
+function makeSegmentBaffle(R, gapSide, thickness, angleCut) {
+  const g = new THREE.Group();
+  const thetaLen = Math.PI * 2 - angleCut;
+  let thetaStart = (gapSide === 'top')
+    ? Math.PI/2 + angleCut/2
+    : -Math.PI/2 + angleCut/2;
+  const segGeo = new THREE.CylinderGeometry(R*0.985, R*0.985, thickness, 48, 1, false, thetaStart, thetaLen);
+  segGeo.rotateZ(-Math.PI/2);
+  const mesh = new THREE.Mesh(segGeo, MAT.baffle);
+  mesh.castShadow = true; mesh.receiveShadow = true;
+  g.add(mesh);
+  const edgeGeo = new THREE.CylinderGeometry(R*1.0, R*1.0, thickness*0.35, 48, 1, true, thetaStart, thetaLen);
+  edgeGeo.rotateZ(-Math.PI/2);
+  g.add(new THREE.Mesh(edgeGeo, MAT.baffleEdge));
+  return g;
+}
+
+/* ============================================================
+   XÂY DỰNG — KHÔNG CÒN VÁCH NGĂN CHỮ U
+   ============================================================ */
+function buildHeater(modelKey) {
+  const M = MODELS[modelKey];
+  currentModel = M;
+
+  [groupShell, groupChannel, groupTubes, groupTS, groupPart,
+   groupBaffle, groupNoz, groupSup, groupFlow, groupTrail, groupGrad,
+   groupDrops, groupLabel].forEach(clearGroup);
+  if (heaterGroup) scene.remove(heaterGroup);
+
+  heaterGroup = new THREE.Group();
+  heaterGroup.add(groupShell, groupChannel, groupTubes, groupTS, groupPart,
+                  groupBaffle, groupNoz, groupSup, groupFlow,
+                  groupTrail, groupGrad, groupDrops, groupLabel);
+  scene.add(heaterGroup);
+
+  const R  = M.shellID / 2000;
+  const L  = M.tubeLen / 1000;
+  const xTS = -L/2;
+  const xU  = xTS + L;
+  const chLen = R * 0.95;
+  const chR   = R * 1.02;
+
+  /* 1. VỎ BÌNH */
+  const shellGeo = new THREE.CylinderGeometry(R, R, L, 60, 1, true);
+  shellGeo.rotateZ(-Math.PI/2);
+  shellGeo.translate(xTS + L/2, 0, 0);
+  const shellMesh = new THREE.Mesh(shellGeo, MAT.shell);
+  shellMesh.castShadow = true; shellMesh.receiveShadow = true;
+  groupShell.add(shellMesh);
+
+  const innerGeo = new THREE.CylinderGeometry(R*0.97, R*0.97, L, 40, 1, true);
+  innerGeo.rotateZ(-Math.PI/2);
+  innerGeo.translate(xTS + L/2, 0, 0);
+  groupShell.add(new THREE.Mesh(innerGeo, MAT.shellInner));
+
+  const domeGeo = new THREE.SphereGeometry(R, 40, 24, 0, Math.PI*2, 0, Math.PI/2);
+  domeGeo.rotateZ(-Math.PI/2);
+  domeGeo.scale(0.92, 1, 1);
+  domeGeo.translate(xU, 0, 0);
+  const domeMesh = new THREE.Mesh(domeGeo, MAT.shell);
+  domeMesh.castShadow = true;
+  groupShell.add(domeMesh);
+
+  const flGeo = new THREE.CylinderGeometry(R*1.08, R*1.08, 0.07*R*2, 40);
+  flGeo.rotateZ(-Math.PI/2);
+  flGeo.translate(xTS, 0, 0);
+  groupShell.add(new THREE.Mesh(flGeo, MAT.flange));
+
+  /* 2. KÊNH NƯỚC */
+  const chCyl = new THREE.Mesh(new THREE.CylinderGeometry(chR, chR, chLen, 40, 1, true), MAT.channel);
+  chCyl.geometry.rotateZ(-Math.PI/2);
+  chCyl.geometry.translate(xTS - chLen/2, 0, 0);
+  chCyl.castShadow = true;
+  groupChannel.add(chCyl);
+
+  const chInnerGeo = new THREE.CylinderGeometry(chR*0.97, chR*0.97, chLen, 40, 1, true);
+  chInnerGeo.rotateZ(-Math.PI/2);
+  chInnerGeo.translate(xTS - chLen/2, 0, 0);
+  groupChannel.add(new THREE.Mesh(chInnerGeo, MAT.channelInner));
+
+  const chDomeGeo = new THREE.SphereGeometry(chR, 40, 24, 0, Math.PI*2, 0, Math.PI/2);
+  chDomeGeo.rotateZ(Math.PI/2);
+  chDomeGeo.scale(0.78, 1, 1);
+  chDomeGeo.translate(xTS - chLen, 0, 0);
+  const chDome = new THREE.Mesh(chDomeGeo, MAT.channel);
+  chDome.castShadow = true;
+  groupChannel.add(chDome);
+
+  const chFlGeo = new THREE.CylinderGeometry(chR*1.05, chR*1.05, 0.05*R*2, 40);
+  chFlGeo.rotateZ(-Math.PI/2);
+  chFlGeo.translate(xTS - chLen, 0, 0);
+  groupChannel.add(new THREE.Mesh(chFlGeo, MAT.flange));
+
+  /* 3. VÁCH CHIA PASS trong KÊNH NƯỚC */
+  const partLen = chLen + chR*0.65;
+  const partGeo = new THREE.BoxGeometry(partLen, 0.045, chR*1.9);
+  partGeo.translate(xTS - partLen/2 + 0.02, 0, 0);
+  const partMesh = new THREE.Mesh(partGeo, MAT.partition);
+  partMesh.castShadow = true;
+  groupPart.add(partMesh);
+
+  const ribGeo = new THREE.BoxGeometry(partLen*0.95, 0.06, 0.05);
+  const rib1 = new THREE.Mesh(ribGeo, MAT.partition);
+  rib1.position.set(xTS - partLen/2 + 0.02, 0, chR*0.6);
+  const rib2 = new THREE.Mesh(ribGeo, MAT.partition);
+  rib2.position.set(xTS - partLen/2 + 0.02, 0, -chR*0.6);
+  groupPart.add(rib1, rib2);
+
+  /* 4. VÁCH ỐNG */
+  const tsThk = 0.10 * R;
+  const tsGeo = new THREE.CylinderGeometry(R*0.99, R*0.99, tsThk, 60);
+  tsGeo.rotateZ(-Math.PI/2);
+  tsGeo.translate(xTS + tsThk/2, 0, 0);
+  const tsMesh = new THREE.Mesh(tsGeo, MAT.tubesheet);
+  tsMesh.castShadow = true; tsMesh.receiveShadow = true;
+  groupTS.add(tsMesh);
+
+  const tsRingGeo = new THREE.CylinderGeometry(R*1.08, R*1.08, tsThk*0.5, 40);
+  tsRingGeo.rotateZ(-Math.PI/2);
+  tsRingGeo.translate(xTS + tsThk/2, 0, 0);
+  groupTS.add(new THREE.Mesh(tsRingGeo, MAT.flange));
+
+  const nBolts = 16;
+  for (let i = 0; i < nBolts; i++) {
+    const ang = (i / nBolts) * Math.PI * 2;
+    const br = R * 1.03;
+    const bolt = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, tsThk*1.6, 8), MAT.flange);
+    bolt.rotation.z = Math.PI/2;
+    bolt.position.set(xTS + tsThk/2, Math.sin(ang)*br, Math.cos(ang)*br);
+    groupTS.add(bolt);
+  }
+
+  /* 5. CHÙM ỐNG U */
+  const N_TUBES_VIS = Math.min(110, Math.round(M.tubes / 18));
+  const positions = generateTubePositions(R, N_TUBES_VIS);
+  const tubeRadius = R * 0.014;
+
+  positions.forEach((p, idx) => {
+    const curve = new UTubeCurve(xTS + tsThk + 0.02, L*0.96, p.y, p.z);
+    const geo = new THREE.TubeGeometry(curve, 40, tubeRadius, 6, false);
+    const mat = (idx % 4 === 0) ? MAT.tubeDark : MAT.tube;
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.castShadow = true;
+    groupTubes.add(mesh);
+  });
+
+  /* ============================================================
+     6. BAFFLE CHỮ Z — BỐ TRÍ ĐÚNG ĐỂ TẠO Z LIÊN TỤC
+     ------------------------------------------------------------
+     Số baffle = SỐ LẺ (5 hoặc 7) để đường hơi kết thúc ở ĐÁY.
+     Tấm thứ 1 (gần U-bend nhất) cắt ĐÁY → hơi đi xuống ngay.
+     Tấm 2 cắt TRÊN → hơi đi lên.
+     Xen kẽ cho đến tấm cuối (lẻ) cắt ĐÁY → hơi ở ĐÁY (drain).
+     ============================================================ */
+  const nBaffles = M.nBaffles || 7;   // LUÔN LẺ
+  const xBaffleStart = xTS + L*0.12;
+  const xBaffleEnd   = xTS + L*0.95;
+  const baffleThk    = 0.028 * R;
+  const angleCut     = Math.PI * 0.40;   // ~72° → cắt ~30% đường kính
+  const baffleZones  = [];
+
+  for (let i = 0; i < nBaffles; i++) {
+    const t = (i + 0.5) / nBaffles;
+    const xPos = xBaffleStart + t * (xBaffleEnd - xBaffleStart);
+
+    // Tấm chẵn (0, 2, 4, 6) → cắt ĐÁY
+    // Tấm lẻ (1, 3, 5) → cắt TRÊN
+    const gapSide = (i % 2 === 0) ? 'bottom' : 'top';
+    const baffle = makeSegmentBaffle(R, gapSide, baffleThk, angleCut);
+    baffle.position.x = xPos;
+    groupBaffle.add(baffle);
+    baffleZones.push({ x: xPos, gapSide });
+  }
+
+  /* 7. ĐẦU NỐI */
+  const nz = (r, h, x, y, z, d, m) => groupNoz.add(makeNozzle(r, h, x, y, z, d, m));
+  nz(R*0.30, R*0.50, xTS - chLen*0.55, -chR*0.92, 0, 'down', MAT.nozzleCold);
+  nz(R*0.30, R*0.50, xTS - chLen*0.55,  chR*0.92, 0, 'up', MAT.nozzleHot);
+  nz(R*0.22, R*0.55, xTS + L*0.75, R*0.97, 0, 'up', MAT.nozzleSteam);
+  nz(R*0.22, R*0.55, xTS + L*0.55, R*0.97, 0, 'up', MAT.nozzleSteam);
+  nz(R*0.13, R*0.40, xTS + L*0.10, R*0.97, 0, 'up', MAT.nozzleDrain);
+  nz(R*0.17, R*0.46, xTS + L*0.18, -R*0.97, 0, 'down', MAT.nozzleDrain);
+  nz(R*0.075, R*0.28, xTS + L*0.92, R*0.97, 0, 'up', MAT.nozzle2);
+  nz(R*0.06, R*0.32, xTS + L*0.35, 0,  R*0.99, 'front', MAT.nozzle2);
+  nz(R*0.06, R*0.32, xTS + L*0.35, 0, -R*0.99, 'back',  MAT.nozzle2);
+  nz(R*0.10, R*0.30, xTS + L*0.35, R*0.97, 0, 'up', MAT.nozzle2);
+
+  /* 8. GỐI ĐỠ */
+  const supPositions = [xTS + L*0.18, xTS + L*0.58, xTS + L*0.88];
+  supPositions.forEach((x) => {
+    const g = new THREE.Group();
+    const saddle = new THREE.Mesh(new THREE.BoxGeometry(R*0.30, R*0.9, R*2.05), MAT.support);
+    saddle.position.set(x, -R*1.42, 0);
+    saddle.castShadow = true; g.add(saddle);
+    const base = new THREE.Mesh(new THREE.BoxGeometry(R*0.62, R*0.10, R*2.5), MAT.support);
+    base.position.set(x, -R*1.92, 0);
+    base.castShadow = true; g.add(base);
+    groupSup.add(g);
+  });
+  const anchor = new THREE.Mesh(new THREE.BoxGeometry(R*0.28, R*1.0, R*2.0), MAT.support);
+  anchor.position.set(xTS - chLen*0.4, -R*1.48, 0);
+  anchor.castShadow = true;
+  groupSup.add(anchor);
+
+  /* 9. GRADIENT NHIỆT */
+  const zones = M.zones;
+  const zoneStart = xTS + L*0.05;
+  const zoneEnd   = xTS + L*0.95;
+  const zoneTotal = zoneEnd - zoneStart;
+  let cursor = zoneStart;
+  if (zones.includes('Desuperheating')) {
+    const zLen = zoneTotal * 0.24;
+    addZone(cursor + zLen/2, zLen, R*0.96, 0xff6b6b, 0.10);
+    cursor += zLen;
+  }
+  const condLen = zones.includes('Desuperheating') ? zoneTotal * 0.58 : zoneTotal * 0.82;
+  addZone(cursor + condLen/2, condLen, R*0.96, 0x4ecdc4, 0.08);
+  cursor += condLen;
+  if (zones.includes('Drain Cooling')) {
+    const dcLen = zoneEnd - cursor;
+    addZone(cursor + dcLen/2, dcLen, R*0.96, 0x5b8def, 0.10);
+  }
+  function addZone(x, len, rad, color, opacity) {
+    const zg = new THREE.CylinderGeometry(rad, rad, len, 40, 1, true);
+    zg.rotateZ(-Math.PI/2);
+    zg.translate(x, 0, 0);
+    const m = new THREE.MeshBasicMaterial({ color, transparent:true, opacity, side:THREE.DoubleSide, depthWrite:false });
+    groupGrad.add(new THREE.Mesh(zg, m));
+  }
+
+  /* ============================================================
+     10. ĐƯỜNG HƠI ZIC-ZẮC LIÊN TỤC — SỬA ĐÚNG
+     ------------------------------------------------------------
+     Đường đi bắt đầu ở ĐỈNH gần U-bend, đi về phía VÁCH ỐNG:
+     - Trước baffle 1 (cắt đáy): ở ĐỈNH
+     - Sau baffle 1: rớt xuống ĐÁY
+     - Sau baffle 2 (cắt trên): vọt lên ĐỈNH
+     - Sau baffle 3 (cắt đáy): rớt xuống ĐÁY
+     - ... xen kẽ
+     - Sau baffle cuối (lẻ, cắt đáy): ở ĐÁY → drain outlet
+     Không có "tấm cắt ngang" nào chia đôi đường đi.
+     ============================================================ */
+  const R_path = R * 0.72;
+  const yTop =  R_path * 0.90;
+  const yBot = -R_path * 0.90;
+
+  // Xây dựng mảng điểm zic-zắc
+  const pathPoints = [];
+
+  // Bắt đầu: ĐỈNH ngay sau U-bend (hơi vừa vào)
+  pathPoints.push(new THREE.Vector3(xTS + L*0.98, yTop, 0));
+
+  // Điểm trước tấm baffle 1 (vẫn ở đỉnh)
+  pathPoints.push(new THREE.Vector3(baffleZones[0].x + 0.15, yTop, 0));
+
+  // Sau mỗi baffle, chuyển sang phía đối diện
+  for (let i = 0; i < baffleZones.length; i++) {
+    const b = baffleZones[i];
+    // Nếu baffle cắt ĐÁY → hơi đi xuống ĐÁY
+    // Nếu baffle cắt TRÊN → hơi đi lên ĐỈNH
+    const yAfter = (b.gapSide === 'bottom') ? yBot : yTop;
+    pathPoints.push(new THREE.Vector3(b.x - 0.15, yAfter, 0));
+    // Thêm điểm giữ để mô phỏng đoạn chảy ngang
+    if (i < baffleZones.length - 1) {
+      const xNext = baffleZones[i+1].x;
+      pathPoints.push(new THREE.Vector3((b.x + xNext)/2, yAfter, 0));
+    }
+  }
+
+  // Kết thúc: ĐÁY gần vách ống (drain outlet)
+  const lastZ = baffleZones[baffleZones.length - 1];
+  const yLast = (lastZ.gapSide === 'bottom') ? yBot : yTop;
+  pathPoints.push(new THREE.Vector3(xTS + L*0.14, yLast, 0));
+  // Rồi xuống drain nozzle
+  pathPoints.push(new THREE.Vector3(xTS + L*0.18, -R*0.85, 0));
+
+  const nStreams = 5;
+
+  for (let s = 0; s < nStreams; s++) {
+    const zOffset = (s - (nStreams-1)/2) * (R_path * 0.42);
+    const pts = pathPoints.map(p => new THREE.Vector3(p.x, p.y, zOffset));
+    const curve = new THREE.CatmullRomCurve3(pts, false, 'catmullrom', 0.25);
+
+    // Ống dẫn mờ cho đường hơi
+    const tubeGeo = new THREE.TubeGeometry(curve, 180, 0.011, 6, false);
+    const tubeMat = new THREE.MeshBasicMaterial({ color:0xc0392b, transparent:true, opacity:0.15, depthWrite:false });
+    groupFlow.add(new THREE.Mesh(tubeGeo, tubeMat));
+
+    // Mũi tên dọc theo curve
+    const nArrows = 7;
+    for (let a = 0; a < nArrows; a++) {
+      const t = a / nArrows;
+      const arrow = makeArrowMesh();
+      groupFlow.add(arrow);
+      flowArrows.push({
+        curve, arrow,
+        t: t,
+        baseSpeed: 0.036 + (s * 0.002) + (a * 0.001),
+        kind: 'steam'
+      });
+    }
+
+    // Vệt đuôi
+    for (let a = 0; a < nArrows; a++) {
+      const t = a / nArrows;
+      const trailGeo = new THREE.TubeGeometry(
+        new THREE.CatmullRomCurve3(
+          [curve.getPointAt(Math.max(0, t - 0.030)),
+           curve.getPointAt(Math.max(0.01, t - 0.010))],
+          false, 'catmullrom', 0.3
+        ),
+        8, 0.015, 6, false
+      );
+      const trailMat = new THREE.MeshBasicMaterial({ color:0xc0392b, transparent:true, opacity:0.35, depthWrite:false });
+      const trailMesh = new THREE.Mesh(trailGeo, trailMat);
+      groupTrail.add(trailMesh);
+      trailSegs.push({
+        mesh: trailMesh, curve,
+        t: t,
+        baseSpeed: 0.036 + (s * 0.002) + (a * 0.001),
+        kind: 'steam',
+        radius: 0.015
+      });
+    }
+  }
+
+  /* Nước cấp trong ống U */
+  const fwPath1 = [
+    new THREE.Vector3(xTS - chLen*0.6, -chR*0.55, 0),
+    new THREE.Vector3(xTS + 0.1, -R*0.35, 0),
+    new THREE.Vector3(xU - 0.3, -R*0.35, 0),
+  ];
+  const fwPath2 = [
+    new THREE.Vector3(xU - 0.3, R*0.35, 0),
+    new THREE.Vector3(xTS + 0.1, R*0.35, 0),
+    new THREE.Vector3(xTS - chLen*0.6, chR*0.55, 0),
+  ];
+  const fwCurve1 = new THREE.CatmullRomCurve3(fwPath1, false, 'catmullrom', 0.4);
+  const fwCurve2 = new THREE.CatmullRomCurve3(fwPath2, false, 'catmullrom', 0.4);
+  addFeedwaterFlow(fwCurve1, 0x1a8fc8, 0.075, 3);
+  addFeedwaterFlow(fwCurve2, 0xe8734a, 0.075, 3);
+  function addFeedwaterFlow(curve, color, speed, nArrows) {
+    const tubeGeo = new THREE.TubeGeometry(curve, 80, 0.008, 6, false);
+    const tubeMat = new THREE.MeshBasicMaterial({ color, transparent:true, opacity:0.22, depthWrite:false });
+    groupFlow.add(new THREE.Mesh(tubeGeo, tubeMat));
+    for (let a = 0; a < nArrows; a++) {
+      const arrow = makeArrowMesh(color);
+      groupFlow.add(arrow);
+      flowArrows.push({ curve, arrow, t: a/nArrows, baseSpeed: speed, kind:'fw' });
+    }
+  }
+
+  /* Hơi vào từ 2 nozzle trên đỉnh */
+  addSteamInput(new THREE.CatmullRomCurve3([
+    new THREE.Vector3(xTS + L*0.75, R*1.55, 0),
+    new THREE.Vector3(xTS + L*0.75, R*0.7, 0),
+    new THREE.Vector3(xTS + L*0.72, R*0.55, 0),
+  ], false, 'catmullrom', 0.4), 0xc0392b, 2);
+  addSteamInput(new THREE.CatmullRomCurve3([
+    new THREE.Vector3(xTS + L*0.55, R*1.55, 0),
+    new THREE.Vector3(xTS + L*0.55, R*0.7, 0),
+    new THREE.Vector3(xTS + L*0.58, R*0.55, 0),
+  ], false, 'catmullrom', 0.4), 0xc0392b, 2);
+  function addSteamInput(curve, color, nArrows) {
+    const tubeGeo = new THREE.TubeGeometry(curve, 40, 0.012, 6, false);
+    const tubeMat = new THREE.MeshBasicMaterial({ color, transparent:true, opacity:0.25, depthWrite:false });
+    groupFlow.add(new THREE.Mesh(tubeGeo, tubeMat));
+    for (let a = 0; a < nArrows; a++) {
+      const arrow = makeArrowMesh(color, 0.09);
+      groupFlow.add(arrow);
+      flowArrows.push({ curve, arrow, t: a/nArrows, baseSpeed: 0.10, kind:'steamIn' });
+    }
+  }
+
+  /* Nước ngưng ra */
+  const drainCurve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(xTS + L*0.18, -R*0.55, 0),
+    new THREE.Vector3(xTS + L*0.18, -R*0.9, 0),
+    new THREE.Vector3(xTS + L*0.18, -R*1.35, 0),
+  ], false, 'catmullrom', 0.4);
+  const drainGeo = new THREE.TubeGeometry(drainCurve, 30, 0.010, 6, false);
+  groupFlow.add(new THREE.Mesh(drainGeo, new THREE.MeshBasicMaterial({ color:0x7f8c8d, transparent:true, opacity:0.30, depthWrite:false })));
+  for (let a = 0; a < 2; a++) {
+    const arrow = makeArrowMesh(0x7f8c8d, 0.09);
+    groupFlow.add(arrow);
+    flowArrows.push({ curve: drainCurve, arrow, t: a/2, baseSpeed: 0.13, kind:'drain' });
+  }
+
+  /* 11. GIỌT NƯỚC NGƯNG RƠI */
+  const dropMat = new THREE.MeshStandardMaterial({ color:0x5d8bb0, metalness:0.2, roughness:0.4, transparent:true, opacity:0.75 });
+  for (let i = 0; i < 40; i++) {
+    const dropGeo = new THREE.SphereGeometry(0.020, 8, 6);
+    const m = new THREE.Mesh(dropGeo, dropMat);
+    const x = xTS + L*0.1 + Math.random() * L * 0.8;
+    const z = (Math.random() - 0.5) * R * 1.6;
+    const yStart = R * 0.5 - Math.random() * R * 0.5;
+    m.position.set(x, yStart, z);
+    groupDrops.add(m);
+    drops.push({ mesh: m, vel: 0.04 + Math.random() * 0.03, yStart, yLimit: -R * 0.85 });
+  }
+
+  /* 12. NHÃN */
+  function addLabel(text, x, y, z, cls) {
+    const div = document.createElement('div');
+    div.className = 'label' + (cls ? ' ' + cls : '');
+    div.textContent = text;
+    const obj = new CSS2DObject(div);
+    obj.position.set(x, y, z);
+    groupLabel.add(obj);
+  }
+  addLabel('Vỏ bình',              xTS + L*0.45,  R*2.0,  0);
+  addLabel('Chùm ống U',           xTS + L*0.55, -R*2.5,  0);
+  addLabel('Vách ống',             xTS,           R*1.8,  0);
+  addLabel('Kênh nước cấp',        xTS - chLen*1.1, R*1.7, 0);
+  addLabel('Vách chia pass (kênh)',xTS - chLen*0.6, -R*1.5, 0, 'warm');
+  addLabel('Khoang trên (nước ra)', xTS - chLen*0.55,  R*1.15, 0, 'warm');
+  addLabel('Khoang dưới (nước vào)',xTS - chLen*0.55, -R*1.15, 0, 'cool');
+  addLabel('Hơi trích vào',        xTS + L*0.75, R*2.7, 0, 'steam');
+  addLabel('Nước ngưng ra',        xTS + L*0.18, -R*2.9, 0, 'drain');
+  addLabel('Baffle chữ Z (7 tấm, so le)', xTS + L*0.50, R*1.55, R*0.7, 'baffle');
+  addLabel('Đường hơi z liên tục', xTS + L*0.45, -R*1.9, 0, 'steam');
+  addLabel('Chỏm U-bend',          xU + R*0.8,   R*1.6,  0);
+}
+
+function makeArrowMesh(color = 0xc0392b, size = 0.065) {
+  const geo = new THREE.ConeGeometry(size, size*2.4, 8);
+  geo.rotateZ(-Math.PI/2);
+  const mat = new THREE.MeshStandardMaterial({ color, emissive:color, emissiveIntensity:0.55, metalness:0.3, roughness:0.4 });
+  const m = new THREE.Mesh(geo, mat);
+  m.castShadow = false;
+  return m;
+}
+
+/* ============================================================
+   CLIPPING / VISIBILITY
+   ============================================================ */
+function applyClip() {
+  clipPlanes = [];
+  if (mode === 'cutaway') clipPlanes.push(new THREE.Plane(new THREE.Vector3(0, 0, -1), 0));
+  else if (mode === 'cross') clipPlanes.push(new THREE.Plane(new THREE.Vector3(-1, 0, 0), crossPos));
+  else if (mode === 'head') {
+    const xTS = currentModel ? -currentModel.tubeLen / 2000 : 0;
+    clipPlanes.push(new THREE.Plane(new THREE.Vector3(-1, 0, 0), xTS + 0.9));
+  }
+  scene.traverse(o => {
+    if (o.isMesh && o.material) {
+      const mats = Array.isArray(o.material) ? o.material : [o.material];
+      mats.forEach(m => {
+        m.clippingPlanes = clipPlanes.length ? clipPlanes : null;
+        m.needsUpdate = true;
+      });
+    }
+  });
+}
+
+function applyVisibility() {
+  groupShell.visible   = document.getElementById('cbShell').checked;
+  groupChannel.visible = document.getElementById('cbChannel').checked;
+  groupTubes.visible   = document.getElementById('cbTubes').checked;
+  groupTS.visible      = document.getElementById('cbTS').checked;
+  groupPart.visible    = document.getElementById('cbPart').checked;
+  groupBaffle.visible  = document.getElementById('cbBaffle').checked;
+  groupNoz.visible     = document.getElementById('cbNoz').checked;
+  groupSup.visible     = document.getElementById('cbSup').checked;
+  groupLabel.visible   = document.getElementById('cbLab').checked;
+  groupFlow.visible    = document.getElementById('cbFlow').checked;
+  groupTrail.visible   = document.getElementById('cbTrail').checked && document.getElementById('cbFlow').checked;
+  groupGrad.visible    = document.getElementById('cbGrad').checked;
+  groupDrops.visible   = document.getElementById('cbDrops').checked;
+
+  const trans = document.getElementById('cbTrans').checked;
+  [MAT.shell, MAT.channel].forEach(m => {
+    m.transparent = trans;
+    m.opacity = trans ? 0.30 : 1.0;
+    m.depthWrite = !trans;
+    m.needsUpdate = true;
+  });
+  gridHelper.visible = document.getElementById('cbGrid').checked;
+}
+
+function updateSpecs(M) {
+  const fmt = n => n.toLocaleString('en-US');
+  document.getElementById('specBox').innerHTML = `
+    <div class="spec"><span class="k">Thiết bị</span><span class="v" style="color:#0a84c8">${M.name}</span></div>
+    <div class="spec"><span class="k">KKS</span><span class="v">${M.kks}</span></div>
+    <div class="spec"><span class="k">Đường kính trong</span><span class="v">${fmt(M.shellID)} mm</span></div>
+    <div class="spec"><span class="k">Chiều dài ống</span><span class="v">${fmt(M.tubeLen)} mm</span></div>
+    <div class="spec"><span class="k">Số ống U</span><span class="v">${fmt(M.tubes)}</span></div>
+    <div class="spec"><span class="k">Diện tích bề mặt</span><span class="v">${M.surface.toFixed(1)} m²</span></div>
+    <div class="spec"><span class="k">Áp suất thiết kế</span><span class="v">${M.designP} barg</span></div>
+    <div class="spec"><span class="k">Nhiệt độ thiết kế</span><span class="v">${M.designT} °C</span></div>
+    <div class="spec"><span class="k">Áp suất làm việc</span><span class="v">${M.opP} bara</span></div>
+    <div class="spec"><span class="k">Nhiệt độ làm việc</span><span class="v">${M.opT} °C</span></div>
+    <div class="spec"><span class="k">Hơi trích vào</span><span class="v">${M.steamIn}</span></div>
+    <div class="spec"><span class="k">Nước cấp vào/ra</span><span class="v">${M.fwIn} / ${M.fwOut}</span></div>
+    <div class="spec"><span class="k">Nước ngưng ra</span><span class="v">${M.drainOut}</span></div>
+    <div class="spec"><span class="k">Số baffle chữ Z</span><span class="v" style="color:#8e44ad">${M.nBaffles} (số lẻ)</span></div>
+    <div class="spec"><span class="k">Vách ngăn dọc thân</span><span class="v" style="color:#c0392b">KHÔNG CÓ</span></div>
+    <div class="spec"><span class="k">Khối lượng vỏ+bundle</span><span class="v">${fmt(M.shellW)} kg</span></div>
+    <div class="spec"><span class="k">Vật liệu</span><span class="v" style="font-size:10px">${M.mat}</span></div>
+    <div class="spec"><span class="k">Tiêu chuẩn</span><span class="v">${M.code}</span></div>
+    <div class="spec"><span class="k">Kiểu</span><span class="v">${M.pass}</span></div>
+  `;
+}
+
+/* ============================================================
+   UI
+   ============================================================ */
+const modelList = document.getElementById('modelList');
+Object.keys(MODELS).forEach(k => {
+  const btn = document.createElement('button');
+  btn.className = 'model-btn' + (k === 'HP6' ? ' active' : '');
+  btn.innerHTML = `<span>${MODELS[k].name}</span><span class="tag">${k.startsWith('HP') ? 'HP' : 'LP'}</span>`;
+  btn.onclick = () => {
+    document.querySelectorAll('.model-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    buildHeater(k);
+    applyClip();
+    applyVisibility();
+  };
+  modelList.appendChild(btn);
+});
+
+document.querySelectorAll('.mode-btn').forEach(b => {
+  b.onclick = () => {
+    document.querySelectorAll('.mode-btn').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    mode = b.dataset.mode;
+    document.getElementById('crossWrap').style.display = (mode === 'cross') ? 'block' : 'none';
+    applyClip();
+  };
+});
+
+const crossSlider = document.getElementById('crossSlider');
+const crossVal = document.getElementById('crossVal');
+crossSlider.oninput = () => {
+  const v = parseFloat(crossSlider.value) / 100;
+  if (!currentModel) return;
+  const L = currentModel.tubeLen / 1000;
+  crossPos = v * (L * 0.95);
+  crossVal.textContent = crossPos.toFixed(2) + ' m';
+  applyClip();
+};
+
+const speedSlider = document.getElementById('speedSlider');
+const speedVal    = document.getElementById('speedVal');
+const speedBadge  = document.getElementById('speedBadge');
+function updateSpeedUI() {
+  const f = parseFloat(speedSlider.value) / 100;
+  steamSpeedFactor = f;
+  speedVal.textContent = f.toFixed(2) + '×';
+  let label, color;
+  if (f < 0.30)      { label = 'RẤT CHẬM'; color = '#2c7fb8'; }
+  else if (f < 0.65) { label = 'CHẬM';     color = '#0a84c8'; }
+  else if (f < 1.15) { label = 'VỪA';      color = '#e67e22'; }
+  else if (f < 1.55) { label = 'NHANH';    color = '#e8734a'; }
+  else               { label = 'RẤT NHANH';color = '#c0392b'; }
+  speedBadge.textContent = label;
+  speedBadge.style.background = color;
+}
+speedSlider.oninput = updateSpeedUI;
+updateSpeedUI();
+
+['cbShell','cbChannel','cbTubes','cbTS','cbPart','cbBaffle','cbNoz','cbSup','cbLab',
+ 'cbFlow','cbTrail','cbGrad','cbDrops','cbTrans','cbGrid']
+  .forEach(id => document.getElementById(id).addEventListener('change', applyVisibility));
+
+document.getElementById('cbAuto').addEventListener('change', e => { controls.autoRotate = e.target.checked; });
+
+/* ============================================================
+   ANIMATION
+   ============================================================ */
+const tempColorHot  = new THREE.Color(0xc0392b);
+const tempColorWarm = new THREE.Color(0xe67e22);
+const tempColorCool = new THREE.Color(0x7f8c8d);
+const _tmpColor = new THREE.Color();
+
+function updateArrow(fa, dt) {
+  fa.t += fa.baseSpeed * steamSpeedFactor * dt;
+  if (fa.t > 1) fa.t -= 1;
+  if (fa.t < 0) fa.t += 1;
+  const pos = fa.curve.getPointAt(fa.t);
+  fa.arrow.position.copy(pos);
+  const tan = fa.curve.getTangentAt(fa.t).normalize();
+  const q = new THREE.Quaternion();
+  q.setFromUnitVectors(new THREE.Vector3(1,0,0), tan);
+  fa.arrow.quaternion.copy(q);
+  if (fa.kind === 'steam') {
+    const mixT = fa.t;
+    if (mixT < 0.30) _tmpColor.copy(tempColorHot).lerp(tempColorWarm, mixT / 0.30);
+    else if (mixT < 0.70) _tmpColor.copy(tempColorWarm).lerp(tempColorCool, (mixT - 0.30) / 0.40);
+    else _tmpColor.copy(tempColorCool);
+    fa.arrow.material.color.copy(_tmpColor);
+    fa.arrow.material.emissive.copy(_tmpColor);
+  }
+}
+
+function animateFlow(dt) {
+  flowArrows.forEach(fa => updateArrow(fa, dt));
+  trailSegs.forEach(ts => {
+    ts.t += ts.baseSpeed * steamSpeedFactor * dt;
+    if (ts.t > 1) ts.t -= 1;
+    if (ts.t < 0) ts.t += 1;
+    const tStart = Math.max(0.005, ts.t - 0.040);
+    const tEnd   = Math.max(tStart + 0.005, ts.t - 0.005);
+    const pStart = ts.curve.getPointAt(tStart);
+    const pEnd   = ts.curve.getPointAt(tEnd);
+    if (pStart.distanceTo(pEnd) > 0.5) return;
+    ts.mesh.geometry.dispose();
+    const segCurve = new THREE.CatmullRomCurve3([pStart, pEnd], false, 'catmullrom', 0.3);
+    ts.mesh.geometry = new THREE.TubeGeometry(segCurve, 6, ts.radius, 6, false);
+    const mixT = ts.t;
+    let col;
+    if (mixT < 0.30) col = tempColorHot.clone().lerp(tempColorWarm, mixT / 0.30);
+    else if (mixT < 0.70) col = tempColorWarm.clone().lerp(tempColorCool, (mixT - 0.30) / 0.40);
+    else col = tempColorCool.clone();
+    ts.mesh.material.color.copy(col);
+  });
+}
+
+function animateDrops(dt) {
+  drops.forEach(d => {
+    d.mesh.position.y -= d.vel * dt * 20;
+    if (d.mesh.position.y < d.yLimit) {
+      d.mesh.position.y = d.yStart;
+      const L = currentModel ? currentModel.tubeLen / 1000 : 10;
+      const xTS = -L/2;
+      d.mesh.position.x = xTS + L*0.1 + Math.random() * L * 0.8;
+      d.mesh.position.z = (Math.random() - 0.5) * (currentModel.shellID/2000) * 1.6;
+    }
+  });
+}
+
+function onResize() {
+  const w = canvas.clientWidth, h = canvas.clientHeight;
+  if (w === 0 || h === 0) return;
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+  renderer.setSize(w, h, false);
+  labelRenderer.setSize(w, h);
+}
+window.addEventListener('resize', onResize);
+
+let _lastTime = performance.now();
+function animate() {
+  requestAnimationFrame(animate);
+  const now = performance.now();
+  const dt = Math.min(0.05, (now - _lastTime) / 1000);
+  _lastTime = now;
+  const flowOn = document.getElementById('cbFlow').checked;
+  const trailOn = document.getElementById('cbTrail').checked;
+  if (flowOn) animateFlow(dt);
+  if (document.getElementById('cbDrops').checked) animateDrops(dt);
+  groupTrail.visible = trailOn && flowOn;
+  controls.update();
+  renderer.render(scene, camera);
+  labelRenderer.render(scene, camera);
+}
+
+/* ============================================================
+   START
+   ============================================================ */
+buildHeater('HP6');
+applyClip();
+applyVisibility();
+
+(function resetCamera() {
+  const L = currentModel.tubeLen/1000, R = currentModel.shellID/2000;
+  const dist = Math.max(L * 0.95, R * 8) * 1.05;
+  camera.position.set(dist * 0.52, dist * 0.38, dist * 0.82);
+  camera.near = 0.1; camera.far = dist * 12;
+  camera.updateProjectionMatrix();
+  controls.target.set(0, 0, 0);
+  controls.update();
+})();
+
+onResize();
+animate();
+</script>
+</body>
+</html>

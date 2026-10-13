@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Mô phỏng 3D — Thân vỏ Bình ngưng 540 MW | NĐ Mông Dương 1</title>
+<style>
+  :root{
+    --bg1:#f2f7fd; --bg2:#dfeaf8;
+    --panel:rgba(255,255,255,.86);
+    --stroke:rgba(140,175,215,.45);
+    --ink:#0f2744; --muted:#5c7893;
+    --accent:#1e7fe0; --accent2:#0fb5a8; --warn:#ff7a3d;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;overflow:hidden;font-family:"Segoe UI",system-ui,-apple-system,sans-serif;color:var(--ink)}
+  body{background:radial-gradient(1200px 800px at 50% 0%,var(--bg1),var(--bg2));}
+  #stage{position:fixed;inset:0}
+  canvas{display:block}
+
+  /* ---------- HEADER ---------- */
+  #hud-top{
+    position:fixed;top:16px;left:50%;transform:translateX(-50%);
+    display:flex;align-items:center;gap:14px;
+    padding:10px 22px;border-radius:999px;
+    background:var(--panel);backdrop-filter:blur(14px);
+    border:1px solid rgba(255,255,255,.9);
+    box-shadow:0 10px 30px rgba(20,60,110,.14);
+    z-index:20;white-space:nowrap;
+  }
+  #hud-top .dot{width:9px;height:9px;border-radius:50%;background:var(--accent2);box-shadow:0 0 0 4px rgba(15,181,168,.18)}
+  #hud-top h1{font-size:14px;font-weight:700;letter-spacing:.2px}
+  #hud-top span{font-size:11.5px;color:var(--muted);border-left:1px solid var(--stroke);padding-left:14px}
+
+  /* ---------- PANEL ---------- */
+  #panel{
+    position:fixed;top:86px;left:16px;width:274px;max-height:calc(100vh - 110px);
+    overflow-y:auto;padding:16px;border-radius:18px;
+    background:var(--panel);backdrop-filter:blur(16px);
+    border:1px solid rgba(255,255,255,.9);
+    box-shadow:0 14px 40px rgba(20,60,110,.16);
+    z-index:20;
+  }
+  #panel::-webkit-scrollbar{width:6px}
+  #panel::-webkit-scrollbar-thumb{background:rgba(30,127,224,.25);border-radius:3px}
+  .sec{margin-bottom:16px}
+  .sec:last-child{margin-bottom:0}
+  .sec-t{
+    font-size:10.5px;font-weight:800;letter-spacing:1.1px;text-transform:uppercase;
+    color:var(--accent);margin-bottom:9px;display:flex;align-items:center;gap:7px;
+  }
+  .sec-t::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--stroke),transparent)}
+
+  .btn-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+  .btn{
+    border:1px solid var(--stroke);background:rgba(255,255,255,.75);
+    color:var(--ink);font-size:11.5px;font-weight:600;font-family:inherit;
+    padding:8px 6px;border-radius:10px;cursor:pointer;transition:.18s;
+    display:flex;align-items:center;justify-content:center;gap:5px;
+  }
+  .btn:hover{background:#fff;border-color:var(--accent);color:var(--accent);transform:translateY(-1px);
+    box-shadow:0 5px 14px rgba(30,127,224,.18)}
+  .btn.on{background:linear-gradient(135deg,var(--accent),#3b9bf0);color:#fff;border-color:transparent;
+    box-shadow:0 6px 16px rgba(30,127,224,.35)}
+
+  .row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:9px 0;font-size:12px}
+  .row label{font-weight:600;color:var(--ink);display:flex;align-items:center;gap:7px;cursor:pointer}
+  .sw{position:relative;width:36px;height:20px;flex-shrink:0}
+  .sw input{opacity:0;width:0;height:0;position:absolute}
+  .sw i{position:absolute;inset:0;border-radius:999px;background:#c7d5e4;transition:.22s;cursor:pointer}
+  .sw i::before{content:"";position:absolute;width:15px;height:15px;left:2.5px;top:2.5px;border-radius:50%;
+    background:#fff;transition:.22s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+  .sw input:checked + i{background:linear-gradient(135deg,var(--accent),#4aa8f5)}
+  .sw input:checked + i::before{transform:translateX(16px)}
+
+  input[type=range]{
+    -webkit-appearance:none;width:100%;height:5px;border-radius:99px;margin-top:6px;
+    background:linear-gradient(90deg,var(--accent),#8fc4f5);outline:none;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;width:15px;height:15px;border-radius:50%;background:#fff;cursor:pointer;
+    border:2.5px solid var(--accent);box-shadow:0 2px 7px rgba(30,127,224,.4);
+  }
+  .slide-wrap{padding:6px 0 2px}
+  .slide-wrap .lab{display:flex;justify-content:space-between;font-size:11px;font-weight:600;color:var(--muted)}
+  .slide-wrap .lab b{color:var(--accent);font-variant-numeric:tabular-nums}
+
+  /* ---------- LEGEND ---------- */
+  #legend{
+    position:fixed;bottom:16px;right:16px;padding:13px 16px;border-radius:16px;
+    background:var(--panel);backdrop-filter:blur(14px);
+    border:1px solid rgba(255,255,255,.9);
+    box-shadow:0 12px 34px rgba(20,60,110,.15);z-index:20;
+    font-size:11px;min-width:186px;
+  }
+  #legend .lt{font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;
+    color:var(--accent);margin-bottom:9px}
+  #legend .li{display:flex;align-items:center;gap:8px;margin:5px 0;color:var(--muted);font-weight:600}
+  #legend .chip{width:13px;height:13px;border-radius:4px;flex-shrink:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
+
+  /* ---------- LABELS ---------- */
+  .lbl{
+    font:600 11px/1.25 "Segoe UI",system-ui,sans-serif;color:#0b2545;
+    background:rgba(255,255,255,.94);
+    border:1px solid rgba(30,127,224,.4);
+    border-radius:7px;padding:4px 9px;white-space:nowrap;
+    box-shadow:0 4px 12px rgba(20,60,110,.18);
+    pointer-events:none;user-select:none;
+  }
+  .lbl.acc{border-color:rgba(15,181,168,.55);color:#0a5f57}
+
+  /* ---------- LOADER ---------- */
+  #loader{position:fixed;inset:0;background:linear-gradient(160deg,#f4f9ff,#dbe9f8);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+    z-index:100;transition:opacity .7s;font-size:12px;color:var(--muted);letter-spacing:1.4px;font-weight:700}
+  #loader .ring{width:44px;height:44px;border-radius:50%;border:3px solid rgba(30,127,224,.18);
+    border-top-color:var(--accent);animation:spin .9s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  #loader.hide{opacity:0;pointer-events:none}
+
+  @media(max-width:820px){
+    #panel{width:238px;top:78px;left:10px;padding:12px}
+    #hud-top h1{font-size:12px} #hud-top span{display:none}
+    #legend{display:none}
+  }
+</style>
+</head>
+<body>
+<div id="stage"></div>
+
+<header id="hud-top">
+  <div class="dot"></div>
+  <h1>Thân vỏ Bình ngưng — 540 MW</h1>
+  <span>NĐ Mông Dương 1 · Mô phỏng kết cấu 3D</span>
+</header>
+
+<aside id="panel">
+  <div class="sec">
+    <div class="sec-t">Chế độ xem</div>
+    <div class="btn-grid">
+      <button class="btn on" data-view="all">🌐 Toàn cảnh</button>
+      <button class="btn" data-view="cross">✂️ Cắt ngang</button>
+      <button class="btn" data-view="long">📐 Cắt dọc A</button>
+      <button class="btn" data-view="quarter">◱ Cắt 3/4</button>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-t">Mặt cắt</div>
+    <div class="row">
+      <label>Mặt cắt ngang (X)</label>
+      <span class="sw"><input type="checkbox" id="cxOn"><i></i></span>
+    </div>
+    <div class="slide-wrap">
+      <div class="lab"><span>Vị trí</span><b id="cxVal">0.0 m</b></div>
+      <input type="range" id="cx" min="-8" max="8" step="0.1" value="0">
+    </div>
+
+    <div class="row" style="margin-top:12px">
+      <label>Mặt cắt dọc (Z)</label>
+      <span class="sw"><input type="checkbox" id="czOn"><i></i></span>
+    </div>
+    <div class="slide-wrap">
+      <div class="lab"><span>Vị trí</span><b id="czVal">0.0 m</b></div>
+      <input type="range" id="cz" min="-12" max="12" step="0.1" value="-5.5">
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-t">Lớp hiển thị</div>
+    <div class="row"><label>Thân vỏ & Hotwell</label><span class="sw"><input type="checkbox" data-part="casing" checked><i></i></span></div>
+    <div class="row"><label>Chùm ống Titan</label><span class="sw"><input type="checkbox" data-part="tubes" checked><i></i></span></div>
+    <div class="row"><label>Cổ & BGN hạ áp</label><span class="sw"><input type="checkbox" data-part="neck" checked><i></i></span></div>
+    <div class="row"><label>Hộp nước</label><span class="sw"><input type="checkbox" data-part="waterbox" checked><i></i></span></div>
+    <div class="row"><label>Tuabin hạ áp</label><span class="sw"><input type="checkbox" data-part="turbine" checked><i></i></span></div>
+    <div class="row"><label>Ống liên thông</label><span class="sw"><input type="checkbox" data-part="pipes" checked><i></i></span></div>
+    <div class="row"><label>Chi tiết trong vỏ</label><span class="sw"><input type="checkbox" data-part="internals" checked><i></i></span></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-t">Tùy chọn</div>
+    <div class="row"><label>Nhãn chú thích</label><span class="sw"><input type="checkbox" id="lblOn" checked><i></i></span></div>
+    <div class="row"><label>Xuyên sáng vỏ</label><span class="sw"><input type="checkbox" id="xray"><i></i></span></div>
+    <div class="row"><label>Tự động xoay</label><span class="sw"><input type="checkbox" id="autoRot"><i></i></span></div>
+  </div>
+</aside>
+
+<div id="legend">
+  <div class="lt">Chú giải vật liệu</div>
+  <div class="li"><span class="chip" style="background:#c3d3e3"></span>Vỏ thép carbon</div>
+  <div class="li"><span class="chip" style="background:#d9cba8"></span>Ống Titan</div>
+  <div class="li"><span class="chip" style="background:#ff8a4c"></span>Hộp nước tuần hoàn</div>
+  <div class="li"><span class="chip" style="background:#4ade80"></span>BGN hạ áp #1</div>
+  <div class="li"><span class="chip" style="background:#38bdf8"></span>BGN hạ áp #2</div>
+  <div class="li"><span class="chip" style="background:#f472b6"></span>Ống xả bypass LP</div>
+  <div class="li"><span class="chip" style="background:#22d3ee"></span>Ống liên thông hơi</div>
+  <div class="li"><span class="chip" style="background:#a78bfa"></span>Ống cân bằng nước</div>
+  <div class="li"><span class="chip" style="background:#34d399"></span>Ống hút khí không ngưng</div>
+</div>
+
+<div id="loader"><div class="ring"></div>ĐANG DỰNG MÔ HÌNH 3D…</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+/* ══════════════════════════════════════════════════════════
+   1. RENDERER / SCENE / CAMERA
+   ══════════════════════════════════════════════════════════ */
+const stage = document.getElementById('stage');
+
+const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.localClippingEnabled = true;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+stage.appendChild(renderer.domElement);
+
+const labelRenderer = new CSS2DRenderer();
+labelRenderer.setSize(innerWidth, innerHeight);
+Object.assign(labelRenderer.domElement.style, {
+  position:'fixed', top:'0', left:'0', pointerEvents:'none', zIndex:'10'
+});
+stage.appendChild(labelRenderer.domElement);
+
+const scene = new THREE.Scene();
+
+const camera = new THREE.PerspectiveCamera(45, innerWidth/innerHeight, 0.5, 600);
+camera.position.set(30, 22, 36);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.07;
+controls.target.set(0, 5, 0);
+controls.minDistance = 14;
+controls.maxDistance = 130;
+controls.autoRotateSpeed = 0.6;
+
+/* ══════════════════════════════════════════════════════════
+   2. ENVIRONMENT + LIGHTS
+   ══════════════════════════════════════════════════════════ */
+function envTexture(){
+  const c = document.createElement('canvas');
+  c.width = 1024; c.height = 512;
+  const x = c.getContext('2d');
+  const g = x.createLinearGradient(0,0,0,512);
+  g.addColorStop(0.00,'#ffffff');
+  g.addColorStop(0.42,'#d8e9f8');
+  g.addColorStop(0.50,'#a9c6e0');
+  g.addColorStop(0.75,'#7d93a8');
+  g.addColorStop(1.00,'#5c6f80');
+  x.fillStyle = g; x.fillRect(0,0,1024,512);
+  x.fillStyle = 'rgba(255,255,255,.95)';
+  x.beginPath(); x.ellipse(250,90,150,65,0,0,7); x.fill();
+  x.beginPath(); x.ellipse(800,150,110,50,0,0,7); x.fill();
+  const t = new THREE.CanvasTexture(c);
+  t.mapping = THREE.EquirectangularReflectionMapping;
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromEquirectangular(envTexture()).texture;
+
+scene.add(new THREE.HemisphereLight(0xffffff, 0x9db4c9, 1.15));
+const key = new THREE.DirectionalLight(0xffffff, 2.0); key.position.set(24, 34, 20); scene.add(key);
+const fill = new THREE.DirectionalLight(0xdcecff, 0.85); fill.position.set(-28, 16, -22); scene.add(fill);
+const rim = new THREE.DirectionalLight(0xa8d8ff, 0.6); rim.position.set(0, -14, 26); scene.add(rim);
+
+/* ══════════════════════════════════════════════════════════
+   3. CLIPPING PLANES
+   ══════════════════════════════════════════════════════════ */
+const clipPlanes = [];                                   // shared array
+const planeX = new THREE.Plane(new THREE.Vector3(-1,0,0), 0);  // keep x <= c
+const planeZ = new THREE.Plane(new THREE.Vector3(0,0,-1), 0);  // keep z <= c
+
+function applyClips(){
+  clipPlanes.length = 0;
+  if (ui.cxOn) clipPlanes.push(planeX);
+  if (ui.czOn) clipPlanes.push(planeZ);
+  cutVisX.visible = ui.cxOn;
+  cutVisZ.visible = ui.czOn;
+  cutVisX.position.x = ui.cx;
+  cutVisZ.position.z = ui.cz;
+}
+
+/* ══════════════════════════════════════════════════════════
+   4. MATERIALS
+   ══════════════════════════════════════════════════════════ */
+const allMats = [];
+function M(p){
+  const m = new THREE.MeshStandardMaterial(p);
+  m.side = THREE.DoubleSide;
+  m.clippingPlanes = clipPlanes;
+  m.clipShadows = true;
+  allMats.push(m);
+  return m;
+}
+const MAT = {
+  shell   : M({ color:0xc3d3e3, metalness:0.55, roughness:0.40 }),
+  sheet   : M({ color:0x8095ab, metalness:0.85, roughness:0.32 }),
+  hotwell : M({ color:0xa8bdd2, metalness:0.62, roughness:0.42 }),
+  tube    : M({ color:0xd9cba8, metalness:0.92, roughness:0.20 }),
+  support : M({ color:0x6d8299, metalness:0.70, roughness:0.48 }),
+  baffle  : M({ color:0x8fa3ba, metalness:0.60, roughness:0.50 }),
+  neck    : M({ color:0xcfdcea, metalness:0.55, roughness:0.38 }),
+  heater1 : M({ color:0x4ade80, metalness:0.55, roughness:0.32 }),
+  heater2 : M({ color:0x38bdf8, metalness:0.55, roughness:0.32 }),
+  dump    : M({ color:0xf472b6, metalness:0.60, roughness:0.32 }),
+  water   : M({ color:0xff8a4c, metalness:0.42, roughness:0.42 }),
+  waterD  : M({ color:0xff6b35, metalness:0.42, roughness:0.42 }),
+  duct    : M({ color:0x22d3ee, metalness:0.50, roughness:0.34 }),
+  eqpipe  : M({ color:0xa78bfa, metalness:0.60, roughness:0.34 }),
+  airpipe : M({ color:0x34d399, metalness:0.60, roughness:0.34 }),
+  hood    : M({ color:0x9aabc0, metalness:0.72, roughness:0.33, transparent:true, opacity:0.62 })
+};
+
+/* ══════════════════════════════════════════════════════════
+   5. HELPERS
+   ══════════════════════════════════════════════════════════ */
+const world = new THREE.Group();
+scene.add(world);
+
+const parts = { casing:[], tubes:[], internals:[], neck:[], waterbox:[], turbine:[], pipes:[] };
+const reg = (cat, obj) => { parts[cat].push(obj); return obj; };
+
+function box(w,h,d, mat, x=0,y=0,z=0){
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), mat);
+  m.position.set(x,y,z);
+  return m;
+}
+function cylX(r, len, mat, x=0,y=0,z=0){
+  const g = new THREE.CylinderGeometry(r,r,len,20);
+  g.rotateZ(Math.PI/2);
+  const m = new THREE.Mesh(g, mat); m.position.set(x,y,z); return m;
+}
+function cylZ(r, len, mat, x=0,y=0,z=0){
+  const g = new THREE.CylinderGeometry(r,r,len,20);
+  g.rotateX(Math.PI/2);
+  const m = new THREE.Mesh(g, mat); m.position.set(x,y,z); return m;
+}
+/** Taper the BOTTOM face of a box geometry (keeps top at full size) */
+function taperBottom(w,h,d, sx, sz){
+  const g = new THREE.BoxGeometry(w,h,d);
+  const p = g.attributes.position;
+  for (let i=0;i<p.count;i++){
+    if (p.getY(i) < 0){ p.setX(i, p.getX(i)*sx); p.setZ(i, p.getZ(i)*sz); }
+  }
+  p.needsUpdate = true; g.computeVertexNormals();
+  return g;
+}
+/** Horizontal plate with a rectangular hole (for the condenser neck opening) */
+function plateWithHole(w,d,hw,hd,t){
+  const s = new THREE.Shape();
+  s.moveTo(-w/2,-d/2); s.lineTo(w/2,-d/2); s.lineTo(w/2,d/2); s.lineTo(-w/2,d/2); s.closePath();
+  const h = new THREE.Path();
+  h.moveTo(-hw/2,-hd/2); h.lineTo(-hw/2,hd/2); h.lineTo(hw/2,hd/2); h.lineTo(hw/2,-hd/2); h.closePath();
+  s.holes.push(h);
+  const g = new THREE.ExtrudeGeometry(s,{depth:t, bevelEnabled:false, curveSegments:1});
+  g.rotateX(-Math.PI/2);
+  return g;
+}
+function label(text, x,y,z, cls=''){
+  const el = document.createElement('div');
+  el.className = 'lbl ' + cls;
+  el.textContent = text;
+  const o = new CSS2DObject(el);
+  o.position.set(x,y,z);
+  world.add(o);
+  labels.push(o);
+  return o;
+}
+const labels = [];
+
+/* ══════════════════════════════════════════════════════════
+   6. BUILD — SHELL
+   ══════════════════════════════════════════════════════════ */
+const L = 16, W = 8, H = 6, hL = L/2, hW = W/2;
+const NECK_W = 7.0, NECK_D = 3.6;
+
+function buildShell(zc, tag){
+  const G = new THREE.Group();
+  G.position.z = zc;
+  world.add(G);
+
+  /* ---- 6.1 Casing walls ---- */
+  const t = 0.18;
+  G.add(reg('casing', box(L, H, t, MAT.shell, 0, H/2, -hW)));
+  G.add(reg('casing', box(L, H, t, MAT.shell, 0, H/2,  hW)));
+  const top = new THREE.Mesh(plateWithHole(L, W, NECK_W, NECK_D, t), MAT.shell);
+  top.position.y = H;
+  G.add(reg('casing', top));
+
+  /* ---- 6.2 Hotwell (giếng gom nước ngưng) ---- */
+  const hot = new THREE.Mesh(taperBottom(L, 3.0, W, 0.45, 0.50), MAT.hotwell);
+  hot.position.y = -1.5;
+  G.add(reg('casing', hot));
+
+  /* ---- 6.3 Tube sheets (mặt sàng) ---- */
+  G.add(reg('casing', box(0.30, H, W, MAT.sheet, -hL+0.15, H/2, 0)));
+  G.add(reg('casing', box(0.30, H, W, MAT.sheet,  hL-0.15, H/2, 0)));
+
+  /* ---- 6.4 Tube bundle (chùm ống Titan) ---- */
+  const rows = 22, cols = 16;
+  const y0 = 0.85, y1 = 5.00, zGap = 0.50, zEdge = 3.45;
+  const stepY = (y1-y0)/(rows-1);
+  const stepZ = (zEdge-zGap)/(cols-1);
+
+  const tubeGeo = new THREE.CylinderGeometry(0.075, 0.075, L-0.6, 8);
+  tubeGeo.rotateZ(Math.PI/2);
+
+  const count = rows*cols*2;
+  const inst = new THREE.InstancedMesh(tubeGeo, MAT.tube, count);
+  const mtx = new THREE.Matrix4();
+  let k = 0;
+  for (let r=0;r<rows;r++){
+    const y = y0 + r*stepY;
+    for (let c=0;c<cols;c++){
+      const dz = c*stepZ;
+      mtx.makeTranslation(0, y, -zGap-dz); inst.setMatrixAt(k++, mtx);
+      mtx.makeTranslation(0, y,  zGap+dz); inst.setMatrixAt(k++, mtx);
+    }
+  }
+  inst.instanceMatrix.needsUpdate = true;
+  G.add(reg('tubes', inst));
+
+  /* ---- 6.5 Support plates (vách đỡ ống) ---- */
+  [-5.0,-2.5, 0, 2.5, 5.0].forEach(x=>{
+    const p = box(0.06, 4.6, 7.2, MAT.support, x, 2.85, 0);
+    G.add(reg('internals', p));
+  });
+
+  /* ---- 6.6 Impingement baffle + LP bypass dump tube ---- */
+  G.add(reg('internals', box(11, 0.10, 2.4, MAT.baffle, 0, 4.70, 0)));
+  G.add(reg('internals', cylX(0.30, 12.5, MAT.dump, 0, 5.35, 0)));
+  // spray nozzles
+  for (let i=-4;i<=4;i++){
+    const n = new THREE.Mesh(new THREE.ConeGeometry(0.10, 0.34, 8), MAT.dump);
+    n.position.set(i*1.35, 5.62, 0);
+    G.add(reg('internals', n));
+  }
+
+  /* ---- 6.7 Air-removal pipe (ống hút khí không ngưng) ---- */
+  G.add(reg('internals', cylX(0.26, 19.0, MAT.airpipe, 0.8, 3.30, 0)));
+
+  /* ---- 6.8 Neck (cổ bình ngưng) ---- */
+  const neck = new THREE.Mesh(taperBottom(8.0, 3.6, 4.0, NECK_W/8.0, NECK_D/4.0), MAT.neck);
+  neck.position.y = H + 1.8;
+  G.add(reg('neck', neck));
+
+  /* ---- 6.9 Neck heaters: LP FWH #1 & #2 ---- */
+  G.add(reg('neck', cylX(0.62, 5.6, MAT.heater1, 0, 7.05, -1.05)));
+  G.add(reg('neck', cylX(0.62, 5.6, MAT.heater1, 0, 7.05,  1.05)));
+  G.add(reg('neck', cylX(0.52, 5.2, MAT.heater2, 0, 8.65, -1.05)));
+  G.add(reg('neck', cylX(0.52, 5.2, MAT.heater2, 0, 8.65,  1.05)));
+
+  /* ---- 6.10 Waterboxes ---- */
+  const wbR = box(2.0, 6.8, 8.8, MAT.water, 9.0, 3.0, 0);       // inlet / outlet
+  G.add(reg('waterbox', wbR));
+  G.add(reg('waterbox', box(2.0, 6.8, 0.14, MAT.waterD, 9.0, 3.0, 0))); // divider
+  const wbL = box(2.0, 6.8, 8.8, MAT.water, -9.0, 3.0, 0);      // reversing
+  G.add(reg('waterbox', wbL));
+  // flanges
+  G.add(reg('waterbox', box(0.20, 7.2, 9.2, MAT.sheet, 8.05, 3.0, 0)));
+  G.add(reg('waterbox', box(0.20, 7.2, 9.2, MAT.sheet, -8.05, 3.0, 0)));
+
+  /* ---- 6.11 Turbine LP hood ---- */
+  const trans = new THREE.Mesh(taperBottom(9.6, 3.0, 7.2, 0.83, 0.55), MAT.hood);
+  trans.position.y = H + 3.6 + 1.5;
+  G.add(reg('turbine', trans));
+  const hood = box(9.6, 3.4, 7.2, MAT.hood, 0, H + 3.6 + 3.0 + 1.7, 0);
+  G.add(reg('turbine', hood));
+
+  return G;
+}
+
+/* Build both shells */
+const shellA = buildShell(-5.5, 'A');
+const shellB = buildShell( 5.5, 'B');
+
+/* ══════════════════════════════════════════════════════════
+   7. BUILD — INTER-SHELL CONNECTIONS
+   ══════════════════════════════════════════════════════════ */
+// Steam crossover duct
+const cross = box(3.6, 2.6, 8.2, MAT.duct, 0, 7.6, 0);
+world.add(reg('pipes', cross));
+// Water equalizing pipe
+world.add(reg('pipes', cylZ(0.50, 12.5, MAT.eqpipe, 0, -1.5, 0)));
+
+/* ══════════════════════════════════════════════════════════
+   8. LABELS
+   ══════════════════════════════════════════════════════════ */
+label('Tuabin hạ áp LP-A',      0, 15.4, -5.5);
+label('Tuabin hạ áp LP-B',      0, 15.4,  5.5);
+label('Cổ bình ngưng',          0,  9.9, -9.8);
+label('BGN hạ áp #1 & #2',      5.2, 8.0, -5.5);
+label('Chùm ống Titan',         0,  3.0, -14.2, 'acc');
+label('Thân vỏ Shell A',       -9.5, 6.4, -5.5);
+label('Giếng nước ngưng',       0, -3.6, -5.5, 'acc');
+label('Hộp nước vào/ra',       11.6, 3.0, -5.5);
+label('Hộp nước đảo chiều',   -11.6, 3.0, -5.5);
+label('Ống liên thông hơi',     0,  9.5,  0);
+label('Ống cân bằng nước',      0, -2.9,  0, 'acc');
+
+/* ══════════════════════════════════════════════════════════
+   9. CUT-PLANE VISUAL GUIDES
+   ══════════════════════════════════════════════════════════ */
+function makeCutPlane(w,h, rotY){
+  const g = new THREE.Group();
+  const m = new THREE.Mesh(
+    new THREE.PlaneGeometry(w,h),
+    new THREE.MeshBasicMaterial({ color:0x1e7fe0, transparent:true, opacity:0.07,
+      side:THREE.DoubleSide, depthWrite:false })
+  );
+  g.add(m);
+  const edge = new THREE.LineSegments(
+    new THREE.EdgesGeometry(new THREE.PlaneGeometry(w,h)),
+    new THREE.LineBasicMaterial({ color:0x1e7fe0, transparent:true, opacity:0.45 })
+  );
+  g.add(edge);
+  if (rotY) g.rotation.y = rotY;
+  g.position.y = 5.5;
+  g.visible = false;
+  world.add(g);
+  return g;
+}
+const cutVisX = makeCutPlane(30, 26, Math.PI/2);
+const cutVisZ = makeCutPlane(30, 26, 0);
+
+/* ══════════════════════════════════════════════════════════
+   10. UI WIRING
+   ══════════════════════════════════════════════════════════ */
+const ui = { cxOn:false, czOn:false, cx:0, cz:-5.5 };
+
+const $ = s => document.querySelector(s);
+const cxEl = $('#cx'), czEl = $('#cz');
+const cxOnEl = $('#cxOn'), czOnEl = $('#czOn');
+
+cxEl.addEventListener('input', e => {
+  ui.cx = parseFloat(e.target.value);
+  planeX.constant = ui.cx;
+  $('#cxVal').textContent = ui.cx.toFixed(1) + ' m';
+  applyClips();
+});
+czEl.addEventListener('input', e => {
+  ui.cz = parseFloat(e.target.value);
+  planeZ.constant = ui.cz;
+  $('#czVal').textContent = ui.cz.toFixed(1) + ' m';
+  applyClips();
+});
+cxOnEl.addEventListener('change', e => {
+  ui.cxOn = e.target.checked;
+  planeX.constant = ui.cx;
+  applyClips(); syncViewButtons();
+});
+czOnEl.addEventListener('change', e => {
+  ui.czOn = e.target.checked;
+  planeZ.constant = ui.cz;
+  applyClips(); syncViewButtons();
+});
+
+/* ---- Part visibility ---- */
+document.querySelectorAll('[data-part]').forEach(cb=>{
+  cb.addEventListener('change', e=>{
+    const v = e.target.checked;
+    parts[e.target.dataset.part].forEach(o => o.visible = v);
+  });
+});
+
+/* ---- Labels toggle ---- */
+$('#lblOn').addEventListener('change', e=>{
+  labels.forEach(l => l.visible = e.target.checked);
+});
+
+/* ---- X-ray shell ---- */
+$('#xray').addEventListener('change', e=>{
+  const on = e.target.checked;
+  MAT.shell.transparent = on;
+  MAT.shell.opacity = on ? 0.28 : 1;
+  MAT.hotwell.transparent = on;
+  MAT.hotwell.opacity = on ? 0.32 : 1;
+  MAT.neck.transparent = on;
+  MAT.neck.opacity = on ? 0.34 : 1;
+  MAT.shell.depthWrite = !on;
+  MAT.hotwell.depthWrite = !on;
+  MAT.neck.depthWrite = !on;
+  allMats.forEach(m=>m.needsUpdate = true);
+});
+
+/* ---- Auto rotate ---- */
+$('#autoRot').addEventListener('change', e=>{
+  controls.autoRotate = e.target.checked;
+});
+
+/* ---- View presets ---- */
+const VIEWS = {
+  all:     { pos:[30,22,36],  tgt:[0,5,0],   cx:false, cz:false, cxv:0,    czv:-5.5 },
+  cross:   { pos:[42,14,10],  tgt:[0,4,0],   cx:true,  cz:false, cxv:0,    czv:-5.5 },
+  long:    { pos:[4,12,-34],  tgt:[0,5,-5.5],cx:false, cz:true,  cxv:0,    czv:-5.5 },
+  quarter: { pos:[30,20,-30], tgt:[0,5,-4],  cx:true,  cz:true,  cxv:2,    czv:-2   }
+};
+
+function flyTo(v){
+  const from = camera.position.clone();
+  const to = new THREE.Vector3(...v.pos);
+  const tf = controls.target.clone();
+  const tt = new THREE.Vector3(...v.tgt);
+  const t0 = performance.now(), dur = 900;
+  (function step(){
+    const k = Math.min(1, (performance.now()-t0)/dur);
+    const e = 1 - Math.pow(1-k, 3);
+    camera.position.lerpVectors(from, to, e);
+    controls.target.lerpVectors(tf, tt, e);
+    controls.update();
+    if (k < 1) requestAnimationFrame(step);
+  })();
+}
+
+function setView(name){
+  const v = VIEWS[name];
+  ui.cxOn = v.cx; ui.czOn = v.cz;
+  ui.cx = v.cxv;  ui.cz = v.czv;
+  cxOnEl.checked = v.cx; czOnEl.checked = v.cz;
+  cxEl.value = v.cxv; czEl.value = v.czv;
+  $('#cxVal').textContent = v.cxv.toFixed(1) + ' m';
+  $('#czVal').textContent = v.czv.toFixed(1) + ' m';
+  planeX.constant = v.cxv;
+  planeZ.constant = v.czv;
+  applyClips();
+  flyTo(v);
+  syncViewButtons(name);
+}
+
+function syncViewButtons(active){
+  const btns = document.querySelectorAll('[data-view]');
+  btns.forEach(b => b.classList.remove('on'));
+  if (active) {
+    const b = document.querySelector(`[data-view="${active}"]`);
+    if (b) b.classList.add('on');
+    return;
+  }
+  // infer
+  if (ui.cxOn && ui.czOn) document.querySelector('[data-view="quarter"]').classList.add('on');
+  else if (ui.cxOn) document.querySelector('[data-view="cross"]').classList.add('on');
+  else if (ui.czOn) document.querySelector('[data-view="long"]').classList.add('on');
+  else document.querySelector('[data-view="all"]').classList.add('on');
+}
+
+document.querySelectorAll('[data-view]').forEach(b=>{
+  b.addEventListener('click', ()=> setView(b.dataset.view));
+});
+
+/* ══════════════════════════════════════════════════════════
+   11. RESIZE + LOOP
+   ══════════════════════════════════════════════════════════ */
+addEventListener('resize', ()=>{
+  camera.aspect = innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+  labelRenderer.setSize(innerWidth, innerHeight);
+});
+
+function animate(){
+  requestAnimationFrame(animate);
+  controls.update();
+  renderer.render(scene, camera);
+  labelRenderer.render(scene, camera);
+}
+
+/* ---- init ---- */
+planeX.constant = ui.cx;
+planeZ.constant = ui.cz;
+applyClips();
+animate();
+
+setTimeout(()=>{
+  $('#loader').classList.add('hide');
+  setTimeout(()=> $('#loader').remove(), 800);
+}, 700);
+</script>
+</body>
+</html>

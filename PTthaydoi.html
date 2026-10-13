@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mô hình 3D — Tuabin hơi: Sự cố p₀↑ &amp; t₀↓</title>
+<style>
+    :root{
+        --primary:#1B365D; --danger:#c0392b; --warning:#d35400;
+        --safe:#27ae60; --info:#2980b9;
+        --bg:#eef3f9; --card:#ffffff; --border:#d5e0ec;
+        --text:#1c2b3a; --text-dim:#5f7488;
+    }
+    *{box-sizing:border-box;}
+    html,body{
+        margin:0;padding:0;height:100%;overflow:hidden;background:var(--bg);color:var(--text);
+        font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+    }
+    #canvasWrap{position:fixed;inset:0;}
+    canvas{display:block;}
+
+    /* ---------- Cột trái: điều khiển ---------- */
+    .left-col{
+        position:fixed;top:18px;left:18px;width:270px;z-index:10;
+        display:flex;flex-direction:column;gap:12px;
+    }
+    .panel{
+        background:rgba(255,255,255,.94);border:1px solid var(--border);border-radius:14px;
+        padding:14px 16px;backdrop-filter:blur(10px);
+        box-shadow:0 8px 22px rgba(27,54,93,.10);
+    }
+    .panel h3{
+        margin:0 0 10px;font-size:12px;letter-spacing:1.2px;color:#2e86de;font-weight:700;
+        text-transform:uppercase;border-bottom:1px solid var(--border);padding-bottom:7px;
+    }
+
+    /* Mode buttons */
+    .mode-group{display:flex;gap:8px;flex-wrap:wrap;}
+    .mode-btn{
+        flex:1;min-width:105px;
+        background:#fff;border:1px solid var(--border);color:var(--primary);
+        padding:9px 12px;border-radius:9px;font-size:12px;font-weight:700;letter-spacing:.4px;
+        cursor:pointer;transition:.2s;font-family:inherit;
+        box-shadow:0 2px 6px rgba(27,54,93,.06);
+    }
+    .mode-btn:hover{border-color:#5aa9ff;color:#0f4c8f;transform:translateY(-1px);}
+    .mode-btn.active{
+        background:linear-gradient(135deg,#1f5fae,#2e86de);border-color:#6cc0ff;color:#fff;
+        box-shadow:0 5px 16px rgba(70,150,255,.40);
+    }
+    .mode-btn.active.danger{
+        background:linear-gradient(135deg,#a02b1e,#c0392b);border-color:#ff7a66;color:#fff;
+        box-shadow:0 5px 16px rgba(220,70,50,.40);
+    }
+
+    /* Sliders */
+    .slider-row{margin-bottom:12px;}
+    .slider-row:last-child{margin-bottom:0;}
+    .slider-head{
+        display:flex;justify-content:space-between;align-items:baseline;
+        font-size:12px;margin-bottom:5px;
+    }
+    .slider-head span{color:var(--text-dim);font-weight:600;}
+    .slider-head b{color:var(--primary);font-variant-numeric:tabular-nums;font-size:13px;}
+    input[type=range]{
+        -webkit-appearance:none;width:100%;height:6px;border-radius:4px;
+        background:linear-gradient(90deg,#cfe0f3,#e3ebf4);outline:none;cursor:pointer;
+    }
+    input[type=range]::-webkit-slider-thumb{
+        -webkit-appearance:none;width:18px;height:18px;border-radius:50%;
+        background:linear-gradient(135deg,#2e86de,#1f5fae);
+        border:2px solid #fff;box-shadow:0 2px 8px rgba(46,134,222,.45);
+        cursor:pointer;transition:.15s;
+    }
+    input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15);}
+    input[type=range]::-moz-range-thumb{
+        width:16px;height:16px;border-radius:50%;
+        background:linear-gradient(135deg,#2e86de,#1f5fae);
+        border:2px solid #fff;box-shadow:0 2px 8px rgba(46,134,222,.45);
+        cursor:pointer;
+    }
+    .slider-row.speed input[type=range]{
+        background:linear-gradient(90deg,#d5f0e0,#e3ebf4);
+    }
+    .slider-row.speed input[type=range]::-webkit-slider-thumb{
+        background:linear-gradient(135deg,#27ae60,#1e8e4f);
+        box-shadow:0 2px 8px rgba(39,174,96,.45);
+    }
+
+    /* ---------- Cột phải: HUD + Effects ---------- */
+    .right-col{
+        position:fixed;top:18px;right:18px;width:300px;z-index:10;
+        display:flex;flex-direction:column;gap:12px;
+        max-height:calc(100vh - 36px);overflow-y:auto;
+        scrollbar-width:thin;
+    }
+    .hud h3{
+        margin:0 0 10px;font-size:12px;letter-spacing:1.2px;color:#2e86de;font-weight:700;
+        text-transform:uppercase;border-bottom:1px solid var(--border);padding-bottom:7px;
+    }
+    .row{
+        display:flex;justify-content:space-between;align-items:center;
+        font-size:12.5px;padding:4px 0;
+    }
+    .row span{color:var(--text-dim);}
+    .row b{color:var(--primary);font-variant-numeric:tabular-nums;font-weight:700;font-size:12.5px;}
+    .row b.bad{color:#c0392b;}
+    .row b.good{color:#1e8e4f;}
+    .bar{height:8px;border-radius:5px;background:#e3ebf4;overflow:hidden;margin-top:10px;}
+    .bar i{display:block;height:100%;width:100%;background:#27ae60;border-radius:5px;
+           transition:width .3s ease, background .3s ease;}
+    .bar-lbl{font-size:11px;color:var(--text-dim);margin-top:6px;letter-spacing:.4px;}
+
+    /* Effects panel */
+    .effect{margin-bottom:10px;}
+    .effect:last-child{margin-bottom:0;}
+    .effect-head{
+        display:flex;justify-content:space-between;align-items:baseline;
+        font-size:12px;margin-bottom:4px;
+    }
+    .effect-head span{color:var(--text-dim);font-weight:600;}
+    .effect-head b{font-size:11px;font-variant-numeric:tabular-nums;}
+    .mini-bar{height:6px;border-radius:4px;background:#e9eff6;overflow:hidden;}
+    .mini-bar i{
+        display:block;height:100%;width:0%;border-radius:4px;
+        transition:width .35s ease, background .35s ease;
+    }
+    .effect.lv-low   .effect-head b{color:#1e8e4f;}
+    .effect.lv-mid   .effect-head b{color:#d35400;}
+    .effect.lv-high  .effect-head b{color:#c0392b;}
+
+    /* ---------- Legend ---------- */
+    .legend{
+        position:fixed;left:18px;bottom:18px;z-index:10;
+        background:rgba(255,255,255,.94);border:1px solid var(--border);border-radius:12px;
+        padding:10px 14px;backdrop-filter:blur(10px);
+        box-shadow:0 8px 22px rgba(27,54,93,.10);font-size:12px;
+    }
+    .legend div{display:flex;align-items:center;gap:8px;margin:4px 0;color:var(--text-dim);}
+    .legend i{width:11px;height:11px;border-radius:50%;display:inline-block;flex:0 0 auto;
+        box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);}
+
+    /* ---------- Warning ---------- */
+    .warnbar{
+        position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);z-index:11;
+        background:linear-gradient(135deg,#e74c3c,#c0392b);
+        border:1px solid #ff8b73;color:#fff;padding:11px 20px;border-radius:30px;font-size:13px;
+        display:flex;align-items:center;gap:9px;opacity:0;pointer-events:none;transition:.35s;
+        box-shadow:0 8px 26px rgba(220,70,50,.4);white-space:nowrap;max-width:92vw;
+    }
+    .warnbar.show{opacity:1;transform:translate(-50%,0);}
+    .warnbar .dot{width:9px;height:9px;border-radius:50%;background:#ffd93b;animation:pulse 1s infinite;flex:0 0 auto;}
+    @keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.35;transform:scale(.72);}}
+
+    @media(max-width:1100px){
+        .left-col{width:230px;}
+        .right-col{width:250px;}
+    }
+    @media(max-width:820px){
+        .right-col{width:210px;top:auto;bottom:12px;right:12px;max-height:58vh;}
+        .left-col{width:200px;gap:8px;}
+        .panel{padding:10px 12px;}
+        .legend{display:none;}
+        .warnbar{font-size:11px;padding:9px 14px;bottom:auto;top:80px;white-space:normal;}
+        .slider-row{margin-bottom:8px;}
+    }
+</style>
+</head>
+<body>
+
+<div id="canvasWrap"></div>
+
+<!-- ============ CỘT TRÁI ============ -->
+<div class="left-col">
+
+    <div class="panel">
+        <h3>Chế độ vận hành</h3>
+        <div class="mode-group">
+            <button class="mode-btn active" data-mode="normal">ĐỊNH MỨC</button>
+            <button class="mode-btn" data-mode="incident">SỰ CỐ</button>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h3>Điều chỉnh từng yếu tố</h3>
+
+        <div class="slider-row">
+            <div class="slider-head">
+                <span>Áp suất hơi mới p₀</span>
+                <b id="lbl-p0">9.00 MPa</b>
+            </div>
+            <input type="range" id="sl-p0" min="8" max="12" step="0.05" value="9">
+        </div>
+
+        <div class="slider-row">
+            <div class="slider-head">
+                <span>Nhiệt độ hơi mới t₀</span>
+                <b id="lbl-t0">540 °C</b>
+            </div>
+            <input type="range" id="sl-t0" min="400" max="560" step="1" value="540">
+        </div>
+
+        <div class="slider-row speed">
+            <div class="slider-head">
+                <span>Tốc độ dòng hơi</span>
+                <b id="lbl-speed">1.0×</b>
+            </div>
+            <input type="range" id="sl-speed" min="0.2" max="3" step="0.1" value="1">
+        </div>
+    </div>
+
+</div>
+
+<!-- ============ CỘT PHẢI ============ -->
+<div class="right-col">
+
+    <div class="panel hud">
+        <h3>Thông số tính toán</h3>
+        <div class="row"><span>Áp suất p₀</span><b id="v-p0">9.00 MPa</b></div>
+        <div class="row"><span>Nhiệt độ t₀</span><b id="v-t0">540 °C</b></div>
+        <div class="row"><span>t<sub>sat</sub>(p₀)</span><b id="v-tsat">303 °C</b></div>
+        <div class="row"><span>Độ quá nhiệt Δt<sub>sh</sub></span><b id="v-dtsh" class="good">237 K</b></div>
+        <div class="row"><span>Độ ẩm cuối y₂</span><b id="v-y2">7 %</b></div>
+        <div class="row"><span>Nhiệt giáng H₀</span><b id="v-h0">100 %</b></div>
+        <div class="bar"><i id="barDtsh"></i></div>
+        <div class="bar-lbl">Mức độ quá nhiệt còn lại</div>
+    </div>
+
+    <div class="panel">
+        <h3>Ảnh hưởng mô phỏng</h3>
+
+        <div class="effect lv-low" id="eff-erosion">
+            <div class="effect-head"><span>Xói mòn cánh</span><b>0 %</b></div>
+            <div class="mini-bar"><i style="background:#e74c3c"></i></div>
+        </div>
+
+        <div class="effect lv-low" id="eff-vibration">
+            <div class="effect-head"><span>Rung động trục</span><b>0 %</b></div>
+            <div class="mini-bar"><i style="background:#d35400"></i></div>
+        </div>
+
+        <div class="effect lv-low" id="eff-axial">
+            <div class="effect-head"><span>Dịch chuyển dọc trục</span><b>0 %</b></div>
+            <div class="mini-bar"><i style="background:#8e44ad"></i></div>
+        </div>
+
+        <div class="effect lv-low" id="eff-water">
+            <div class="effect-head"><span>Nguy cơ nước vào</span><b>0 %</b></div>
+            <div class="mini-bar"><i style="background:#2980b9"></i></div>
+        </div>
+
+        <div class="effect lv-low" id="eff-heat">
+            <div class="effect-head"><span>Suất tiêu hao nhiệt</span><b>0 %</b></div>
+            <div class="mini-bar"><i style="background:#c0392b"></i></div>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ============ LEGEND ============ -->
+<div class="legend">
+    <div><i style="background:#4db8e8"></i>Hơi quá nhiệt</div>
+    <div><i style="background:#2e8fd6"></i>Bắt đầu ngưng</div>
+    <div><i style="background:#1f6fd0"></i>Bão hòa ẩm</div>
+    <div><i style="background:#e74c3c"></i>Giọt nước — xói mòn</div>
+</div>
+
+<!-- ============ WARNING ============ -->
+<div class="warnbar" id="warnbar">
+    <span class="dot"></span>
+    <span id="warnText"><b>CẢNH BÁO:</b> Độ quá nhiệt giảm — hơi ẩm xuất hiện sớm</span>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+/* =========================================================
+   0. CẤU HÌNH
+   ========================================================= */
+const CFG = {
+    xInlet:  -7.0,
+    xOutlet:  7.0,
+    stages:   12,
+    xStageStart: -4.8,
+    xStageEnd:    5.4,
+    steamCount: 1400,
+    dropCount:   500,
+    sparkCount:  200,
+    casingR: 3.35
+};
+
+/* ---- Ánh xạ vật lý: p₀, t₀  →  các đại lượng dẫn xuất ---- */
+function computeDerived(p0, t0) {
+    // Nhiệt độ bão hòa xấp xỉ cho nước (MPa → °C)
+    const tsat = 303 + (p0 - 9) * 7.3;
+    const dtsh = t0 - tsat;
+
+    // Độ ẩm cuối tuabin
+    let y2 = 0.06 + Math.max(0, 248 - dtsh) * 0.00105;
+    y2 = THREE.MathUtils.clamp(y2, 0.045, 0.26);
+
+    // Vị trí bắt đầu ngưng tụ
+    let wetStart = 2.7 - (y2 - 0.08) * 44.4;
+    wetStart = THREE.MathUtils.clamp(wetStart, -3.0, 5.0);
+
+    // Nhiệt giáng tương đối
+    const H0 = 100 - Math.max(0, 237 - dtsh) * 0.082
+                   - Math.max(0, 100 - dtsh) * 0.150;
+
+    return { tsat, dtsh, y2, wetStart, H0: Math.max(H0, 55) };
+}
+
+/* ---- Trạng thái (giá trị hiện tại — được làm mượt) ---- */
+const state = {
+    p0: 9.0, t0: 540,
+    tsat: 303, dtsh: 237, y2: 0.07, wetStart: 2.7, H0: 100,
+    speed: 1.0
+};
+/* ---- Đích (do người dùng đặt) ---- */
+const target = { p0: 9.0, t0: 540 };
+
+/* =========================================================
+   1. SCENE / CAMERA / RENDERER
+   ========================================================= */
+const wrap = document.getElementById('canvasWrap');
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xeef3f9);
+scene.fog = new THREE.Fog(0xeef3f9, 34, 84);
+
+const CAM_HOME = new THREE.Vector3(-10.5, 8.5, 16.5);
+
+const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.1, 300);
+camera.position.copy(CAM_HOME);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.0;
+wrap.appendChild(renderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping  = true;
+controls.dampingFactor  = 0.06;
+controls.minDistance    = 9;
+controls.maxDistance    = 48;
+controls.maxPolarAngle  = Math.PI * 0.52;
+controls.autoRotateSpeed = 0.7;
+controls.target.set(0, 0, 0);
+
+/* =========================================================
+   2. ÁNH SÁNG
+   ========================================================= */
+scene.add(new THREE.HemisphereLight(0xffffff, 0xc2d2e3, 1.35));
+
+const keyLight = new THREE.DirectionalLight(0xffffff, 2.0);
+keyLight.position.set(-8, 16, 12);
+scene.add(keyLight);
+
+const rimLight = new THREE.DirectionalLight(0xbcd8ff, 1.0);
+rimLight.position.set(14, -4, -12);
+scene.add(rimLight);
+
+const frontLight = new THREE.DirectionalLight(0xffffff, 1.1);
+frontLight.position.set(4, 6, 20);
+scene.add(frontLight);
+
+const fillLight = new THREE.DirectionalLight(0xd9e8ff, 0.7);
+fillLight.position.set(0, -10, 6);
+scene.add(fillLight);
+
+/* Đèn đỏ mô phỏng vùng ẩm */
+const wetLight = new THREE.PointLight(0xff3b2f, 0, 9, 2);
+wetLight.position.set(4.6, 0, 0);
+scene.add(wetLight);
+
+/* Đèn xanh mô phỏng vùng quá nhiệt mạnh (khi t₀ cao) */
+const hotLight = new THREE.PointLight(0x4dc3ff, 0, 10, 2);
+hotLight.position.set(-5.5, 0, 0);
+scene.add(hotLight);
+
+/* =========================================================
+   3. VẬT LIỆU
+   ========================================================= */
+const MAT = {
+    shaft: new THREE.MeshStandardMaterial({ color: 0xb9c7d6, metalness: 0.9,  roughness: 0.28 }),
+    disc:  new THREE.MeshStandardMaterial({ color: 0x93a5b8, metalness: 0.85, roughness: 0.38 }),
+    rotorBlade:  new THREE.MeshStandardMaterial({ color: 0xe0a92e, metalness: 0.85, roughness: 0.3 }),
+    statorBlade: new THREE.MeshStandardMaterial({ color: 0x8b9cb0, metalness: 0.8,  roughness: 0.45 }),
+    casing: new THREE.MeshPhysicalMaterial({
+        color: 0x4a90d9, metalness: 0.1, roughness: 0.08,
+        transparent: true, opacity: 0.08, side: THREE.DoubleSide, depthWrite: false
+    }),
+    wire: new THREE.MeshBasicMaterial({
+        color: 0x3a6ea5, wireframe: true, transparent: true, opacity: 0.10, depthWrite: false
+    }),
+    ring: new THREE.MeshStandardMaterial({
+        color: 0x7e93a8, metalness: 0.8, roughness: 0.4, transparent: true, opacity: 0.55
+    }),
+    pipe: new THREE.MeshStandardMaterial({ color: 0x8e9cad, metalness: 0.85, roughness: 0.42 }),
+    cond: new THREE.MeshStandardMaterial({
+        color: 0x8fa9c2, metalness: 0.5, roughness: 0.5, transparent: true, opacity: 0.6
+    })
+};
+
+/* =========================================================
+   4. HÌNH HỌC THEO TRỤC
+   ========================================================= */
+function t01(x) {
+    return THREE.MathUtils.clamp((x - CFG.xStageStart) / (CFG.xStageEnd - CFG.xStageStart), 0, 1);
+}
+function hubAt(x) { return 0.46 + 0.50 * t01(x); }
+function tipAt(x) { return 1.30 + 1.70 * Math.pow(t01(x), 0.8); }
+function stageX(i) {
+    return CFG.xStageStart + (CFG.xStageEnd - CFG.xStageStart) * i / (CFG.stages - 1);
+}
+
+/* =========================================================
+   5. DỰNG MÔ HÌNH
+   ========================================================= */
+const root = new THREE.Group();
+scene.add(root);
+
+/* ---------- 5.1 Rôto ---------- */
+const rotor = new THREE.Group();
+root.add(rotor);
+
+const shaft = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.92, 0.44, 13.6, 40, 1, false),
+    MAT.shaft
+);
+shaft.rotation.z = -Math.PI / 2;
+rotor.add(shaft);
+
+[ -6.6, 6.6 ].forEach(x => {
+    const collar = new THREE.Mesh(new THREE.CylinderGeometry(0.62, 0.62, 0.3, 28), MAT.disc);
+    collar.rotation.z = -Math.PI / 2;
+    collar.position.x = x;
+    rotor.add(collar);
+});
+
+function makeBladeRing(x, rIn, rOut, count, mat, twist, chord, thick) {
+    const g = new THREE.Group();
+    g.position.x = x;
+    const len = rOut - rIn;
+    const geo = new THREE.BoxGeometry(thick, len, chord);
+    for (let k = 0; k < count; k++) {
+        const pivot = new THREE.Object3D();
+        pivot.rotation.x = (k / count) * Math.PI * 2;
+        const b = new THREE.Mesh(geo, mat);
+        b.position.y = rIn + len / 2;
+        b.rotation.y = twist;
+        pivot.add(b);
+        g.add(pivot);
+    }
+    return g;
+}
+
+/* Rôto: đĩa + cánh động */
+for (let i = 0; i < CFG.stages; i++) {
+    const x  = stageX(i);
+    const hb = hubAt(x);
+    const tp = tipAt(x);
+
+    const disc = new THREE.Mesh(
+        new THREE.CylinderGeometry(hb * 1.06, hb * 1.06, 0.16, 32), MAT.disc
+    );
+    disc.rotation.z = -Math.PI / 2;
+    disc.position.x = x;
+    rotor.add(disc);
+
+    const nb = Math.round(20 - i * 0.62);
+    rotor.add(makeBladeRing(x, hb + 0.02, tp, nb, MAT.rotorBlade, 0.5, 0.30, 0.09));
+}
+
+/* ---------- 5.2 Cánh tĩnh ---------- */
+const stator = new THREE.Group();
+root.add(stator);
+
+for (let i = 0; i < CFG.stages - 1; i++) {
+    const x  = (stageX(i) + stageX(i + 1)) / 2;
+    const hb = hubAt(x);
+    const tp = tipAt(x);
+    const nb = Math.round(24 - i * 0.7);
+    stator.add(makeBladeRing(x, hb + 0.12, tp + 0.05, nb, MAT.statorBlade, -0.5, 0.26, 0.07));
+}
+
+/* ---------- 5.3 Vỏ tuabin ---------- */
+const casingGeo = new THREE.CylinderGeometry(CFG.casingR - 0.15, CFG.casingR, 13.8, 56, 1, true);
+
+const casing = new THREE.Mesh(casingGeo, MAT.casing);
+casing.rotation.z = -Math.PI / 2;
+casing.renderOrder = 3;
+root.add(casing);
+
+const casingWire = new THREE.Mesh(casingGeo, MAT.wire);
+casingWire.rotation.z = -Math.PI / 2;
+casingWire.renderOrder = 4;
+root.add(casingWire);
+
+for (let i = -3; i <= 3; i++) {
+    const x = i * 2.0;
+    const r = THREE.MathUtils.lerp(CFG.casingR - 0.15, CFG.casingR, t01(x));
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(r, 0.045, 8, 48), MAT.ring);
+    ring.rotation.y = Math.PI / 2;
+    ring.position.x = x;
+    root.add(ring);
+}
+
+/* ---------- 5.4 Đường hơi vào ---------- */
+const pipeInH = new THREE.Mesh(new THREE.CylinderGeometry(0.85, 0.85, 3.0, 24), MAT.pipe);
+pipeInH.rotation.z = -Math.PI / 2;
+pipeInH.position.set(-8.2, 0, 0);
+root.add(pipeInH);
+
+const pipeInV = new THREE.Mesh(new THREE.CylinderGeometry(0.85, 0.85, 4.6, 24), MAT.pipe);
+pipeInV.position.set(-9.5, 2.2, 0);
+root.add(pipeInV);
+
+/* ---------- 5.5 Đường thoát + bình ngưng ---------- */
+const exhH = new THREE.Mesh(new THREE.CylinderGeometry(1.7, 1.7, 2.2, 28), MAT.pipe);
+exhH.rotation.z = -Math.PI / 2;
+exhH.position.set(7.9, 0, 0);
+root.add(exhH);
+
+const exhV = new THREE.Mesh(new THREE.CylinderGeometry(1.7, 1.7, 3.2, 28), MAT.pipe);
+exhV.position.set(9.0, -1.6, 0);
+root.add(exhV);
+
+const condenser = new THREE.Mesh(new THREE.BoxGeometry(4.2, 1.8, 3.6), MAT.cond);
+condenser.position.set(9.0, -3.9, 0);
+root.add(condenser);
+
+const condWire = new THREE.Mesh(
+    new THREE.BoxGeometry(4.2, 1.8, 3.6),
+    new THREE.MeshBasicMaterial({ color: 0x4a90d9, wireframe: true, transparent: true, opacity: 0.28 })
+);
+condWire.position.copy(condenser.position);
+root.add(condWire);
+
+/* ---------- 5.6 Lưới nền ---------- */
+const grid = new THREE.GridHelper(70, 70, 0xb6c6d8, 0xd4e0ec);
+grid.position.y = -5.6;
+grid.material.transparent = true;
+grid.material.opacity = 0.85;
+scene.add(grid);
+
+/* =========================================================
+   6. HỆ HẠT
+   ========================================================= */
+function makeDotTexture() {
+    const s = 64;
+    const c = document.createElement('canvas');
+    c.width = c.height = s;
+    const ctx = c.getContext('2d');
+    const g = ctx.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
+    g.addColorStop(0.0, 'rgba(255,255,255,1)');
+    g.addColorStop(0.35, 'rgba(255,255,255,0.72)');
+    g.addColorStop(1.0, 'rgba(255,255,255,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, s, s);
+    const tex = new THREE.CanvasTexture(c);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    return tex;
+}
+const dotTex = makeDotTexture();
+
+/* Bảng màu */
+const C_SUPER = new THREE.Color(0x4db8e8);
+const C_DRY   = new THREE.Color(0x2e8fd6);
+const C_WET   = new THREE.Color(0x1f6fd0);
+const C_DROP  = new THREE.Color(0xe74c3c);
+const C_SPARK = new THREE.Color(0xff7a4a);
+const tmpColor = new THREE.Color();
+
+function colorFor(dryness, out) {
+    const m = 1 - dryness;
+    if (m <= 0.004)      out.copy(C_SUPER);
+    else if (m < 0.05)   out.copy(C_DRY).lerp(C_WET, (m - 0.004) / 0.046);
+    else                 out.copy(C_WET).lerp(C_DROP, Math.min((m - 0.05) / 0.10, 1));
+    return out;
+}
+
+function drynessAt(x) {
+    const ws = state.wetStart;
+    if (x <= ws) return 1;
+    const t = Math.min((x - ws) / (CFG.xOutlet - ws), 1);
+    return 1 - t * state.y2;
+}
+
+/* ---------- 6.1 Hạt hơi ---------- */
+const steamGeo = new THREE.BufferGeometry();
+const steamPos = new Float32Array(CFG.steamCount * 3);
+const steamCol = new Float32Array(CFG.steamCount * 3);
+steamGeo.setAttribute('position', new THREE.BufferAttribute(steamPos, 3));
+steamGeo.setAttribute('color',    new THREE.BufferAttribute(steamCol, 3));
+
+const steamPts = new THREE.Points(steamGeo, new THREE.PointsMaterial({
+    size: 0.19, map: dotTex, vertexColors: true, transparent: true,
+    depthWrite: false, blending: THREE.NormalBlending, opacity: 0.88, sizeAttenuation: true
+}));
+steamPts.frustumCulled = false;
+root.add(steamPts);
+
+const steamData = [];
+for (let i = 0; i < CFG.steamCount; i++) {
+    steamData.push({
+        x:  THREE.MathUtils.randFloat(CFG.xInlet - 0.6, CFG.xOutlet + 0.6),
+        a:  Math.random() * Math.PI * 2,
+        rf: 0.42 + Math.random() * 0.55,
+        sp: 2.4 + Math.random() * 1.8,
+        sw: (Math.random() * 0.7 + 0.5) * (Math.random() < 0.5 ? -1 : 1),
+        br: 0.78 + Math.random() * 0.22
+    });
+}
+
+/* ---------- 6.2 Hạt giọt nước ---------- */
+const dropGeo = new THREE.BufferGeometry();
+const dropPos = new Float32Array(CFG.dropCount * 3);
+const dropCol = new Float32Array(CFG.dropCount * 3);
+dropGeo.setAttribute('position', new THREE.BufferAttribute(dropPos, 3));
+dropGeo.setAttribute('color',    new THREE.BufferAttribute(dropCol, 3));
+
+const dropPts = new THREE.Points(dropGeo, new THREE.PointsMaterial({
+    size: 0.42, map: dotTex, vertexColors: true, transparent: true,
+    depthWrite: false, blending: THREE.NormalBlending, opacity: 0.75, sizeAttenuation: true
+}));
+dropPts.frustumCulled = false;
+root.add(dropPts);
+
+const dropData = [];
+for (let i = 0; i < CFG.dropCount; i++) {
+    dropData.push({
+        x:  THREE.MathUtils.randFloat(CFG.xInlet, CFG.xOutlet + 0.6),
+        a:  Math.random() * Math.PI * 2,
+        rf: 0.55 + Math.random() * 0.45,
+        sp: 3.0 + Math.random() * 2.0,
+        sw: (Math.random() * 1.1 + 0.7) * (Math.random() < 0.5 ? -1 : 1)
+    });
+}
+
+/* ---------- 6.3 Hạt tia lửa xói mòn (tầng cuối) ---------- */
+const sparkGeo = new THREE.BufferGeometry();
+const sparkPos = new Float32Array(CFG.sparkCount * 3);
+const sparkCol = new Float32Array(CFG.sparkCount * 3);
+sparkGeo.setAttribute('position', new THREE.BufferAttribute(sparkPos, 3));
+sparkGeo.setAttribute('color',    new THREE.BufferAttribute(sparkCol, 3));
+
+const sparkPts = new THREE.Points(sparkGeo, new THREE.PointsMaterial({
+    size: 0.30, map: dotTex, vertexColors: true, transparent: true,
+    depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0, sizeAttenuation: true
+}));
+sparkPts.frustumCulled = false;
+root.add(sparkPts);
+
+const sparkData = [];
+for (let i = 0; i < CFG.sparkCount; i++) {
+    sparkData.push({
+        x: 0, a: 0, r: 0, life: 0, maxLife: 0, vx: 0, va: 0
+    });
+}
+
+function respawnSpark(p) {
+    const ang = Math.random() * Math.PI * 2;
+    const xw  = 3.6 + Math.random() * 2.0;
+    const rr  = tipAt(xw) * (0.85 + Math.random() * 0.30);
+    p.x = xw;
+    p.a = ang;
+    p.r = rr;
+    p.life = 0;
+    p.maxLife = 0.4 + Math.random() * 0.5;
+    p.vx = 1.5 + Math.random() * 3.0;
+    p.va = (Math.random() - 0.5) * 4.0;
+}
+sparkData.forEach(respawnSpark);
+
+/* =========================================================
+   7. NHÃN 3D
+   ========================================================= */
+function makeLabel(text, color, scale) {
+    scale = scale || 1;
+    const c = document.createElement('canvas');
+    c.width = 512; c.height = 128;
+    const ctx = c.getContext('2d');
+    ctx.font = 'bold 52px "Segoe UI", Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.lineWidth = 9;
+    ctx.strokeStyle = 'rgba(255,255,255,0.92)';
+    ctx.strokeText(text, c.width / 2, c.height / 2);
+    ctx.shadowColor = 'rgba(255,255,255,0.9)';
+    ctx.shadowBlur = 10;
+    ctx.fillStyle = color;
+    ctx.fillText(text, c.width / 2, c.height / 2);
+
+    const tex = new THREE.CanvasTexture(c);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    const sp = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: tex, transparent: true, depthTest: false, depthWrite: false
+    }));
+    sp.scale.set(4.4 * scale, 1.1 * scale, 1);
+    sp.renderOrder = 999;
+    return sp;
+}
+
+const lblInlet = makeLabel('HƠI MỚI VÀO', '#1f6fd0', 1.0);
+lblInlet.position.set(-9.5, 5.6, 0);
+root.add(lblInlet);
+
+const lblRotor = makeLabel('RÔTO TUABIN', '#b8860b', 0.95);
+lblRotor.position.set(0, -3.0, 0);
+root.add(lblRotor);
+
+const lblLast = makeLabel('TẦNG CÁNH CUỐI', '#c0392b', 0.95);
+lblLast.position.set(4.6, 4.6, 0);
+root.add(lblLast);
+
+const lblWet = makeLabel('VÙNG HƠI ẨM', '#c0392b', 1.05);
+lblWet.position.set(3.4, -4.2, 0);
+lblWet.material.opacity = 0;
+root.add(lblWet);
+
+const lblCond = makeLabel('BÌNH NGƯNG', '#2e86de', 0.9);
+lblCond.position.set(9.0, -5.6, 0);
+root.add(lblCond);
+
+/* Dấu xói mòn */
+const erosionSprites = [];
+for (let i = 0; i < 10; i++) {
+    const s = makeLabel('✖', '#e74c3c', 0.42);
+    const ang = Math.random() * Math.PI * 2;
+    const r = tipAt(5.0) * (0.9 + Math.random() * 0.25);
+    s.position.set(4.6 + Math.random() * 1.6, Math.cos(ang) * r, Math.sin(ang) * r);
+    s.material.opacity = 0;
+    root.add(s);
+    erosionSprites.push(s);
+}
+
+/* =========================================================
+   8. UI & ĐIỀU KHIỂN
+   ========================================================= */
+const el = {
+    p0:    document.getElementById('v-p0'),
+    t0:    document.getElementById('v-t0'),
+    tsat:  document.getElementById('v-tsat'),
+    dtsh:  document.getElementById('v-dtsh'),
+    y2:    document.getElementById('v-y2'),
+    h0:    document.getElementById('v-h0'),
+    bar:   document.getElementById('barDtsh'),
+    warn:  document.getElementById('warnbar'),
+    warnT: document.getElementById('warnText'),
+
+    lblP0:    document.getElementById('lbl-p0'),
+    lblT0:    document.getElementById('lbl-t0'),
+    lblSpeed: document.getElementById('lbl-speed'),
+    slP0:     document.getElementById('sl-p0'),
+    slT0:     document.getElementById('sl-t0'),
+    slSpeed:  document.getElementById('sl-speed'),
+
+    effErosion:   document.getElementById('eff-erosion'),
+    effVibration: document.getElementById('eff-vibration'),
+    effAxial:     document.getElementById('eff-axial'),
+    effWater:     document.getElementById('eff-water'),
+    effHeat:      document.getElementById('eff-heat')
+};
+
+/* ---- Preset ---- */
+const PRESETS = {
+    normal:   { p0: 9.00,  t0: 540 },
+    incident: { p0: 10.80, t0: 460 }
+};
+
+const buttons = document.querySelectorAll('.mode-btn[data-mode]');
+
+function setMode(mode, fromUser) {
+    const p = PRESETS[mode];
+    target.p0 = p.p0;
+    target.t0 = p.t0;
+    el.slP0.value = p.p0;
+    el.slT0.value = p.t0;
+    updateSliderLabels();
+    if (fromUser) {
+        buttons.forEach(b => { b.classList.remove('active', 'danger'); });
+        const btn = document.querySelector(`.mode-btn[data-mode="${mode}"]`);
+        if (btn) {
+            btn.classList.add('active');
+            if (mode === 'incident') btn.classList.add('danger');
+        }
+    }
+}
+
+function clearModeButtons() {
+    buttons.forEach(b => b.classList.remove('active', 'danger'));
+}
+
+/* ---- Slider handlers ---- */
+function updateSliderLabels() {
+    el.lblP0.textContent    = parseFloat(el.slP0.value).toFixed(2) + ' MPa';
+    el.lblT0.textContent    = parseFloat(el.slT0.value).toFixed(0) + ' °C';
+    el.lblSpeed.textContent = parseFloat(el.slSpeed.value).toFixed(1) + '×';
+}
+
+el.slP0.addEventListener('input', () => {
+    target.p0 = parseFloat(el.slP0.value);
+    updateSliderLabels();
+    clearModeButtons();
+});
+el.slT0.addEventListener('input', () => {
+    target.t0 = parseFloat(el.slT0.value);
+    updateSliderLabels();
+    clearModeButtons();
+});
+el.slSpeed.addEventListener('input', () => {
+    state.speed = parseFloat(el.slSpeed.value);
+    updateSliderLabels();
+});
+
+buttons.forEach(btn => {
+    btn.addEventListener('click', () => setMode(btn.dataset.mode, true));
+});
+
+/* ---- Nút xoay / reset ---- */
+/* (đặt trong topbar cũ — nay gộp vào bàn phím tắt) */
+addEventListener('keydown', e => {
+    if (e.key === 'r' || e.key === 'R') {
+        controls.autoRotate = !controls.autoRotate;
+    }
+    if (e.key === 'h' || e.key === 'H') {
+        camera.position.copy(CAM_HOME);
+        controls.target.set(0, 0, 0);
+        controls.update();
+    }
+});
+
+/* Thêm hai nút nhỏ vào panel chế độ */
+const extraDiv = document.createElement('div');
+extraDiv.style.cssText = 'display:flex;gap:6px;margin-top:8px;';
+extraDiv.innerHTML = `
+    <button class="mode-btn" id="btnRotate" style="font-size:11px;padding:7px 8px;">↻ Xoay</button>
+    <button class="mode-btn" id="btnReset" style="font-size:11px;padding:7px 8px;">⌂ Góc nhìn</button>
+`;
+document.querySelector('.left-col .panel:first-child').appendChild(extraDiv);
+
+document.getElementById('btnRotate').addEventListener('click', function(){
+    controls.autoRotate = !controls.autoRotate;
+    this.classList.toggle('active', controls.autoRotate);
+});
+document.getElementById('btnReset').addEventListener('click', () => {
+    camera.position.copy(CAM_HOME);
+    controls.target.set(0, 0, 0);
+    controls.update();
+});
+
+/* =========================================================
+   9. VÒNG LẶP
+   ========================================================= */
+const clock = new THREE.Clock();
+
+/* ---- Cập nhật hạt hơi ---- */
+function updateSteam(dt) {
+    const speedMul = state.speed;
+
+    /* Hạt hơi */
+    for (let i = 0; i < CFG.steamCount; i++) {
+        const p = steamData[i];
+        p.x += p.sp * speedMul * dt;
+        p.a += p.sw * dt;
+        if (p.x > CFG.xOutlet + 0.8) {
+            p.x = CFG.xInlet - 0.8;
+            p.a = Math.random() * Math.PI * 2;
+            p.rf = 0.42 + Math.random() * 0.55;
+        }
+        const hb = hubAt(p.x);
+        const tp = tipAt(p.x);
+        const r  = hb + (tp - hb) * p.rf;
+
+        const i3 = i * 3;
+        steamPos[i3]     = p.x;
+        steamPos[i3 + 1] = Math.cos(p.a) * r;
+        steamPos[i3 + 2] = Math.sin(p.a) * r;
+
+        colorFor(drynessAt(p.x), tmpColor);
+
+        /* Tint theo nhiệt độ: t₀ thấp → hơi xỉn hơn */
+        const tNorm = THREE.MathUtils.clamp((state.t0 - 400) / 160, 0, 1);
+        const bright = 0.72 + 0.28 * tNorm;
+
+        steamCol[i3]     = tmpColor.r * p.br * bright;
+        steamCol[i3 + 1] = tmpColor.g * p.br * bright;
+        steamCol[i3 + 2] = tmpColor.b * p.br * bright;
+    }
+    steamGeo.attributes.position.needsUpdate = true;
+    steamGeo.attributes.color.needsUpdate = true;
+
+    /* Kích thước hạt theo áp suất (p cao → hơi dày hơn) */
+    const pSize = 0.16 + (state.p0 - 8) * 0.022;
+    steamPts.material.size    = pSize;
+    steamPts.material.opacity = 0.72 + (state.p0 - 8) * 0.035;
+
+    /* Giọt nước */
+    const ws = state.wetStart;
+    const sev = THREE.MathUtils.clamp((state.y2 - 0.06) / 0.19, 0, 1);
+
+    for (let i = 0; i < CFG.dropCount; i++) {
+        const p = dropData[i];
+        p.x += p.sp * speedMul * dt;
+        p.a += p.sw * dt;
+        if (p.x > CFG.xOutlet + 0.8) {
+            p.x = Math.max(ws, CFG.xInlet);
+            p.a = Math.random() * Math.PI * 2;
+            p.rf = 0.55 + Math.random() * 0.45;
+        }
+        const hb = hubAt(p.x);
+        const tp = tipAt(p.x);
+        const r  = hb + (tp - hb) * p.rf;
+
+        const i3 = i * 3;
+        dropPos[i3]     = p.x;
+        dropPos[i3 + 1] = Math.cos(p.a) * r;
+        dropPos[i3 + 2] = Math.sin(p.a) * r;
+
+        if (p.x < ws) {
+            dropCol[i3] = dropCol[i3 + 1] = dropCol[i3 + 2] = 0;
+        } else {
+            const m = 1 - drynessAt(p.x);
+            tmpColor.copy(C_WET).lerp(C_DROP, Math.min(m / 0.16, 1));
+            const k = 0.55 + 0.45 * sev;
+            dropCol[i3]     = tmpColor.r * k;
+            dropCol[i3 + 1] = tmpColor.g * k;
+            dropCol[i3 + 2] = tmpColor.b * k;
+        }
+    }
+    dropGeo.attributes.position.needsUpdate = true;
+    dropGeo.attributes.color.needsUpdate = true;
+    dropPts.material.opacity = 0.20 + 0.65 * sev;
+
+    /* Tia lửa xói mòn */
+    const sparkSev = Math.max(0, (sev - 0.35) / 0.65);
+    sparkPts.material.opacity = sparkSev * 0.95;
+
+    for (let i = 0; i < CFG.sparkCount; i++) {
+        const p = sparkData[i];
+        p.life += dt;
+        if (p.life >= p.maxLife) {
+            if (sparkSev > 0.05) {
+                respawnSpark(p);
+            } else {
+                p.life = p.maxLife + 1;
+                sparkPos[i * 3] = sparkPos[i * 3 + 1] = sparkPos[i * 3 + 2] = 0;
+                sparkCol[i * 3] = sparkCol[i * 3 + 1] = sparkCol[i * 3 + 2] = 0;
+                continue;
+            }
+        }
+        p.x += p.vx * speedMul * dt;
+        p.a += p.va * dt;
+
+        const r = p.r * (1 + p.life * 0.4);
+        const i3 = i * 3;
+        sparkPos[i3]     = p.x;
+        sparkPos[i3 + 1] = Math.cos(p.a) * r;
+        sparkPos[i3 + 2] = Math.sin(p.a) * r;
+
+        const fade = 1 - p.life / p.maxLife;
+        sparkCol[i3]     = C_SPARK.r * fade;
+        sparkCol[i3 + 1] = C_SPARK.g * fade;
+        sparkCol[i3 + 2] = C_SPARK.b * fade;
+    }
+    sparkGeo.attributes.position.needsUpdate = true;
+    sparkGeo.attributes.color.needsUpdate = true;
+}
+
+/* ---- Cập nhật HUD ---- */
+function setEffect(el, value) {
+    const b = el.querySelector('b');
+    const i = el.querySelector('.mini-bar i');
+    const pct = Math.round(value * 100);
+    b.textContent = pct + ' %';
+    i.style.width = (value * 100).toFixed(1) + '%';
+    el.classList.remove('lv-low', 'lv-mid', 'lv-high');
+    if (value < 0.33)      el.classList.add('lv-low');
+    else if (value < 0.66) el.classList.add('lv-mid');
+    else                   el.classList.add('lv-high');
+}
+
+function updateHUD() {
+    el.p0.textContent   = state.p0.toFixed(2) + ' MPa';
+    el.t0.textContent   = state.t0.toFixed(0) + ' °C';
+    el.tsat.textContent = state.tsat.toFixed(0) + ' °C';
+    el.dtsh.textContent = state.dtsh.toFixed(0) + ' K';
+    el.y2.textContent   = (state.y2 * 100).toFixed(0) + ' %';
+    el.h0.textContent   = state.H0.toFixed(0) + ' %';
+
+    const pct = THREE.MathUtils.clamp(state.dtsh / 250, 0, 1);
+
+    el.dtsh.classList.remove('good', 'bad');
+    if (pct > 0.75)      el.dtsh.classList.add('good');
+    else if (pct < 0.62) el.dtsh.classList.add('bad');
+
+    el.bar.style.width = (pct * 100).toFixed(1) + '%';
+    el.bar.style.background = pct > 0.75 ? '#27ae60'
+                            : pct > 0.62 ? '#d35400'
+                            : '#c0392b';
+
+    /* ---- Tính các chỉ số ảnh hưởng ---- */
+    const sevY = THREE.MathUtils.clamp((state.y2 - 0.06) / 0.19, 0, 1);
+    const sevD = THREE.MathUtils.clamp((237 - state.dtsh) / 200, 0, 1);
+    const sevP = THREE.MathUtils.clamp((state.p0 - 9) / 3, 0, 1);
+    const sevT = THREE.MathUtils.clamp((540 - state.t0) / 140, 0, 1);
+
+    const erosion   = sevY;
+    const vibration = Math.min(1, sevY * 0.70 + sevP * 0.30);
+    const axial     = Math.min(1, sevY * 0.75 + sevT * 0.25);
+    const water     = Math.min(1, sevY * 0.55 + sevD * 0.45);
+    const heatRate  = Math.min(1, sevD * 0.7 + sevP * 0.3);
+
+    setEffect(el.effErosion,   erosion);
+    setEffect(el.effVibration, vibration);
+    setEffect(el.effAxial,     axial);
+    setEffect(el.effWater,     water);
+    setEffect(el.effHeat,      heatRate);
+
+    /* ---- Cảnh báo ---- */
+    const maxSev = Math.max(erosion, vibration, axial, water, heatRate);
+    if (maxSev > 0.35) {
+        el.warn.classList.add('show');
+        let msg;
+        if (water > 0.7)      msg = '<b>NGUY HIỂM:</b> Nguy cơ nước vào tuabin rất cao — cần giảm tải ngay';
+        else if (erosion > 0.7) msg = '<b>CẢNH BÁO:</b> Xói mòn cánh nghiêm trọng — hơi ẩm quá lớn';
+        else if (vibration > 0.6) msg = '<b>CẢNH BÁO:</b> Rung động trục tăng cao';
+        else if (axial > 0.6)   msg = '<b>CẢNH BÁO:</b> Dịch chuyển dọc trục bất thường';
+        else                    msg = '<b>CẢNH BÁO:</b> Độ quá nhiệt giảm — hơi ẩm xuất hiện sớm';
+        el.warnT.innerHTML = msg;
+    } else {
+        el.warn.classList.remove('show');
+    }
+}
+
+/* ---- Animate ---- */
+function animate() {
+    requestAnimationFrame(animate);
+
+    const dt = Math.min(clock.getDelta(), 0.05);
+
+    /* Làm mượt p₀, t₀ về đích */
+    const k = 1 - Math.pow(0.0015, dt);
+    state.p0 += (target.p0 - state.p0) * k;
+    state.t0 += (target.t0 - state.t0) * k;
+
+    /* Tính lại các đại lượng dẫn xuất từ giá trị HIỆN TẠI */
+    const d = computeDerived(state.p0, state.t0);
+    state.tsat     = d.tsat;
+    state.dtsh     = d.dtsh;
+    state.y2       = d.y2;
+    state.wetStart = d.wetStart;
+    state.H0       = d.H0;
+
+    const sev = THREE.MathUtils.clamp((state.y2 - 0.06) / 0.19, 0, 1);
+
+    /* Rôto quay — tốc độ quay tỉ lệ nhẹ với tốc độ dòng hơi */
+    rotor.rotation.x += dt * 2.6 * (0.8 + 0.2 * state.speed);
+
+    /* --- RUNG ĐỘNG & DỊCH CHUYỂN DỌC TRỤC --- */
+    const vib = Math.min(1, sev * 0.7 + Math.max(0, (state.p0 - 9) / 3) * 0.3);
+    const shakeAmp = vib * 0.065;
+    const tNow = performance.now() * 0.001;
+    rotor.position.y = Math.sin(tNow * 42) * shakeAmp;
+    rotor.position.z = Math.cos(tNow * 38) * shakeAmp;
+    /* Dịch chuyển dọc trục: đẩy nhẹ về phía thoát */
+    rotor.position.x = sev * 0.20 + Math.sin(tNow * 22) * shakeAmp * 0.5;
+
+    /* --- ĐÈN VÙNG ẨM & VÙNG QUÁ NHIỆT --- */
+    wetLight.intensity = sev * 180;
+    wetLight.position.x = THREE.MathUtils.lerp(2.5, 5.0, sev);
+
+    const hotNorm = THREE.MathUtils.clamp((state.t0 - 480) / 80, 0, 1);
+    hotLight.intensity = hotNorm * 60;
+    hotLight.position.x = THREE.MathUtils.lerp(-6.0, -4.0, 1 - hotNorm);
+
+    /* --- NHÃN & DẤU XÓI MÒN --- */
+    lblWet.material.opacity = sev;
+    const pulse = 0.55 + 0.45 * Math.sin(performance.now() * 0.006);
+    erosionSprites.forEach((s, i) => {
+        s.material.opacity = sev * pulse * (0.5 + 0.5 * Math.sin(performance.now() * 0.004 + i));
+    });
+
+    updateSteam(dt);
+    updateHUD();
+
+    controls.update();
+    renderer.render(scene, camera);
+}
+
+/* =========================================================
+   10. RESIZE
+   ========================================================= */
+addEventListener('resize', () => {
+    camera.aspect = innerWidth / innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth, innerHeight);
+});
+
+/* =========================================================
+   11. KHỞI ĐỘNG
+   ========================================================= */
+updateSliderLabels();
+setMode('normal', false);
+animate();
+</script>
+
+</body>
+</html>
