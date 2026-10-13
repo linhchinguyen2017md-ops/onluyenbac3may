@@ -53,14 +53,13 @@
         .header h1 { margin: 0; font-size: 28px; text-transform: uppercase; letter-spacing: 1px; position: relative; z-index: 2; }
         .header p { margin: 10px 0 0 0; font-size: 16px; font-weight: 500; color: #e6f2ff; position: relative; z-index: 2; text-transform: uppercase; letter-spacing: 0.5px;}
         
-        /* MÀN HÌNH 1: GIAO DIỆN CHỌN THƯ MỤC (BÂY GIỜ LÀ 6 THƯ MỤC) */
+        /* MÀN HÌNH 1: GIAO DIỆN CHỌN THƯ MỤC */
         #screen-home {
             display: grid;
             grid-template-columns: 1fr;
             gap: 25px;
         }
         
-        /* Layout chia đều 3 cột, 2 hàng rất đẹp */
         @media (min-width: 768px) {
             #screen-home { 
                 grid-template-columns: repeat(3, 1fr); 
@@ -86,7 +85,7 @@
         .folder-safety { border-bottom: 8px solid #2e7d32; }
         .folder-quiz { border-bottom: 8px solid #6a1b9a; }
         .folder-drive { border-bottom: 8px solid #f4511e; } 
-        .folder-3d { border-bottom: 8px solid #e91e63; } /* Màu Hồng Đỏ cho 3D */
+        .folder-3d { border-bottom: 8px solid #e91e63; }
         
         .folder-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
         .folder-maytruong:hover { border-color: #0056b3; }
@@ -186,7 +185,6 @@
         }
         .file-link::before { content: "📄"; margin-right: 15px; font-size: 18px; opacity: 0.8; }
         
-        /* Icon riêng cho bài 3D */
         #screen-3d .file-link::before { content: "🖥️"; }
 
         /* MÀN HÌNH 3: KHUNG ĐỌC TÀI LIỆU */
@@ -205,33 +203,90 @@
             width: 100%;
             height: 100%;
             border: none;
-            padding-top: 60px;
+            padding-top: 64px;
             box-sizing: border-box;
             background-color: white;
         }
 
-        #btn-close-doc {
+        /* ===== THANH CÔNG CỤ ĐỌC TÀI LIỆU ===== */
+        #doc-toolbar {
             position: fixed;
-            top: 12px;
-            left: 20px;
-            background-color: #e53935;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 64px;
+            background: #ffffff;
+            border-bottom: 3px solid #ff8c00;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 14px;
+            box-sizing: border-box;
+            z-index: 1001;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap;
+        }
+
+        .tool-btn {
             color: white;
-            padding: 10px 20px;
+            padding: 10px 16px;
             border: none;
             border-radius: 4px;
             font-family: 'Segoe UI', sans-serif;
             font-weight: bold;
             font-size: 14px;
             cursor: pointer;
-            z-index: 1001;
-            transition: background 0.3s;
-            display: flex;
+            transition: background 0.25s, opacity 0.25s;
+            display: inline-flex;
             align-items: center;
             gap: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            flex: 0 0 auto;
         }
+        .tool-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+        #btn-close-doc { background-color: #e53935; }
         #btn-close-doc:hover { background-color: #c62828; }
 
+        #btn-read-doc { background-color: #0073e6; }
+        #btn-read-doc:hover:not(:disabled) { background-color: #0056b3; }
+        #btn-read-doc.reading { background-color: #f39c12; }
+        #btn-read-doc.reading:hover { background-color: #d68910; }
+
+        #btn-stop-read { background-color: #616161; }
+        #btn-stop-read:hover:not(:disabled) { background-color: #424242; }
+
+        #read-rate {
+            padding: 9px 10px;
+            border: 2px solid #0073e6;
+            border-radius: 4px;
+            font-family: 'Segoe UI', sans-serif;
+            font-weight: bold;
+            font-size: 14px;
+            color: #0056b3;
+            background: #fff;
+            cursor: pointer;
+            flex: 0 0 auto;
+        }
+
+        #read-status {
+            font-size: 13px;
+            font-weight: 600;
+            color: #0073e6;
+            margin-left: auto;
+            padding-left: 10px;
+            flex: 0 0 auto;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 700px) {
+            .tool-btn { padding: 9px 11px; font-size: 12.5px; }
+            #read-status { display: none; }
+            #doc-iframe { padding-top: 60px; }
+            #doc-toolbar { height: 60px; }
+        }
     </style>
 </head>
 <body>
@@ -264,7 +319,6 @@
         </div>
 
         <!-- Hàng 2 -->
-        <!-- Thư mục MỚI: Mô phỏng 3D -->
         <div class="folder-card folder-3d" onclick="openFolder('screen-3d')">
             <div class="folder-icon">🖥️</div>
             <h2 class="folder-title">Mô Phỏng 3D</h2>
@@ -344,21 +398,17 @@
         </div>
     </div>
     
-    <!-- MÀN HÌNH 2E: THƯ MỤC 3D (MỚI) -->
+    <!-- MÀN HÌNH 2E: THƯ MỤC 3D -->
     <div id="screen-3d" class="list-section">
         <div class="section-header">
             <h2 class="section-title">🖥️ Mục: Mô Phỏng 3D</h2>
             <button class="back-btn" onclick="goBackToHome()">⬅ QUAY LẠI TỔNG</button>
         </div>
         <div class="list-container">
-            <!-- Đã thêm 4 file anh cung cấp -->
             <a class="file-link" onclick="openDoc('anhhuongchankhong.html')">Mô phỏng ảnh hưởng chân không bình ngưng</a>
             <a class="file-link" onclick="openDoc('binhgianhiet.html')">Mô phỏng 3D Hệ thống Bình gia nhiệt</a>
             <a class="file-link" onclick="openDoc('binhngung.html')">Mô phỏng 3D Cấu tạo Bình ngưng</a>
             <a class="file-link" onclick="openDoc('PThaydoi.html')">Mô phỏng sự cố: Biến động áp lực</a>
-            
-            <!-- Sau này anh có thêm bài 3D mới thì copy dòng này sửa lại tên nhé -->
-            <!-- <a class="file-link" onclick="openDoc('tenfilemoi.html')">Tên Bài Mô Phỏng Mới</a> -->
         </div>
     </div>
 
@@ -377,14 +427,31 @@
 
 <!-- MÀN HÌNH 3: KHUNG ĐỌC TÀI LIỆU -->
 <div id="screen-content">
-    <button id="btn-close-doc" onclick="closeDoc()">⬅ ĐÓNG TÀI LIỆU</button>
+    <div id="doc-toolbar">
+        <button id="btn-close-doc" class="tool-btn" onclick="closeDoc()">⬅ ĐÓNG TÀI LIỆU</button>
+        <button id="btn-read-doc" class="tool-btn" onclick="toggleReadDoc()">🔊 ĐỌC VĂN BẢN</button>
+        <button id="btn-stop-read" class="tool-btn" onclick="stopReadDoc()" disabled>⏹ DỪNG ĐỌC</button>
+        <select id="read-rate" title="Tốc độ đọc">
+            <option value="0.75">0.75x</option>
+            <option value="1" selected>1.0x</option>
+            <option value="1.25">1.25x</option>
+            <option value="1.5">1.5x</option>
+            <option value="1.75">1.75x</option>
+            <option value="2">2.0x</option>
+        </select>
+        <span id="read-status"></span>
+    </div>
     <iframe id="doc-iframe" src=""></iframe>
 </div>
 
 <!-- JAVASCRIPT ĐIỀU KHIỂN -->
 <script>
+    /* =========================================================
+       PHẦN 1: ĐIỀU HƯỚNG THƯ MỤC / MỞ TÀI LIỆU
+       ========================================================= */
     let currentFolderId = '';
     let isMayPhoLoaded = false;
+    let currentDocFile = '';   // Lưu file đang mở (phục vụ đọc văn bản)
 
     function openFolder(folderId) {
         currentFolderId = folderId;
@@ -393,7 +460,7 @@
         document.getElementById('screen-maypho').style.display = 'none';
         document.getElementById('screen-safety').style.display = 'none';
         document.getElementById('screen-quiz').style.display = 'none';
-        document.getElementById('screen-3d').style.display = 'none'; // Thêm id 3d
+        document.getElementById('screen-3d').style.display = 'none';
         
         document.getElementById(folderId).style.display = 'block';
         window.scrollTo(0, 0); 
@@ -408,16 +475,17 @@
         document.getElementById('screen-maypho').style.display = 'none';
         document.getElementById('screen-safety').style.display = 'none';
         document.getElementById('screen-quiz').style.display = 'none';
-        document.getElementById('screen-3d').style.display = 'none'; // Thêm id 3d
+        document.getElementById('screen-3d').style.display = 'none';
         
         document.getElementById('screen-home').style.display = 'grid'; 
     }
 
     function openDoc(filename) {
-        // Kiểm tra xem file có tồn tại trên server không
         fetch(filename, { method: 'HEAD' })
             .then(response => {
                 if (response.ok) {
+                    stopReadDoc();                     // Dừng đọc bài cũ (nếu có)
+                    currentDocFile = filename;         // Ghi nhớ file đang mở
                     document.getElementById('doc-iframe').src = filename;
                     document.getElementById('main-wrapper').style.display = 'none';
                     document.getElementById('screen-content').style.display = 'block';
@@ -435,6 +503,7 @@
     }
 
     function closeDoc() {
+        stopReadDoc();                                 // Tắt đọc trước khi đóng
         document.getElementById('doc-iframe').src = "";
         document.getElementById('screen-content').style.display = 'none';
         document.getElementById('main-wrapper').style.display = 'block';
@@ -494,6 +563,284 @@
                 });
         }
     }
+
+    /* =========================================================
+       PHẦN 2: ĐỌC VĂN BẢN (TEXT-TO-SPEECH) CHO TÀI LIỆU ĐANG MỞ
+       ========================================================= */
+    const synth = ('speechSynthesis' in window) ? window.speechSynthesis : null;
+    let readState = 'idle';      // idle | reading | paused
+    let readQueue = [];          // hàng đợi các đoạn văn
+    let cachedVoices = [];
+
+    /* --- Nạp danh sách giọng đọc --- */
+    function loadVoices() {
+        if (!synth) return;
+        cachedVoices = synth.getVoices() || [];
+    }
+    if (synth) {
+        loadVoices();
+        if (typeof synth.onvoiceschanged !== 'undefined') {
+            synth.onvoiceschanged = loadVoices;
+        }
+    }
+
+    function pickVietnameseVoice() {
+        if (!cachedVoices.length) loadVoices();
+        let v = cachedVoices.find(x => x.lang && x.lang.toLowerCase() === 'vi-vn');
+        if (!v) v = cachedVoices.find(x => x.lang && x.lang.toLowerCase().indexOf('vi') === 0);
+        return v || null;
+    }
+
+    /* --- Lấy nội dung text của tài liệu --- */
+    function getDocTextFromIframe() {
+        const iframe = document.getElementById('doc-iframe');
+        try {
+            const doc = iframe.contentDocument || (iframe.contentWindow && iframe.contentWindow.document);
+            if (doc && doc.body) {
+                const t = (doc.body.innerText || '').trim();
+                if (t.length > 0) return t;
+            }
+        } catch (e) { /* bị chặn cross-origin */ }
+        return null;
+    }
+
+    async function getDocTextAsync() {
+        // Cách 1: đọc trực tiếp từ iframe (nhanh, đúng nội dung đang hiển thị)
+        let text = getDocTextFromIframe();
+        if (text) return text;
+
+        // Cách 2: tải lại file và parse (dự phòng)
+        if (currentDocFile) {
+            try {
+                const res = await fetch(currentDocFile);
+                if (res.ok) {
+                    const html = await res.text();
+                    const doc = new DOMParser().parseFromString(html, 'text/html');
+                    return (doc.body.innerText || doc.body.textContent || '');
+                }
+            } catch (e) { /* bỏ qua */ }
+        }
+        return null;
+    }
+
+    /* --- Làm sạch văn bản trước khi đọc --- */
+    function cleanTextForSpeech(text) {
+        return text
+            .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2190}-\u{21FF}\u{2B00}-\u{2BFF}\u{FE0F}]/gu, ' ')
+            .replace(/[\u{2022}\u{25CF}\u{25AA}\u{25A0}\u{25CB}]/gu, ' , ')
+            .replace(/\s+/g, ' ')
+            .replace(/\s*([,.;:!?])\s*/g, '$1 ')
+            .replace(/([.])\1{2,}/g, '.')
+            .trim();
+    }
+
+    /* --- Chia nhỏ văn bản thành các đoạn ~200 ký tự ---
+           (tránh lỗi 1 số trình duyệt tự ngắt khi đọc text quá dài) */
+    function splitIntoChunks(text, maxLen) {
+        maxLen = maxLen || 200;
+        const marked = text.replace(/([.!?;:])\s+/g, '$1|');
+        const sentences = marked.split('|').map(s => s.trim()).filter(Boolean);
+
+        const chunks = [];
+        let cur = '';
+
+        function pushLongSentence(s) {
+            const parts = s.split(/,\s*/);
+            let sub = '';
+            for (let i = 0; i < parts.length; i++) {
+                const p = parts[i];
+                if ((sub ? sub.length + 2 : 0) + p.length > maxLen) {
+                    if (sub) chunks.push(sub.trim());
+                    sub = p;
+                } else {
+                    sub = sub ? sub + ', ' + p : p;
+                }
+            }
+            return sub;
+        }
+
+        for (let i = 0; i < sentences.length; i++) {
+            const s = sentences[i];
+            if ((cur ? cur.length + 1 : 0) + s.length > maxLen) {
+                if (cur) { chunks.push(cur.trim()); cur = ''; }
+                if (s.length > maxLen) {
+                    cur = pushLongSentence(s);
+                } else {
+                    cur = s;
+                }
+            } else {
+                cur = cur ? cur + ' ' + s : s;
+            }
+        }
+        if (cur.trim()) chunks.push(cur.trim());
+        return chunks;
+    }
+
+    /* --- Cập nhật trạng thái nút bấm --- */
+    function updateReadButtons() {
+        const btnRead = document.getElementById('btn-read-doc');
+        const btnStop = document.getElementById('btn-stop-read');
+        const status  = document.getElementById('read-status');
+
+        if (readState === 'idle') {
+            btnRead.textContent = '🔊 ĐỌC VĂN BẢN';
+            btnRead.classList.remove('reading');
+            btnStop.disabled = true;
+            status.textContent = '';
+        } else if (readState === 'reading') {
+            btnRead.textContent = '⏸ TẠM DỪNG';
+            btnRead.classList.add('reading');
+            btnStop.disabled = false;
+            status.textContent = '🔈 Đang đọc...';
+        } else { // paused
+            btnRead.textContent = '▶ TIẾP TỤC';
+            btnRead.classList.add('reading');
+            btnStop.disabled = false;
+            status.textContent = '⏸ Đã tạm dừng';
+        }
+    }
+
+    /* --- Bấm nút ĐỌC / TẠM DỪNG / TIẾP TỤC --- */
+    function toggleReadDoc() {
+        if (!synth) {
+            alert('⚠️ Trình duyệt của bạn không hỗ trợ đọc văn bản (Web Speech API).\n\nVui lòng dùng Google Chrome, Microsoft Edge hoặc Cốc Cốc.');
+            return;
+        }
+        if (readState === 'reading') {
+            synth.pause();
+            readState = 'paused';
+            updateReadButtons();
+            return;
+        }
+        if (readState === 'paused') {
+            readState = 'reading';
+            if (synth.speaking && !synth.pending) {
+                synth.resume();
+            } else if (synth.paused) {
+                synth.resume();
+            } else {
+                speakNextChunk();
+            }
+            updateReadButtons();
+            return;
+        }
+        startReadDoc();
+    }
+
+    /* --- Bắt đầu đọc --- */
+    async function startReadDoc() {
+        const btnRead = document.getElementById('btn-read-doc');
+        const oldLabel = btnRead.textContent;
+        btnRead.disabled = true;
+        btnRead.textContent = '⏳ ĐANG TẢI NỘI DUNG...';
+
+        const raw = await getDocTextAsync();
+
+        btnRead.disabled = false;
+
+        if (!raw || !raw.trim()) {
+            btnRead.textContent = oldLabel;
+            alert('⚠️ KHÔNG ĐỌC ĐƯỢC NỘI DUNG TÀI LIỆU!\n\nNguyên nhân có thể do:\n' +
+                  '• Tài liệu chưa tải xong (hãy đợi vài giây rồi bấm lại)\n' +
+                  '• Tài liệu là hình ảnh / mô phỏng 3D không có chữ\n' +
+                  '• Trình duyệt chặn truy cập nội dung tài liệu\n\n' +
+                  'Gợi ý: mở tài liệu bằng Chrome/Edge và chạy trên máy chủ web (http/https).');
+            return;
+        }
+
+        const clean = cleanTextForSpeech(raw);
+        if (!clean) {
+            btnRead.textContent = oldLabel;
+            alert('⚠️ Tài liệu không có nội dung văn bản để đọc.');
+            return;
+        }
+
+        readQueue = splitIntoChunks(clean, 200);
+        readState = 'reading';
+        updateReadButtons();
+        speakNextChunk();
+    }
+
+    /* --- Đọc từng đoạn --- */
+    function speakNextChunk() {
+        if (!synth || readState === 'idle') return;
+
+        if (readQueue.length === 0) {
+            // Đọc hết
+            readState = 'idle';
+            updateReadButtons();
+            return;
+        }
+
+        const chunk = readQueue.shift();
+        const utter = new SpeechSynthesisUtterance(chunk);
+
+        utter.lang = 'vi-VN';
+        const viVoice = pickVietnameseVoice();
+        if (viVoice) utter.voice = viVoice;
+
+        const rateEl = document.getElementById('read-rate');
+        utter.rate = parseFloat(rateEl && rateEl.value) || 1;
+        utter.pitch = 1;
+        utter.volume = 1;
+
+        utter.onend = function () {
+            if (readState === 'reading') {
+                speakNextChunk();
+            }
+            // Nếu đang 'paused' thì đợi người dùng bấm Tiếp tục
+        };
+
+        utter.onerror = function (e) {
+            if (e && (e.error === 'interrupted' || e.error === 'canceled')) return;
+            if (readState === 'reading') {
+                speakNextChunk();
+            }
+        };
+
+        try {
+            synth.speak(utter);
+        } catch (err) {
+            readState = 'idle';
+            updateReadButtons();
+        }
+    }
+
+    /* --- Dừng đọc hoàn toàn --- */
+    function stopReadDoc() {
+        readState = 'idle';
+        readQueue = [];
+        if (synth) {
+            try { synth.cancel(); } catch (e) { /* bỏ qua */ }
+        }
+        updateReadButtons();
+    }
+
+    /* Đổi tốc độ khi đang đọc -> áp dụng cho các đoạn kế tiếp */
+    document.addEventListener('DOMContentLoaded', function () {
+        const rateEl = document.getElementById('read-rate');
+        if (rateEl) {
+            rateEl.addEventListener('change', function () {
+                if (readState === 'reading') {
+                    const status = document.getElementById('read-status');
+                    if (status) {
+                        const old = status.textContent;
+                        status.textContent = '⚡ Đã đổi tốc độ ' + rateEl.value + 'x';
+                        setTimeout(() => {
+                            if (readState === 'reading') status.textContent = '🔈 Đang đọc...';
+                            else status.textContent = old;
+                        }, 1500);
+                    }
+                }
+            });
+        }
+        updateReadButtons();
+    });
+
+    /* Dừng đọc khi đóng tab / chuyển trang */
+    window.addEventListener('beforeunload', function () {
+        if (synth) { try { synth.cancel(); } catch (e) {} }
+    });
 </script>
 
 </body>
