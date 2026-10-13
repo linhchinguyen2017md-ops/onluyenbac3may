@@ -53,23 +53,18 @@
         .header h1 { margin: 0; font-size: 28px; text-transform: uppercase; letter-spacing: 1px; position: relative; z-index: 2; }
         .header p { margin: 10px 0 0 0; font-size: 16px; font-weight: 500; color: #e6f2ff; position: relative; z-index: 2; text-transform: uppercase; letter-spacing: 0.5px;}
         
-        /* MÀN HÌNH 1: GIAO DIỆN CHỌN THƯ MỤC */
+        /* MÀN HÌNH 1: GIAO DIỆN CHỌN THƯ MỤC (BÂY GIỜ LÀ 6 THƯ MỤC) */
         #screen-home {
             display: grid;
             grid-template-columns: 1fr;
             gap: 25px;
         }
         
+        /* Layout chia đều 3 cột, 2 hàng rất đẹp */
         @media (min-width: 768px) {
             #screen-home { 
-                grid-template-columns: repeat(6, 1fr); 
+                grid-template-columns: repeat(3, 1fr); 
             }
-            .folder-maytruong { grid-column: 1 / 3; }
-            .folder-maypho { grid-column: 3 / 5; }
-            .folder-safety { grid-column: 5 / 7; }
-            
-            .folder-quiz { grid-column: 2 / 4; }
-            .folder-drive { grid-column: 4 / 6; }
         }
 
         .folder-card {
@@ -91,6 +86,7 @@
         .folder-safety { border-bottom: 8px solid #2e7d32; }
         .folder-quiz { border-bottom: 8px solid #6a1b9a; }
         .folder-drive { border-bottom: 8px solid #f4511e; } 
+        .folder-3d { border-bottom: 8px solid #e91e63; } /* Màu Hồng Đỏ cho 3D */
         
         .folder-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
         .folder-maytruong:hover { border-color: #0056b3; }
@@ -98,6 +94,7 @@
         .folder-safety:hover { border-color: #2e7d32; }
         .folder-quiz:hover { border-color: #6a1b9a; }
         .folder-drive:hover { border-color: #f4511e; }
+        .folder-3d:hover { border-color: #e91e63; }
 
         .folder-icon { font-size: 60px; margin-bottom: 20px; }
         .folder-title { font-size: 22px; font-weight: bold; margin: 0 0 10px 0; color: #1a252f; text-transform: uppercase; }
@@ -119,6 +116,7 @@
         #screen-maypho { border-top-color: #00838f; }
         #screen-safety { border-top-color: #2e7d32; }
         #screen-quiz { border-top-color: #6a1b9a; }
+        #screen-3d { border-top-color: #e91e63; }
 
         .section-header {
             display: flex;
@@ -134,6 +132,7 @@
         #screen-maypho .section-title { color: #00838f; }
         #screen-safety .section-title { color: #2e7d32; }
         #screen-quiz .section-title { color: #6a1b9a; }
+        #screen-3d .section-title { color: #e91e63; }
 
         .back-btn {
             background-color: #e53935;
@@ -178,6 +177,7 @@
         #screen-maypho .file-link { border-left-color: #00838f; }
         #screen-safety .file-link { border-left-color: #2e7d32; }
         #screen-quiz .file-link { border-left-color: #6a1b9a; }
+        #screen-3d .file-link { border-left-color: #e91e63; }
         
         .file-link:hover {
             background-color: #e9ecef;
@@ -185,6 +185,9 @@
             transform: translateX(8px);
         }
         .file-link::before { content: "📄"; margin-right: 15px; font-size: 18px; opacity: 0.8; }
+        
+        /* Icon riêng cho bài 3D */
+        #screen-3d .file-link::before { content: "🖥️"; }
 
         /* MÀN HÌNH 3: KHUNG ĐỌC TÀI LIỆU */
         #screen-content {
@@ -239,7 +242,7 @@
         <p>Chuyên Đề Máy Nhiệt Điện Mông Dương 1</p>
     </div>
 
-    <!-- MÀN HÌNH 1: HIỂN THỊ 5 THƯ MỤC -->
+    <!-- MÀN HÌNH 1: HIỂN THỊ 6 THƯ MỤC -->
     <div id="screen-home">
         <!-- Hàng 1 -->
         <div class="folder-card folder-maytruong" onclick="openFolder('screen-maytruong')">
@@ -261,13 +264,19 @@
         </div>
 
         <!-- Hàng 2 -->
+        <!-- Thư mục MỚI: Mô phỏng 3D -->
+        <div class="folder-card folder-3d" onclick="openFolder('screen-3d')">
+            <div class="folder-icon">🖥️</div>
+            <h2 class="folder-title">Mô Phỏng 3D</h2>
+            <p class="folder-desc">Mô hình thiết bị, SCADA và sự cố tương tác</p>
+        </div>
+        
         <div class="folder-card folder-quiz" onclick="openFolder('screen-quiz')">
             <div class="folder-icon">📝</div>
             <h2 class="folder-title">Trắc Nghiệm</h2>
             <p class="folder-desc">Luyện thi trắc nghiệm các chuyên đề tổng hợp</p>
         </div>
 
-        <!-- Thư mục Drive -->
         <a class="folder-card folder-drive" href="https://drive.google.com/drive/folders/1RNLyJO_PgKzgML6FNUyuJBboSq7ypu6F?usp=drive_link" target="_blank" rel="noopener noreferrer">
             <div class="folder-icon">☁️</div>
             <h2 class="folder-title">Thư Viện Drive</h2>
@@ -283,7 +292,6 @@
         </div>
         <div class="list-container">
             <a class="file-link" onclick="openDoc('tonghopmaytruong.html')">📌 Tổng hợp toàn bộ đáp án chuyên môn Máy trưởng</a>
-            
             <a class="file-link" onclick="openDoc('Ảnhhưởngchânkhôngbìnhngưng.html')">Ảnh hưởng chân không bình ngưng</a>
             <a class="file-link" onclick="openDoc('aplucnhiet.html')">Ảnh hưởng của áp lực, nhiệt độ hơi mới và chân không bình ngưng đến quá trình vận hành và hiệu suất của tuabin</a>
             <a class="file-link" onclick="openDoc('Ảnhhưởngcủanhiệtđộhơichínhtớithiếtbịvàhiệusuấttuabin.html')">Ảnh hưởng của nhiệt độ hơi chính tới thiết bị và hiệu suất tuabin</a>
@@ -292,7 +300,6 @@
             <a class="file-link" onclick="openDoc('CácloạitổnthấttronghệthốngTuabinBìnhngưng.html')">Các loại tổn thất trong hệ thống Tuabin - Bình ngưng</a>
             <a class="file-link" onclick="openDoc('caoápCấutạotácdụngvàsựcốthườnggặp.html')">Hệ thống bình gia nhiệt cao áp - Cấu tạo, tác dụng và sự cố thường gặp</a>
             <a class="file-link" onclick="openDoc('Cấutạobìnhngưngvàxửlýsựcốmứcnướcgiảmnhanh.html')">Cấu tạo, tác dụng bình ngưng và xử lý sự cố mức nước giảm nhanh</a>
-            <!-- Đã sửa đổi tên file ở dòng bên dưới -->
             <a class="file-link" onclick="openDoc('chatluonghoi.html')">Chất lượng hơi nước và chỉ tiêu môi trường chu trình tuabin</a>
             <a class="file-link" onclick="openDoc('Hyddro.html')">Hiện tượng, nguyên nhân, biện pháp xử lý sự chênh áp dầu chèn - Hydro dao động</a>
             <a class="file-link" onclick="openDoc('khởi động lạnh.html')">Các bước chuẩn bị, kiểm tra và trình tự khởi động Tuabin từ trạng thái lạnh tới đầy tải</a>
@@ -336,6 +343,24 @@
             <!-- Tự động điền dữ liệu -->
         </div>
     </div>
+    
+    <!-- MÀN HÌNH 2E: THƯ MỤC 3D (MỚI) -->
+    <div id="screen-3d" class="list-section">
+        <div class="section-header">
+            <h2 class="section-title">🖥️ Mục: Mô Phỏng 3D</h2>
+            <button class="back-btn" onclick="goBackToHome()">⬅ QUAY LẠI TỔNG</button>
+        </div>
+        <div class="list-container">
+            <!-- Đã thêm 4 file anh cung cấp -->
+            <a class="file-link" onclick="openDoc('anhhuongchankhong.html')">Mô phỏng ảnh hưởng chân không bình ngưng</a>
+            <a class="file-link" onclick="openDoc('binhgianhiet.html')">Mô phỏng 3D Hệ thống Bình gia nhiệt</a>
+            <a class="file-link" onclick="openDoc('binhngung.html')">Mô phỏng 3D Cấu tạo Bình ngưng</a>
+            <a class="file-link" onclick="openDoc('PThaydoi.html')">Mô phỏng sự cố: Biến động áp lực</a>
+            
+            <!-- Sau này anh có thêm bài 3D mới thì copy dòng này sửa lại tên nhé -->
+            <!-- <a class="file-link" onclick="openDoc('tenfilemoi.html')">Tên Bài Mô Phỏng Mới</a> -->
+        </div>
+    </div>
 
     <!-- MÀN HÌNH 2D: THƯ MỤC TRẮC NGHIỆM -->
     <div id="screen-quiz" class="list-section">
@@ -368,6 +393,7 @@
         document.getElementById('screen-maypho').style.display = 'none';
         document.getElementById('screen-safety').style.display = 'none';
         document.getElementById('screen-quiz').style.display = 'none';
+        document.getElementById('screen-3d').style.display = 'none'; // Thêm id 3d
         
         document.getElementById(folderId).style.display = 'block';
         window.scrollTo(0, 0); 
@@ -382,11 +408,13 @@
         document.getElementById('screen-maypho').style.display = 'none';
         document.getElementById('screen-safety').style.display = 'none';
         document.getElementById('screen-quiz').style.display = 'none';
+        document.getElementById('screen-3d').style.display = 'none'; // Thêm id 3d
         
         document.getElementById('screen-home').style.display = 'grid'; 
     }
 
     function openDoc(filename) {
+        // Kiểm tra xem file có tồn tại trên server không
         fetch(filename, { method: 'HEAD' })
             .then(response => {
                 if (response.ok) {
