@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bài thi trắc nghiệm An toàn – 60 câu / 45 phút</title>
+<title>Hệ Thống Ôn Luyện & Thi Trắc Nghiệm An Toàn – Nhiệt điện Mông Dương</title>
 <style>
   *{margin:0;padding:0;box-sizing:border-box;}
   :root{
@@ -22,7 +22,7 @@
   /* HEADER */
   header.top{
     background:linear-gradient(135deg,#1e5eff,#7c3aed);
-    color:#fff;border-radius:16px;padding:16px 22px;margin-bottom:16px;
+    color:#fff;border-radius:16px;padding:14px 22px;margin-bottom:16px;
     box-shadow:0 10px 28px rgba(30,94,255,.28);
     display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;
   }
@@ -35,8 +35,14 @@
   }
   .home-btn:hover{background:rgba(255,255,255,.32);transform:translateY(-1px);}
   .home-btn:active{transform:scale(.95);}
-  header.top h1{font-size:1.15rem;font-weight:700;letter-spacing:.2px;}
+  header.top h1{font-size:1.12rem;font-weight:700;letter-spacing:.2px;}
   header.top h1 small{display:block;font-weight:400;font-size:.76rem;opacity:.88;margin-top:3px;}
+  
+  .header-badges{display:flex;gap:10px;align-items:center;}
+  .mode-pill{
+    background:#f3e8ff;color:#6d28d9;border:1.5px solid #d8b4fe;
+    padding:8px 14px;border-radius:11px;font-size:.85rem;font-weight:800;
+  }
   .timer{
     background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);
     padding:8px 16px;border-radius:11px;font-variant-numeric:tabular-nums;
@@ -49,15 +55,31 @@
   .card{background:var(--card);border-radius:16px;box-shadow:0 4px 20px rgba(26,34,51,.07);border:1px solid var(--border);margin-bottom:16px;}
   .hidden{display:none !important;}
 
-  /* START */
-  .start{padding:38px 30px;text-align:center;}
-  .start h2{font-size:1.45rem;margin-bottom:10px;}
+  /* TAB ĐIỀU HƯỚNG CHẾ ĐỘ */
+  .mode-nav{
+    display:flex;justify-content:center;gap:12px;margin-bottom:22px;flex-wrap:wrap;
+  }
+  .mode-tab{
+    flex:1;max-width:320px;padding:12px 18px;border-radius:14px;
+    border:2px solid #cbd5e1;background:#f8faff;font-size:.92rem;
+    font-weight:800;color:#475569;cursor:pointer;transition:.2s;font-family:inherit;
+  }
+  .mode-tab:hover{border-color:#93c5fd;background:#f0f7ff}
+  .mode-tab.active{
+    border-color:#1e5eff;background:#1e5eff;color:#fff;
+    box-shadow:0 6px 18px rgba(30,94,255,.32);
+  }
+
+  /* START SCREEN */
+  .start{padding:34px 26px;text-align:center;}
+  .start h2{font-size:1.45rem;margin-bottom:8px;color:#1e3c72;}
   .start p{color:var(--muted);margin-bottom:8px;font-size:.92rem;}
-  .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:11px;margin:24px 0 22px;}
-  .info-box{background:#f5f8fe;border:1px solid var(--border);border-radius:11px;padding:14px;}
+
+  .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:11px;margin:22px 0 20px;}
+  .info-box{background:#f5f8fe;border:1px solid var(--border);border-radius:11px;padding:13px;}
   .info-box .k{font-size:.72rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px;}
   .info-box .v{font-size:1.15rem;font-weight:800;color:var(--primary);margin-top:4px;}
-  .dist{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:24px;}
+  .dist{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:22px;}
   .dist-chip{
     font-size:.78rem;font-weight:600;padding:6px 13px;border-radius:99px;
     border:1.5px dashed var(--border);background:#fbfcff;display:inline-flex;align-items:center;gap:6px;
@@ -67,6 +89,28 @@
   .c-d{background:var(--d);}   .c-p{background:var(--p);}
   .dist-chip b{color:var(--primary);}
 
+  /* KHỐI HỌC TẬP (STUDY PANEL) */
+  #studyPanel{margin-top:10px;text-align:left;}
+  .study-info-box{
+    background:#f0fdf4;border-left:5px solid #16a34a;border-radius:12px;
+    padding:16px 20px;margin-bottom:20px;font-size:.9rem;line-height:1.75;color:#166534;
+  }
+  .study-grid{display:grid;grid-template-columns:1fr;gap:11px;max-width:820px;margin:0 auto;}
+  .study-card{
+    background:#fff;border:2px solid var(--border);border-left:6px solid #1e5eff;
+    border-radius:13px;padding:15px 20px;display:flex;align-items:center;
+    justify-content:space-between;gap:14px;cursor:pointer;transition:.2s;
+  }
+  .study-card:hover{border-color:#1e5eff;transform:translateX(4px);box-shadow:0 4px 16px rgba(30,94,255,.12);}
+  .study-card-body h4{font-size:.96rem;color:#1e3c72;margin-bottom:4px;}
+  .study-card-body p{font-size:.82rem;color:var(--muted);line-height:1.45;}
+  .study-card-btn{
+    background:#eff6ff;color:#1e5eff;font-weight:800;font-size:.83rem;
+    padding:9px 18px;border-radius:20px;border:none;white-space:nowrap;font-family:inherit;
+  }
+  .study-card:hover .study-card-btn{background:#1e5eff;color:#fff;}
+
+  /* BUTTONS */
   .btn{border:none;border-radius:10px;padding:11px 20px;font-size:.88rem;font-weight:600;cursor:pointer;transition:.18s;font-family:inherit;}
   .btn:disabled{opacity:.4;cursor:not-allowed;}
   .btn-ghost{background:#eef2f9;color:#41526b;}
@@ -75,42 +119,41 @@
   .btn-primary:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 18px rgba(30,94,255,.4);}
   .btn-submit{background:linear-gradient(135deg,#16a34a,#059669);color:#fff;box-shadow:0 4px 14px rgba(22,163,74,.3);}
   .btn-submit:hover{transform:translateY(-1px);}
+  .btn-study{background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:#fff;box-shadow:0 4px 14px rgba(109,40,217,.32);}
+  .btn-study:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(109,40,217,.45);}
   .btn-lg{padding:13px 40px;font-size:1rem;}
 
   /* QUIZ */
-  .progress-outer{padding:16px 22px 14px;border-bottom:1px solid var(--border);}
+  .progress-outer{padding:14px 22px;border-bottom:1px solid var(--border);}
   .progress-info{display:flex;justify-content:space-between;font-size:.83rem;color:var(--muted);margin-bottom:8px;font-weight:600;}
   .bar{height:9px;background:#e6ecf7;border-radius:99px;overflow:hidden;}
   .bar-fill{height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,#1e5eff,#7c3aed);transition:width .35s ease;}
 
-  .q-area{padding:24px 26px 26px;}
-  .q-top{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px;}
+  .q-area{padding:22px 24px 24px;}
+  .q-top{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px;}
   .badge{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:4px 11px;border-radius:99px;white-space:nowrap;}
   .b-cm{background:#dbeafe;color:#1e40af;}
   .b-ch{background:#d1fae5;color:#065f46;}
   .b-d{background:#fef3c7;color:#78350f;}
   .b-p{background:#fee2e2;color:#991b1b;}
-  .q-num{font-size:.78rem;font-weight:700;color:var(--muted);}
-  .q-text{font-size:1.06rem;font-weight:600;line-height:1.6;margin-bottom:20px;}
+  .badge-seq{background:#f1f5f9;color:#475569;font-variant-numeric:tabular-nums;border:1px solid #cbd5e1;}
+  .q-num{font-size:.8rem;font-weight:700;color:var(--muted);}
+  .q-text{font-size:1.05rem;font-weight:600;line-height:1.6;margin-bottom:18px;}
 
-  .q-flex{display:flex;gap:22px;align-items:flex-start;}
+  .q-flex{display:flex;gap:20px;align-items:flex-start;}
   .q-main{flex:1;min-width:0;}
 
   /* ====== MASCOT ====== */
   .mascot-side{
-    flex:0 0 170px;position:relative;
+    flex:0 0 160px;position:relative;
     display:flex;flex-direction:column;align-items:center;
-    padding-top:8px;align-self:stretch;
+    padding-top:6px;align-self:stretch;
   }
   .speech-bubble{
-    position:relative;
-    background:#fff;border:2px solid var(--border);
-    padding:8px 13px;border-radius:12px;
-    font-size:.8rem;font-weight:700;color:var(--text);
-    white-space:nowrap;margin-bottom:10px;
-    opacity:0;transform:translateY(6px) scale(.9);
-    transition:.25s cubic-bezier(.34,1.56,.64,1);
-    box-shadow:0 4px 12px rgba(26,34,51,.08);
+    position:relative;background:#fff;border:2px solid var(--border);
+    padding:7px 12px;border-radius:12px;font-size:.78rem;font-weight:700;color:var(--text);
+    white-space:nowrap;margin-bottom:10px;opacity:0;transform:translateY(6px) scale(.9);
+    transition:.25s cubic-bezier(.34,1.56,.64,1);box-shadow:0 4px 12px rgba(26,34,51,.08);
   }
   .speech-bubble.show{opacity:1;transform:translateY(0) scale(1);}
   .speech-bubble::after{
@@ -123,48 +166,39 @@
   .speech-bubble.sad::after{background:#fee2e2;border-color:#fca5a5;}
 
   .mascot-stage{
-    position:relative;width:170px;height:210px;
+    position:relative;width:150px;height:190px;
     display:flex;align-items:flex-end;justify-content:center;
   }
   .mascot-shadow{
     position:absolute;bottom:6px;left:50%;transform:translateX(-50%);
-    width:86px;height:14px;border-radius:50%;
-    background:radial-gradient(ellipse,rgba(0,0,0,.22),transparent 70%);
-    transition:.3s;
+    width:76px;height:12px;border-radius:50%;
+    background:radial-gradient(ellipse,rgba(0,0,0,.22),transparent 70%);transition:.3s;
   }
   .mascot{
-    position:relative;width:150px;height:200px;
-    transform-origin:50% 95%;
-    animation:idleBob 2.4s ease-in-out infinite;
+    position:relative;width:135px;height:180px;
+    transform-origin:50% 95%;animation:idleBob 2.4s ease-in-out infinite;
   }
-  @keyframes idleBob{
-    0%,100%{transform:translateY(0);}
-    50%{transform:translateY(-5px);}
-  }
+  @keyframes idleBob{0%,100%{transform:translateY(0);}50%{transform:translateY(-5px);}}
   .mascot svg{width:100%;height:100%;display:block;overflow:visible;}
 
   .mascot .mouth{opacity:0;transition:.2s;}
   .mascot.idle .mouth.smile{opacity:1;}
   .mascot.correct .mouth.big-smile{opacity:1;}
   .mascot.wrong .mouth.frown{opacity:1;}
-
   .mascot .eye-open{opacity:1;transition:.2s;}
   .mascot .eye-sad{opacity:0;}
   .mascot.wrong .eye-open{opacity:0;}
   .mascot.wrong .eye-sad{opacity:1;}
-
   .mascot .arm-left,.mascot .arm-right{transform-origin:50% 10%;transition:transform .3s;}
   .mascot.correct .arm-left{transform:rotate(-115deg);}
   .mascot.correct .arm-right{transform:rotate(115deg);}
   .mascot.wrong .arm-left{transform:rotate(15deg);}
   .mascot.wrong .arm-right{transform:rotate(-15deg);}
-
   .mascot .leg-left,.mascot .leg-right{transform-origin:50% 0;transition:transform .3s;}
 
   .tear{
-    position:absolute;width:9px;height:13px;
-    background:#5eb3ff;border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;
-    opacity:0;pointer-events:none;
+    position:absolute;width:8px;height:12px;background:#5eb3ff;
+    border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;opacity:0;pointer-events:none;
     box-shadow:inset -2px -2px 0 rgba(255,255,255,.5);
   }
   .tear::after{
@@ -173,68 +207,52 @@
     border-bottom:5px solid #5eb3ff;
   }
   .mascot.wrong .tear{animation:tearFall 1.2s ease-in infinite;}
-  @keyframes tearFall{
-    0%{opacity:0;transform:translateY(0);}
-    15%{opacity:1;}
-    100%{opacity:0;transform:translateY(38px);}
-  }
+  @keyframes tearFall{0%{opacity:0;transform:translateY(0);}15%{opacity:1;}100%{opacity:0;transform:translateY(36px);}}
 
-  .mascot.correct{
-    animation:jumpForJoy .95s cubic-bezier(.28,.84,.42,1) 1;
-  }
+  .mascot.correct{animation:jumpForJoy .95s cubic-bezier(.28,.84,.42,1) 1;}
   @keyframes jumpForJoy{
-    0%   {transform:translateY(0) rotate(0) scale(1);}
-    15%  {transform:translateY(4px) rotate(0) scale(1.05,.95);}
-    30%  {transform:translateY(-38px) rotate(-9deg) scale(.96,1.06);}
-    50%  {transform:translateY(-58px) rotate(9deg) scale(1);}
-    70%  {transform:translateY(-32px) rotate(-6deg) scale(1.02,.98);}
-    85%  {transform:translateY(-6px) rotate(4deg) scale(1.04,.96);}
-    100% {transform:translateY(0) rotate(0) scale(1);}
+    0%{transform:translateY(0) rotate(0) scale(1);}
+    15%{transform:translateY(4px) rotate(0) scale(1.05,.95);}
+    30%{transform:translateY(-38px) rotate(-9deg) scale(.96,1.06);}
+    50%{transform:translateY(-58px) rotate(9deg) scale(1);}
+    70%{transform:translateY(-32px) rotate(-6deg) scale(1.02,.98);}
+    85%{transform:translateY(-6px) rotate(4deg) scale(1.04,.96);}
+    100%{transform:translateY(0) rotate(0) scale(1);}
   }
-  .mascot.correct ~ .mascot-shadow,
-  .mascot.correct + .mascot-shadow{
-    animation:shadowPulse .95s ease-out 1;
-  }
+  .mascot.correct + .mascot-shadow{animation:shadowPulse .95s ease-out 1;}
   @keyframes shadowPulse{
     0%{transform:translateX(-50%) scale(1);opacity:.9;}
     45%{transform:translateX(-50%) scale(.6);opacity:.4;}
     100%{transform:translateX(-50%) scale(1);opacity:.9;}
   }
-
-  .mascot.wrong{
-    animation:slump .8s cubic-bezier(.34,1.56,.64,1) 1 forwards;
-  }
+  .mascot.wrong{animation:slump .8s cubic-bezier(.34,1.56,.64,1) 1 forwards;}
   @keyframes slump{
-    0%  {transform:translateY(0) rotate(0);}
-    20% {transform:translateY(-8px) rotate(-3deg);}
-    50% {transform:translateY(6px) rotate(4deg);}
-    75% {transform:translateY(11px) rotate(-2deg);}
+    0%{transform:translateY(0) rotate(0);}
+    20%{transform:translateY(-8px) rotate(-3deg);}
+    50%{transform:translateY(6px) rotate(4deg);}
+    75%{transform:translateY(11px) rotate(-2deg);}
     100%{transform:translateY(9px) rotate(0);}
   }
   .mascot.wrong .leg-left{transform:rotate(-8deg);}
   .mascot.wrong .leg-right{transform:rotate(8deg);}
 
-  .confetti-layer{
-    position:absolute;inset:0;pointer-events:none;overflow:visible;z-index:5;
-  }
+  .confetti-layer{position:absolute;inset:0;pointer-events:none;overflow:visible;z-index:5;}
   .confetti-piece{
-    position:absolute;top:38%;left:50%;
-    width:9px;height:13px;border-radius:2px;
-    opacity:0;
+    position:absolute;top:38%;left:50%;width:8px;height:12px;border-radius:2px;opacity:0;
     animation:confettiFly 1.25s cubic-bezier(.15,.7,.35,1) forwards;
   }
   @keyframes confettiFly{
-    0%   {transform:translate(-50%,-50%) rotate(0) scale(.4);opacity:1;}
-    60%  {opacity:1;}
-    100% {transform:translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) rotate(var(--rot)) scale(1);opacity:0;}
+    0%{transform:translate(-50%,-50%) rotate(0) scale(.4);opacity:1;}
+    60%{opacity:1;}
+    100%{transform:translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) rotate(var(--rot)) scale(1);opacity:0;}
   }
   .confetti-piece.round{border-radius:50%;width:8px;height:8px;}
-  .confetti-piece.star{clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);width:12px;height:12px;border-radius:0;}
+  .confetti-piece.star{clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);width:11px;height:11px;border-radius:0;}
 
   /* OPTIONS */
   .opt{
-    display:flex;gap:13px;align-items:flex-start;border:2px solid var(--border);
-    border-radius:12px;padding:13px 16px;margin-bottom:10px;cursor:pointer;
+    display:flex;gap:12px;align-items:flex-start;border:2px solid var(--border);
+    border-radius:12px;padding:12px 15px;margin-bottom:9px;cursor:pointer;
     transition:.18s;background:#fbfcff;user-select:none;
   }
   .opt:hover:not(.locked){border-color:#b9cdfa;background:#f4f8ff;transform:translateX(2px);}
@@ -242,7 +260,7 @@
     flex:0 0 28px;height:28px;border-radius:50%;background:#e6ecf7;color:#4a5b74;
     display:grid;place-items:center;font-weight:700;font-size:.83rem;transition:.16s;
   }
-  .opt .txt{flex:1;font-size:.94rem;}
+  .opt .txt{flex:1;font-size:.93rem;}
   .opt .mark{flex:0 0 auto;font-size:1.15rem;font-weight:800;line-height:1.4;opacity:0;transition:.2s;}
 
   .opt.correct{border-color:var(--ok);background:#dcfce7;box-shadow:0 3px 12px rgba(22,163,74,.18);}
@@ -258,35 +276,35 @@
 
   .feedback{
     display:flex;align-items:center;gap:11px;
-    padding:13px 17px;border-radius:12px;margin-top:14px;
-    font-weight:600;font-size:.92rem;animation:slideIn .35s ease;
+    padding:12px 16px;border-radius:12px;margin-top:14px;
+    font-weight:600;font-size:.9rem;animation:slideIn .35s ease;
   }
   .feedback.ok{background:#dcfce7;color:#14532d;border:1.5px solid #86efac;}
   .feedback.no{background:#fee2e2;color:#7f1d1d;border:1.5px solid #fca5a5;}
-  .feedback .icon{font-size:1.35rem;line-height:1;}
+  .feedback .icon{font-size:1.3rem;line-height:1;}
   .feedback .next-inline{
-    margin-left:auto;padding:8px 16px;border-radius:9px;font-size:.83rem;
+    margin-left:auto;padding:7px 15px;border-radius:9px;font-size:.82rem;
     background:#1e5eff;color:#fff;border:none;cursor:pointer;font-weight:700;
     font-family:inherit;transition:.15s;
   }
   .feedback .next-inline:hover{background:#0f3fd1;transform:translateX(2px);}
   @keyframes slideIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
 
-  .nav{padding:16px 26px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap;}
+  .nav{padding:14px 24px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap;}
 
   /* PALETTE */
-  .palette-card{padding:20px 24px 24px;}
-  .palette-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:14px;}
+  .palette-card{padding:18px 22px 22px;}
+  .palette-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:12px;}
   .palette-head h3{font-size:.95rem;font-weight:700;}
   .palette-summary{display:flex;gap:9px;flex-wrap:wrap;font-size:.78rem;font-weight:700;}
-  .sum{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:99px;background:#f5f8fe;border:1px solid var(--border);}
-  .sum i{width:9px;height:9px;border-radius:50%;}
+  .sum{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:99px;background:#f5f8fe;border:1px solid var(--border);}
+  .sum i{width:8px;height:8px;border-radius:50%;}
   .s-ok i{background:var(--ok);} .s-no i{background:var(--bad);} .s-remain i{background:#94a3b8;}
 
-  .palette{display:grid;grid-template-columns:repeat(auto-fill,minmax(46px,1fr));gap:8px;margin-bottom:16px;}
+  .palette{display:grid;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));gap:7px;margin-bottom:14px;}
   .pbtn{
-    aspect-ratio:1;border-radius:11px;border:2px solid;
-    font-size:.82rem;font-weight:800;cursor:pointer;position:relative;
+    aspect-ratio:1;border-radius:10px;border:2px solid;
+    font-size:.8rem;font-weight:800;cursor:pointer;position:relative;
     display:grid;place-items:center;transition:.18s;font-family:inherit;padding:0;
   }
   .pbtn:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.12);}
@@ -295,46 +313,43 @@
   .pbtn[data-cat="D"]{border-color:#fcd34d;color:#78350f;background:#fffbeb;}
   .pbtn[data-cat="P"]{border-color:#fca5a5;color:#991b1b;background:#fef2f2;}
   .pbtn.cur{box-shadow:0 0 0 3px var(--primary), 0 4px 12px rgba(30,94,255,.35);transform:translateY(-2px) scale(1.05);}
-  .pbtn.right{background:var(--ok) !important;border-color:var(--ok) !important;color:#fff !important;box-shadow:0 3px 10px rgba(22,163,74,.35);}
-  .pbtn.wrong{background:var(--bad) !important;border-color:var(--bad) !important;color:#fff !important;box-shadow:0 3px 10px rgba(225,29,72,.35);}
+  .pbtn.right{background:var(--ok) !important;border-color:var(--ok) !important;color:#fff !important;}
+  .pbtn.wrong{background:var(--bad) !important;border-color:var(--bad) !important;color:#fff !important;}
   .pbtn .badge-mini{
-    position:absolute;top:-4px;right:-4px;width:16px;height:16px;border-radius:50%;
-    font-size:.62rem;font-weight:900;display:grid;place-items:center;color:#fff;
-    box-shadow:0 1px 4px rgba(0,0,0,.25);
+    position:absolute;top:-4px;right:-4px;width:15px;height:15px;border-radius:50%;
+    font-size:.6rem;font-weight:900;display:grid;place-items:center;color:#fff;
   }
   .pbtn.right .badge-mini{background:#065f46;}
   .pbtn.wrong .badge-mini{background:#7f1d1d;}
 
-  .palette-legend{display:flex;flex-wrap:wrap;gap:16px;font-size:.78rem;color:var(--muted);padding-top:14px;border-top:1px dashed var(--border);}
+  .palette-legend{display:flex;flex-wrap:wrap;gap:16px;font-size:.76rem;color:var(--muted);padding-top:12px;border-top:1px dashed var(--border);}
   .palette-legend .grp{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
   .palette-legend .lbl{font-weight:700;color:#41526b;}
   .palette-legend .swatch{display:inline-flex;align-items:center;gap:5px;}
-  .palette-legend .sw{width:14px;height:14px;border-radius:5px;border:2px solid;}
+  .palette-legend .sw{width:13px;height:13px;border-radius:4px;border:2px solid;}
   .sw-cm{background:#eff6ff;border-color:#93c5fd;}
   .sw-ch{background:#ecfdf5;border-color:#6ee7b7;}
   .sw-d{background:#fffbeb;border-color:#fcd34d;}
   .sw-p{background:#fef2f2;border-color:#fca5a5;}
-  .sw-ok{background:var(--ok);border-color:var(--ok);}
-  .sw-no{background:var(--bad);border-color:var(--bad);}
 
   /* RESULT */
-  .result{padding:32px 26px;display:none;}
-  .score-ring{width:158px;height:158px;border-radius:50%;margin:0 auto 18px;display:grid;place-items:center;}
-  .score-ring .inner{width:126px;height:126px;border-radius:50%;background:#fff;display:grid;place-items:center;}
-  .score-num{font-size:2.5rem;font-weight:800;line-height:1;}
-  .score-lbl{font-size:.74rem;color:var(--muted);font-weight:600;margin-top:4px;}
+  .result{padding:30px 24px;display:none;}
+  .score-ring{width:150px;height:150px;border-radius:50%;margin:0 auto 16px;display:grid;place-items:center;}
+  .score-ring .inner{width:120px;height:120px;border-radius:50%;background:#fff;display:grid;place-items:center;}
+  .score-num{font-size:2.4rem;font-weight:800;line-height:1;}
+  .score-lbl{font-size:.74rem;color:var(--muted);font-weight:600;margin-top:3px;}
   .verdict{text-align:center;font-size:1.2rem;font-weight:700;margin-bottom:6px;}
-  .sub-verdict{text-align:center;color:var(--muted);font-size:.88rem;margin-bottom:24px;}
-  .cat-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:11px;margin-bottom:24px;}
-  .cat-card{border:1px solid var(--border);border-radius:11px;padding:13px 15px;background:#fbfcff;}
-  .cat-card .n{font-size:.76rem;font-weight:700;color:var(--muted);margin-bottom:5px;}
-  .cat-card .v{font-size:1.22rem;font-weight:800;color:var(--primary);}
-  .cat-card .v small{font-size:.78rem;color:var(--muted);font-weight:600;}
-  .review-title{font-size:.98rem;font-weight:700;margin-bottom:14px;padding-top:20px;border-top:1px solid var(--border);}
-  .rev-item{border:1px solid var(--border);border-left-width:5px;border-radius:10px;padding:14px 16px;margin-bottom:11px;background:#fff;}
+  .sub-verdict{text-align:center;color:var(--muted);font-size:.88rem;margin-bottom:22px;}
+  .cat-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:22px;}
+  .cat-card{border:1px solid var(--border);border-radius:11px;padding:12px 14px;background:#fbfcff;}
+  .cat-card .n{font-size:.75rem;font-weight:700;color:var(--muted);margin-bottom:4px;}
+  .cat-card .v{font-size:1.2rem;font-weight:800;color:var(--primary);}
+  .cat-card .v small{font-size:.76rem;color:var(--muted);font-weight:600;}
+  .review-title{font-size:.95rem;font-weight:700;margin-bottom:12px;padding-top:18px;border-top:1px solid var(--border);}
+  .rev-item{border:1px solid var(--border);border-left-width:5px;border-radius:10px;padding:13px 15px;margin-bottom:10px;background:#fff;}
   .rev-item.wrong{border-left-color:var(--bad);background:#fff7f8;}
   .rev-item.right{border-left-color:var(--ok);background:#f6fef9;}
-  .rev-q{font-weight:600;font-size:.92rem;margin-bottom:9px;}
+  .rev-q{font-weight:600;font-size:.92rem;margin-bottom:8px;}
   .rev-line{font-size:.86rem;padding:6px 10px;border-radius:7px;margin-bottom:5px;}
   .rev-line.ok{background:#dcfce7;color:#14532d;font-weight:600;}
   .rev-line.no{background:#fee2e2;color:#7f1d1d;font-weight:600;text-decoration:line-through;}
@@ -344,34 +359,30 @@
   .overlay{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;place-items:center;z-index:99;padding:20px;backdrop-filter:blur(3px);}
   .overlay.show{display:grid;}
   .modal{background:#fff;border-radius:16px;padding:26px 28px;max-width:420px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,.28);text-align:center;}
-  .modal h3{font-size:1.1rem;margin-bottom:9px;}
-  .modal p{color:var(--muted);font-size:.88rem;margin-bottom:20px;}
+  .modal h3{font-size:1.1rem;margin-bottom:8px;}
+  .modal p{color:var(--muted);font-size:.88rem;margin-bottom:18px;}
   .modal .row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
   .toast{
     position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);
-    background:#1a2233;color:#fff;padding:11px 22px;border-radius:11px;
-    font-size:.88rem;font-weight:600;opacity:0;transition:.3s;z-index:200;
-    box-shadow:0 10px 30px rgba(0,0,0,.3);
+    background:#1a2233;color:#fff;padding:10px 20px;border-radius:10px;
+    font-size:.86rem;font-weight:600;opacity:0;transition:.3s;z-index:200;
   }
   .toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
 
-  /* RESPONSIVE */
   @media(max-width:820px){
     .q-flex{gap:14px;}
     .mascot-side{flex:0 0 130px;}
-    .mascot-stage{width:130px;height:170px;}
-    .mascot{width:120px;height:160px;}
-    .speech-bubble{font-size:.72rem;padding:6px 10px;}
+    .mascot-stage{width:130px;height:165px;}
+    .mascot{width:115px;height:155px;}
   }
   @media(max-width:600px){
-    .q-area,.palette-card,.progress-outer,.nav{padding-left:16px;padding-right:16px;}
-    .palette{grid-template-columns:repeat(auto-fill,minmax(40px,1fr));gap:6px;}
-    .pbtn{font-size:.72rem;border-radius:9px;}
+    .q-area,.palette-card,.progress-outer,.nav{padding-left:15px;padding-right:15px;}
+    .palette{grid-template-columns:repeat(auto-fill,minmax(38px,1fr));gap:5px;}
+    .pbtn{font-size:.7rem;border-radius:8px;}
     .q-flex{flex-direction:column-reverse;gap:6px;}
     .mascot-side{flex:0 0 auto;align-self:center;width:100%;}
-    .mascot-stage{height:120px;}
-    .mascot{width:100px;height:130px;}
-    .speech-bubble{margin-bottom:4px;}
+    .mascot-stage{height:115px;}
+    .mascot{width:95px;height:125px;}
   }
 </style>
 </head>
@@ -381,49 +392,73 @@
   <header class="top">
     <div class="brand">
       <button class="home-btn" id="homeBtn" onclick="goHome()" title="Về trang chủ">🏠</button>
-      <h1>BÀI THI TRẮC NGHIỆM AN TOÀN
-        <small>Nhiệt điện Mông Dương · 60 câu · 45 phút · Có trợ lý ảo đồng hành</small>
-      </h1>
+      <div>
+        <h1 id="headerTitle">BÀI THI TRẮC NGHIỆM AN TOÀN</h1>
+        <small id="headerSub">Nhiệt điện Mông Dương · 60 câu · 45 phút · Kỹ sư Bảo đồng hành</small>
+      </div>
     </div>
-    <div class="timer" id="timer">45:00</div>
+    <div class="header-badges">
+      <div class="mode-pill" id="pillMode" style="display:none">📚 Chế độ: Học tập</div>
+      <div class="timer" id="timer">45:00</div>
+    </div>
   </header>
 
   <div class="card">
 
-    <!-- START -->
+    <!-- START SCREEN -->
     <div class="start" id="startScreen">
-      <h2>🎯 Sẵn sàng làm bài?</h2>
-      <p>Đề thi gồm <b>60 câu</b> rút ngẫu nhiên từ ngân hàng <b id="bankSize">0</b> câu.</p>
-      <p style="font-size:.85rem;">⚡ Chọn đáp án → hiện đáp án đúng ngay. <b>Kỹ sư Bảo</b> sẽ cổ vũ bạn trên từng câu!</p>
+      <h2>🎯 Hệ Thống Ôn Luyện &amp; Sát Hạch An Toàn</h2>
+      <p>Ngân hàng chuẩn <b>184 câu hỏi</b> An toàn lao động, An toàn điện &amp; PCCC.</p>
 
-      <div class="info-grid">
-        <div class="info-box"><div class="k">Số câu</div><div class="v">60</div></div>
-        <div class="info-box"><div class="k">Thời gian</div><div class="v">45 phút</div></div>
-        <div class="info-box"><div class="k">Bậc</div><div class="v">L3</div></div>
-        <div class="info-box"><div class="k">Điểm đạt</div><div class="v">≥ 70%</div></div>
+      <!-- TAB CHỌN CHẾ ĐỘ -->
+      <div class="mode-nav">
+        <button class="mode-tab active" id="tabExam" onclick="switchMode('exam')">🎯 Chế độ Thi sát hạch (60 câu / 45p)</button>
+        <button class="mode-tab" id="tabStudy" onclick="switchMode('study')">📚 Chế độ Học tập (50 câu / phần)</button>
       </div>
 
-      <div class="dist">
-        <span class="dist-chip"><i class="c-cm"></i>Chuyên môn <b>7</b></span>
-        <span class="dist-chip"><i class="c-ch"></i>Chung <b>10</b></span>
-        <span class="dist-chip"><i class="c-d"></i>Điện <b>27</b></span>
-        <span class="dist-chip"><i class="c-p"></i>PCCC <b>16</b></span>
+      <!-- GIAO DIỆN CHẾ ĐỘ THI -->
+      <div id="examPanel">
+        <div class="info-grid">
+          <div class="info-box"><div class="k">Số câu</div><div class="v">60 câu</div></div>
+          <div class="info-box"><div class="k">Thời gian</div><div class="v">45 phút</div></div>
+          <div class="info-box"><div class="k">Bậc an toàn</div><div class="v">Bậc 3 (L3)</div></div>
+          <div class="info-box"><div class="k">Điểm đạt</div><div class="v">≥ 70%</div></div>
+        </div>
+
+        <div class="dist">
+          <span class="dist-chip"><i class="c-cm"></i>Chuyên môn <b>7</b></span>
+          <span class="dist-chip"><i class="c-ch"></i>Chung <b>10</b></span>
+          <span class="dist-chip"><i class="c-d"></i>Điện <b>27</b></span>
+          <span class="dist-chip"><i class="c-p"></i>PCCC <b>16</b></span>
+        </div>
+
+        <button class="btn btn-primary btn-lg" onclick="startQuiz()">🚀 Bắt đầu thi sát hạch</button>
       </div>
 
-      <button class="btn btn-primary btn-lg" onclick="startQuiz()">Bắt đầu làm bài</button>
+      <!-- GIAO DIỆN CHẾ ĐỘ HỌC TẬP -->
+      <div id="studyPanel" class="hidden">
+        <div class="study-info-box">
+          📖 <b>Học trước thi sau:</b> Toàn bộ <b>184 câu hỏi</b> được xếp tuần tự từ trên xuống dưới, <b>không xáo trộn</b> câu hỏi và đáp án.<br>
+          • Tắt đếm ngược thời gian, có nút <b>"Mở toàn bộ đáp án"</b> để học thuộc và đối chiếu nhanh tài liệu quy trình.
+        </div>
+        <div class="study-grid" id="studyGrid">
+          <!-- Render tự động 4 phần học -->
+        </div>
+      </div>
 
+      <!-- LỊCH SỬ THI -->
       <div id="historyBox" style="display:none;margin-top:22px;padding:14px 16px;border-radius:12px;background:#f5f8fe;border:1px solid var(--border);text-align:left;font-size:.85rem;color:var(--muted);">
-        <h4 style="font-size:.78rem;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Lịch sử làm bài</h4>
+        <h4 style="font-size:.78rem;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Lịch sử thi sát hạch (5 lần gần nhất)</h4>
         <div id="historyList"></div>
       </div>
     </div>
 
-    <!-- QUIZ -->
+    <!-- QUIZ SCREEN -->
     <div id="quizScreen" class="hidden">
       <div class="progress-outer">
         <div class="progress-info">
-          <span>Câu <b id="curNum">1</b> / 60</span>
-          <span>Đã trả lời: <b id="doneNum">0</b>/60</span>
+          <span>Câu <b id="curNum">1</b> / <span id="totalNum">60</span></span>
+          <span>Đã làm: <b id="doneNum">0</b>/<span id="totalNumDone">60</span></span>
         </div>
         <div class="bar"><div class="bar-fill" id="barFill"></div></div>
       </div>
@@ -431,6 +466,7 @@
       <div class="q-area">
         <div class="q-top">
           <span class="badge" id="catBadge">—</span>
+          <span class="badge badge-seq" id="seqBadge" style="display:none">Gốc: #1</span>
           <span class="q-num">Câu hỏi <span id="qIdx">1</span></span>
         </div>
         <div class="q-text" id="qText">—</div>
@@ -441,7 +477,7 @@
             <div id="feedbackBox"></div>
           </div>
 
-          <!-- ============ MASCOT ============ -->
+          <!-- MASCOT -->
           <div class="mascot-side">
             <div class="speech-bubble" id="speechBubble">Cố lên nhé!</div>
             <div class="mascot-stage">
@@ -449,7 +485,6 @@
               <div class="mascot-shadow"></div>
               <div class="mascot idle" id="mascot">
                 <svg viewBox="0 0 140 190" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                  <!-- LEGS -->
                   <g class="leg-left">
                     <rect x="52" y="140" width="13" height="30" rx="4" fill="#4a5568"/>
                     <rect x="46" y="162" width="26" height="15" rx="5" fill="#1a202c"/>
@@ -458,15 +493,11 @@
                     <rect x="75" y="140" width="13" height="30" rx="4" fill="#4a5568"/>
                     <rect x="68" y="162" width="26" height="15" rx="5" fill="#1a202c"/>
                   </g>
-
-                  <!-- BODY with safety vest -->
                   <rect x="42" y="86" width="56" height="58" rx="16" fill="#f6ad55"/>
                   <rect x="42" y="86" width="56" height="58" rx="16" fill="none" stroke="#dd6b20" stroke-width="3"/>
                   <rect x="42" y="104" width="56" height="6" fill="#fef3c7"/>
                   <rect x="42" y="126" width="56" height="6" fill="#fef3c7"/>
                   <line x1="70" y1="90" x2="70" y2="142" stroke="#dd6b20" stroke-width="2" stroke-linecap="round"/>
-
-                  <!-- ARMS -->
                   <g class="arm-left">
                     <rect x="26" y="92" width="17" height="42" rx="8.5" fill="#f6ad55" stroke="#dd6b20" stroke-width="2.5"/>
                     <circle cx="34.5" cy="136" r="8.5" fill="#ffd9b3" stroke="#dd6b20" stroke-width="2"/>
@@ -475,59 +506,32 @@
                     <rect x="97" y="92" width="17" height="42" rx="8.5" fill="#f6ad55" stroke="#dd6b20" stroke-width="2.5"/>
                     <circle cx="105.5" cy="136" r="8.5" fill="#ffd9b3" stroke="#dd6b20" stroke-width="2"/>
                   </g>
-
-                  <!-- NECK -->
                   <rect x="63" y="76" width="14" height="12" fill="#ffd9b3"/>
-
-                  <!-- HEAD -->
                   <circle cx="70" cy="52" r="38" fill="#ffd9b3" stroke="#f0b380" stroke-width="2"/>
-
-                  <!-- EARS -->
                   <circle cx="34" cy="56" r="8" fill="#ffd9b3" stroke="#f0b380" stroke-width="2"/>
                   <circle cx="106" cy="56" r="8" fill="#ffd9b3" stroke="#f0b380" stroke-width="2"/>
-
-                  <!-- HARD HAT -->
                   <path d="M26 44 Q26 8 70 8 Q114 8 114 44 L114 48 L26 48 Z" fill="#f6e05e" stroke="#d69e2e" stroke-width="2.5" stroke-linejoin="round"/>
                   <rect x="22" y="44" width="96" height="9" rx="4.5" fill="#ecc94b" stroke="#d69e2e" stroke-width="2"/>
                   <rect x="65" y="8" width="10" height="36" fill="#ecc94b" opacity=".55"/>
-
-                  <!-- EYE WHITES -->
                   <circle cx="56" cy="56" r="8.5" fill="#fff" stroke="#d1d5db" stroke-width="1.5"/>
                   <circle cx="84" cy="56" r="8.5" fill="#fff" stroke="#d1d5db" stroke-width="1.5"/>
-
-                  <!-- PUPILS -->
                   <g class="eye-open">
                     <circle cx="56" cy="57" r="4" fill="#1a202c"/>
                     <circle cx="84" cy="57" r="4" fill="#1a202c"/>
                     <circle cx="54.5" cy="55" r="1.4" fill="#fff"/>
                     <circle cx="82.5" cy="55" r="1.4" fill="#fff"/>
                   </g>
-
-                  <!-- MẮT BUỒN -->
                   <g class="eye-sad" stroke="#1a202c" stroke-width="3" fill="none" stroke-linecap="round">
                     <path d="M50 58 Q56 53 62 58"/>
                     <path d="M78 58 Q84 53 90 58"/>
                   </g>
-
-                  <!-- CHEEKS -->
                   <circle cx="44" cy="70" r="5.5" fill="#fc8181" opacity=".55"/>
                   <circle cx="96" cy="70" r="5.5" fill="#fc8181" opacity=".55"/>
-
-                  <!-- MOUTH: idle -->
-                  <path class="mouth smile" d="M60 72 Q70 80 80 72"
-                        stroke="#1a202c" stroke-width="2.8" fill="none" stroke-linecap="round"/>
-
-                  <!-- MOUTH: correct big smile -->
-                  <path class="mouth big-smile" d="M56 70 Q70 90 84 70 Q70 80 56 70 Z"
-                        fill="#e53e3e" stroke="#1a202c" stroke-width="2.5" stroke-linejoin="round"/>
-                  <path class="mouth big-smile" d="M60 74 Q70 78 80 74"
-                        fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
-
-                  <!-- MOUTH: wrong frown -->
-                  <path class="mouth frown" d="M60 80 Q70 72 80 80"
-                        stroke="#1a202c" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+                  <path class="mouth smile" d="M60 72 Q70 80 80 72" stroke="#1a202c" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+                  <path class="mouth big-smile" d="M56 70 Q70 90 84 70 Q70 80 56 70 Z" fill="#e53e3e" stroke="#1a202c" stroke-width="2.5" stroke-linejoin="round"/>
+                  <path class="mouth big-smile" d="M60 74 Q70 78 80 74" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+                  <path class="mouth frown" d="M60 80 Q70 72 80 80" stroke="#1a202c" stroke-width="2.8" fill="none" stroke-linecap="round"/>
                 </svg>
-
                 <div class="tear" style="top:58%;left:32%;"></div>
                 <div class="tear" style="top:58%;left:62%;animation-delay:.25s;"></div>
               </div>
@@ -538,19 +542,21 @@
 
       <div class="nav">
         <button class="btn btn-ghost" id="btnPrev" onclick="go(-1)">← Câu trước</button>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+          <button class="btn btn-study" id="btnRevealAll" style="display:none" onclick="revealAll()">👁️ Mở toàn bộ đáp án</button>
           <button class="btn btn-primary" id="btnNext" onclick="go(1)">Câu sau →</button>
-          <button class="btn btn-submit" onclick="askSubmit()">Nộp bài</button>
+          <button class="btn btn-submit" id="btnFinish" onclick="askSubmit()">Nộp bài</button>
+          <button class="btn btn-study" id="btnNextPart" style="display:none" onclick="goNextPart()">➡️ Phần tiếp theo</button>
         </div>
       </div>
     </div>
 
-    <!-- RESULT -->
+    <!-- RESULT SCREEN -->
     <div class="result" id="resultScreen">
       <div class="score-ring" id="ring">
         <div class="inner">
           <div class="score-num" id="scoreNum">0</div>
-          <div class="score-lbl">/ 60 câu</div>
+          <div class="score-lbl" id="scoreLbl">/ 60 câu</div>
         </div>
       </div>
       <div class="verdict" id="verdict">—</div>
@@ -564,7 +570,8 @@
 
       <div style="margin-top:20px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
         <button class="btn btn-ghost" onclick="goHome()">🏠 Về trang chủ</button>
-        <button class="btn btn-primary" onclick="startQuiz()">🔄 Tạo đề mới</button>
+        <button class="btn btn-study" id="modalNextPartBtn" style="display:none" onclick="goNextPart()">➡️ Sang phần tiếp theo</button>
+        <button class="btn btn-primary" id="btnRetry" onclick="startQuiz()">🔄 Làm lại đề này</button>
       </div>
     </div>
   </div>
@@ -584,7 +591,7 @@
 
     <div class="palette-legend">
       <div class="grp">
-        <span class="lbl">Chuyên môn:</span>
+        <span class="lbl">Chuyên mục:</span>
         <span class="swatch"><i class="sw sw-cm"></i>Chuyên môn</span>
         <span class="swatch"><i class="sw sw-ch"></i>Chung</span>
         <span class="swatch"><i class="sw sw-d"></i>Điện</span>
@@ -614,10 +621,10 @@
 
 <script>
 /* =========================================================
-   NGÂN HÀNG CÂU HỎI
+   NGÂN HÀNG CÂU HỎI AN TOÀN (184 CÂU CHUẨN)
    ========================================================= */
 const BANK = [
-/* ===== CM ===== */
+/* ===== CM (25 câu) ===== */
 {cat:'CM',q:'Vận hành Tuabin hơi phải đảm bảo nguyên tắc:',o:['Sự làm việc an toàn của thiết bị chính và phụ','Sự sẵn sàng mang công suất điện định mức và phụ tải nhiệt định mức','Các chỉ tiêu kinh tế kỹ thuật định mức của thiết bị chính và phụ','Cả 3 đáp án đều đúng.'],c:3},
 {cat:'CM',q:'Chú ý an toàn ở gian Tuabin nào sau đây là đúng?',o:['Các khu vực vận hành thiết bị phải được chiếu sáng, các biển báo phù hợp, đèn cảnh báo, bố trí các dụng cụ, hệ thống cứu hỏa theo quy định','Các động cơ dẫn động bơm phải được nối đất an toàn, bộ trục nối giữa động cơ điện và bơm phải có chụp bảo vệ','Sửa chữa thiết bị đang vận hành hoặc thiết bị đang ở chế độ dự phòng.','Đáp án 1 và 2'],c:3},
 {cat:'CM',q:'Những chú ý an toàn khi làm việc ở gian Tuabin nào sau đây là SAI?',o:['Sửa chữa thiết bị đang vận hành hoặc thiết bị đang ở chế độ dự phòng.','Các đường ống có nhiệt độ cao phải được bọc bảo ôn đầy đủ','Các khu vực vận hành thiết bị phải được chiếu sáng, các biển báo phù hợp','Các động cơ dẫn động bơm phải được nối đất an toàn'],c:0},
@@ -644,7 +651,7 @@ const BANK = [
 {cat:'CM',q:'Quy định về phòng cháy ở gian tuabin?',o:['Khi sửa chữa có lửa cách khu vực có H2 10m thì phải kiểm tra nồng độ khí H2','Khi hơ nóng các thiết bị, đường ống có dầu phải làm sạch dầu','Không được đưa tạp vật xuống cống rãnh, định kỳ dọn sạch','Cả 3 đáp án trên'],c:3},
 {cat:'CM',q:'Quy định về phòng cháy ở gian tuabin?',o:['Khi hàn cắt trên cao mà phía dưới có chất dễ cháy phải có biện pháp che chắn','Các đường ống có nhiệt độ cao phải duy trì bảo ôn tốt','Cấm bật lửa, cấm hút thuốc trong gian tuabin','Cả 3 đáp án trên'],c:3},
 
-/* ===== CH ===== */
+/* ===== CH (46 câu) ===== */
 {cat:'CH',q:'Theo Quy trình An toàn điện quy định làm việc trên cao là:',o:['Làm việc ở độ cao từ 3,0 m trở lên, tính từ mặt đất đến điểm tiếp xúc của chân người','Làm việc ở độ cao từ 2,0 m trở lên, tính từ trọng tâm của cơ thể','Làm việc ở độ cao từ 2,0 m trở lên, tính từ mặt đất đến điểm tiếp xúc của chân người','Làm việc ở độ cao từ 2,5 m trở lên, tính từ mặt đất đến điểm tiếp xúc của chân người'],c:2},
 {cat:'CH',q:'Theo Quy trình An toàn điện thì ĐVCT (đơn vị công tác) là đơn vị nào?',o:['Là đơn vị có quyền và trách nhiệm cử ra đơn vị công tác để thực hiện công việc','Là đơn vị trực tiếp thực hiện công việc quản lý, vận hành các thiết bị.','Là đơn vị thực hiện công việc sửa chữa, thí nghiệm, xây lắp,...','Là các doanh nghiệp hoạt động điện lực không QLVH thiết bị có trách nhiệm cử ra đơn vị công tác'],c:2},
 {cat:'CH',q:'Theo Quy trình An toàn điện thì ĐVQLVH là đơn vị nào?',o:['Là đơn vị có quyền và trách nhiệm cử ra đơn vị công tác','Là đơn vị trực tiếp thực hiện công việc quản lý, vận hành các thiết bị.','Là đơn vị thực hiện công việc sửa chữa, thí nghiệm, xây lắp','Là các doanh nghiệp hoạt động điện lực không QLVH thiết bị'],c:1},
@@ -697,7 +704,7 @@ const BANK = [
 {cat:'CH',q:'Người lao động được chia làm mấy nhóm?',o:['6','5','4','3'],c:0},
 {cat:'CH',q:'Tai nạn lao động được phân thành các loại nào?',o:['Chết người; nặng','Chết người; nhẹ','Chết người; nặng; nhẹ','Nặng; nhẹ'],c:2},
 
-/* ===== D ===== */
+/* ===== D (54 câu) ===== */
 {cat:'D',q:'Điện cao áp được quy định bao nhiêu (V) là đúng:',o:['Từ 500V trở lên','Đến 1000V','Từ 1000V trở lên','Trên 1000V'],c:2},
 {cat:'D',q:'Người chỉ đạo chung khi công việc do nhiều đơn vị công tác của cùng một tổ chức hoạt động điện lực thực hiện là:',o:['Người cấp phiếu.','Người cho phép.','Người lãnh đạo công việc.','Tất cả đều sai.'],c:2},
 {cat:'D',q:'Người có trách nhiệm phân công công việc, chỉ huy và giám sát nhân viên đơn vị công tác trong suốt quá trình thực hiện công việc là:',o:['Người lãnh đạo công việc.','Người cấp phiếu','Người cho phép','Người chỉ huy trực tiếp'],c:3},
@@ -804,7 +811,7 @@ const BANK = [
 {cat:'D',q:'Theo quy trình an toàn điện, phiếu công tác được quy định như thế nào là đúng?',o:['Là giấy giao nhiệm vụ làm việc ở thiết bị điện','Là giấy cho phép đơn vị công tác làm việc ở thiết bị điện','Là giấy ghi những biện pháp đảm bảo an toàn khi làm việc ở thiết bị điện','Cả 1, 2 và 3'],c:1},
 {cat:'D',q:'Theo quy trình an toàn điện dây tiếp đất di động được quy định như thế nào là đúng?',o:['Là dây chuyên dùng, bằng đồng hoặc hợp kim trần, mềm, nhiều sợi, tiết diện ≥ 25mm²','Tiết diện ≥ 16mm²','Cả 1 và 2','Cả 1, 2 và 3 đều sai'],c:1},
 
-/* ===== P ===== */
+/* ===== P (59 câu) ===== */
 {cat:'P',q:'Hành vi nào bị nghiêm cấm theo quy định về PCCC?',o:['Thi công những công trình có nguy hiểm về cháy nổ mà không có thiết kế về PCCC','Thi công những công trình có nguy hiểm về cháy nổ mà chưa có thiết kế được duyệt về PCCC','Thi công những công trình có nguy hiểm về cháy nổ gần các nhà và công trình công cộng','Thi công những công trình có nguy hiểm về cháy nổ mà không có trang bị phương tiện PCCC'],c:1},
 {cat:'P',q:'Trong hoạt động PCCC nhiệm vụ nào là chính?',o:['Trong hoạt động PCCC lấy phòng ngừa làm chính','Trong hoạt động PCCC lấy phương châm 4 tại chỗ làm chính','Trong hoạt động PCCC lấy chữa cháy làm chính','Trong hoạt động PCCC lấy tuyên truyền là chính.'],c:0},
 {cat:'P',q:'Theo anh chị "Chữa cháy" là như thế nào?',o:['Gồm các công việc huy động triển khai lực lượng, phương tiện chữa cháy, cắt điện, tổ chức thoát nạn, cứu người, cứu tài sản, chống cháy lan, dập tắt đám cháy và các hoạt động khác liên quan đến chữa cháy.','Gồm các công việc tổ chức thoát nạn, cứu người, cứu tài sản, huy động triển khai lực lượng, phương tiện chữa cháy dập tắt đám cháy.','Gồm các công việc huy động triển khai lực lượng, phương tiện chữa cháy, cắt điện, chống cháy lan, cứu người, cứu tài sản.','Câu 2 và 3 đúng.'],c:0},
@@ -866,22 +873,69 @@ const BANK = [
 {cat:'P',q:'Khi phát hiện cháy, trình tự nào sau đây là đúng?',o:['Hô to: Cháy! Cháy! Cháy!, cúp cầu dao điện, tham gia chữa cháy, đồng thời gọi điện thoại báo lực lượng chữa cháy chuyên nghiệp.','Gọi điện thoại báo lực lượng chữa cháy chuyên nghiệp, cúp cầu dao điện, hô to: Cháy! Cháy! Cháy!, tham gia chữa cháy.','Hô to: Cháy! Cháy! Cháy!, cúp cầu dao điện, đồng thời gọi điện thoại báo lực lượng chữa cháy chuyên nghiệp.','Gọi điện thoại báo lực lượng chữa cháy chuyên nghiệp'],c:0}
 ];
 
-/* ============ CẤU HÌNH ============ */
+/* Cấu hình các phần học */
+const STUDY_PARTS_META = [
+  { title: "Phần 1: An toàn Chuyên môn & An toàn chung (P1)", desc: "50 câu: Vận hành tuabin, bình ngưng, clo, dầu bôi trơn và an toàn làm việc trên cao, thiết bị nâng hạ" },
+  { title: "Phần 2: An toàn chung (P2) & An toàn điện (P1)", desc: "50 câu: Thang di động, không gian kín, cấp cứu điện, huấn luyện ATVSLĐ & các khái niệm, cấp điện áp, khoảng cách an toàn" },
+  { title: "Phần 3: An toàn điện (P2) & An toàn PCCC (P1)", desc: "50 câu: Cắt điện, thử điện, nối đất di động, phiếu công tác (PCT) & Luật PCCC, phương tiện chữa cháy MT/MFZ" },
+  { title: "Phần 4: An toàn PCCC (P2)", desc: "34 câu: Biện pháp xử lý cháy nổ, thoát nạn nhà cao tầng, trách nhiệm PCCC cơ sở & ngày toàn dân PCCC" }
+];
+
 const DIST = { CM:7, CH:10, D:27, P:16 };
 const CAT_NAME = { CM:'An toàn chuyên môn', CH:'An toàn chung', D:'An toàn điện', P:'An toàn PCCC' };
 const CAT_CLASS = { CM:'b-cm', CH:'b-ch', D:'b-d', P:'b-p' };
 const KEYS = ['A','B','C','D'];
-const DURATION = 45 * 60;   /* ⏱ 45 phút */
+const DURATION = 45 * 60;
 
-/* ============ TRẠNG THÁI ============ */
+/* TRẠNG THÁI */
+let appMode = 'exam'; // 'exam' hoặc 'study'
+let currentStudyPart = 0;
 let quiz = [], answers = [], current = 0, submitted = false;
 let timeLeft = DURATION, timerId = null;
-let history = JSON.parse(localStorage.getItem('quizHistory60') || '[]');
+let history = JSON.parse(localStorage.getItem('quizHistory60_at') || '[]');
 
-/* ============ TIỆN ÍCH ============ */
+/* TIỆN ÍCH */
 function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 function pickRandom(arr,n){ return shuffle([...arr]).slice(0,n); }
 
+/* Chuyển đổi giữa Chế độ Thi và Chế độ Học */
+function switchMode(mode){
+  appMode = mode;
+  document.getElementById('tabExam').classList.toggle('active', mode === 'exam');
+  document.getElementById('tabStudy').classList.toggle('active', mode === 'study');
+
+  document.getElementById('examPanel').classList.toggle('hidden', mode !== 'exam');
+  document.getElementById('studyPanel').classList.toggle('hidden', mode !== 'study');
+
+  if(mode === 'study'){
+    renderStudyGrid();
+  }
+}
+
+/* Render danh sách các phần học */
+function renderStudyGrid(){
+  const grid = document.getElementById('studyGrid');
+  const total = BANK.length;
+  let html = '';
+
+  STUDY_PARTS_META.forEach((meta, idx)=>{
+    const startNum = idx * 50 + 1;
+    const endNum = Math.min((idx + 1) * 50, total);
+    const count = endNum - startNum + 1;
+
+    html += `<div class="study-card" onclick="startStudyPart(${idx})">
+      <div class="study-card-body">
+        <h4>${meta.title} (${count} câu: #${startNum} - #${endNum})</h4>
+        <p>${meta.desc}</p>
+      </div>
+      <button class="study-card-btn">Vào học ngay ➔</button>
+    </div>`;
+  });
+
+  grid.innerHTML = html;
+}
+
+/* TẠO ĐỀ THI SÁT HẠCH (60 CÂU CÓ XÁO TRỘN) */
 function buildNewExam(){
   const selected = [];
   ['CM','CH','D','P'].forEach(cat=>{
@@ -896,6 +950,26 @@ function buildNewExam(){
     return { cat:item.cat, q:item.q, opts, correct: opts.findIndex(x=>x.ok) };
   });
 }
+
+/* TẠO PHẦN HỌC TẬP (50 CÂU TUẦN TỰ, KHÔNG XÁO TRỘN) */
+function buildStudyPart(partIdx){
+  const start = partIdx * 50;
+  const end = Math.min((partIdx + 1) * 50, BANK.length);
+  const sliced = BANK.slice(start, end);
+
+  return sliced.map((item, idx)=>{
+    // Giữ nguyên thứ tự câu hỏi và thứ tự các đáp án A, B, C, D
+    const opts = item.o.map((txt, i)=>({ txt, ok: i === item.c }));
+    return {
+      cat: item.cat,
+      q: item.q,
+      opts,
+      correct: item.c,
+      rawSeq: start + idx + 1 // Số thứ tự gốc
+    };
+  });
+}
+
 function toast(msg){
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
@@ -903,7 +977,7 @@ function toast(msg){
   t._tid = setTimeout(()=>t.classList.remove('show'), 2200);
 }
 
-/* ============ MASCOT ============ */
+/* MASCOT */
 const MASCOT_HAPPY = ['Giỏi lắm! 🎉','Xuất sắc! 🌟','Đúng rồi! 💯','Tuyệt vời! 👏','Chuẩn luôn! ✨','Bạn giỏi quá! 🏆'];
 const MASCOT_SAD   = ['Cố lên nào... 😢','Sai mất rồi!','Đừng nản nhé!','Lần sau nhớ kỹ hơn!','Tiếc quá...','Bình tĩnh ôn lại nhé!'];
 
@@ -953,10 +1027,10 @@ function burstConfetti(){
   setTimeout(()=>{ cont.innerHTML = ''; }, 1500);
 }
 
-/* ============ ĐIỀU HƯỚNG ============ */
+/* ĐIỀU HƯỚNG VỀ TRANG CHỦ */
 function goHome(){
   if(!submitted && quiz.length && answers.some(a=>a!==null)){
-    showModal('Về trang chủ?', 'Bài làm hiện tại sẽ bị huỷ. Bạn có chắc chắn?', 'Về trang chủ', ()=> resetToHome());
+    showModal('Về trang chủ?', 'Nội dung làm bài hiện tại sẽ bị huỷ. Bạn có chắc chắn?', 'Về trang chủ', ()=> resetToHome());
     return;
   }
   resetToHome();
@@ -967,28 +1041,77 @@ function resetToHome(){
   document.getElementById('quizScreen').classList.add('hidden');
   document.getElementById('resultScreen').style.display = 'none';
   document.getElementById('paletteCard').classList.add('hidden');
+  document.getElementById('pillMode').style.display = 'none';
+  document.getElementById('timer').style.display = 'inline-block';
   document.getElementById('timer').textContent = '45:00';
   document.getElementById('timer').classList.remove('danger');
+  document.getElementById('headerTitle').textContent = 'BÀI THI TRẮC NGHIỆM AN TOÀN';
+  document.getElementById('headerSub').textContent = 'Nhiệt điện Mông Dương · 60 câu · 45 phút · Kỹ sư Bảo đồng hành';
   renderHistory();
   window.scrollTo({ top:0, behavior:'smooth' });
 }
 
-/* ============ BẮT ĐẦU ============ */
+/* BẮT ĐẦU CHẾ ĐỘ THI */
 function startQuiz(){
+  appMode = 'exam';
   quiz = buildNewExam();
   answers = new Array(quiz.length).fill(null);
   current = 0; submitted = false;
 
+  initQuizUI();
+  document.getElementById('pillMode').style.display = 'none';
+  document.getElementById('timer').style.display = 'inline-block';
+  document.getElementById('btnRevealAll').style.display = 'none';
+  document.getElementById('btnNextPart').style.display = 'none';
+  document.getElementById('modalNextPartBtn').style.display = 'none';
+  document.getElementById('btnFinish').textContent = 'Nộp bài';
+  document.getElementById('btnRetry').textContent = '🔄 Tạo đề thi mới';
+
+  document.getElementById('headerTitle').textContent = 'THI SÁT HẠCH AN TOÀN BẬC 3';
+  document.getElementById('headerSub').textContent = '60 câu hỏi ngẫu nhiên · 45 phút đếm ngược';
+
+  startTimer();
+  toast('Đã tạo đề mới 60 câu — 45 phút!');
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+/* BẮT ĐẦU CHẾ ĐỘ HỌC TẬP */
+function startStudyPart(partIdx){
+  appMode = 'study';
+  currentStudyPart = partIdx;
+  quiz = buildStudyPart(partIdx);
+  answers = new Array(quiz.length).fill(null);
+  current = 0; submitted = false;
+  clearInterval(timerId);
+
+  initQuizUI();
+  document.getElementById('timer').style.display = 'none';
+  document.getElementById('pillMode').style.display = 'inline-block';
+  document.getElementById('pillMode').textContent = `📚 Học: Phần ${partIdx + 1} (${quiz.length} câu)`;
+  document.getElementById('btnRevealAll').style.display = 'inline-block';
+  document.getElementById('btnNextPart').style.display = partIdx < 3 ? 'inline-block' : 'none';
+  document.getElementById('modalNextPartBtn').style.display = partIdx < 3 ? 'inline-block' : 'none';
+  document.getElementById('btnFinish').textContent = 'Hoàn thành phần học';
+  document.getElementById('btnRetry').textContent = '🔄 Học lại phần này';
+
+  document.getElementById('headerTitle').textContent = `HỌC TẬP AN TOÀN: PHẦN ${partIdx + 1}`;
+  document.getElementById('headerSub').textContent = `${STUDY_PARTS_META[partIdx].title} (Không giới hạn thời gian)`;
+
+  toast(`Đang học Phần ${partIdx + 1}: ${quiz.length} câu tuần tự!`);
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+function initQuizUI(){
   document.getElementById('startScreen').classList.add('hidden');
   document.getElementById('quizScreen').classList.remove('hidden');
   document.getElementById('resultScreen').style.display = 'none';
   document.getElementById('paletteCard').classList.remove('hidden');
 
+  document.getElementById('totalNum').textContent = quiz.length;
+  document.getElementById('totalNumDone').textContent = quiz.length;
+
   buildPalette();
   renderQuestion();
-  startTimer();
-  toast('Đã tạo đề mới 60 câu — 45 phút!');
-  window.scrollTo({ top:0, behavior:'smooth' });
 }
 
 function startTimer(){
@@ -1004,11 +1127,10 @@ function paintTimer(){
   const m = Math.floor(timeLeft/60), s = timeLeft % 60;
   const el = document.getElementById('timer');
   el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-  /* Cảnh báo đỏ khi còn ≤ 5 phút */
   el.classList.toggle('danger', timeLeft <= 300);
 }
 
-/* ============ PALETTE ============ */
+/* PALETTE */
 function buildPalette(){
   const p = document.getElementById('palette');
   p.innerHTML = '';
@@ -1017,7 +1139,7 @@ function buildPalette(){
     b.className = 'pbtn';
     b.dataset.cat = item.cat;
     b.textContent = i+1;
-    b.title = `Câu ${i+1} · ${CAT_NAME[item.cat]}`;
+    b.title = `Câu ${i+1} · ${CAT_NAME[item.cat]}${item.rawSeq ? ` (Gốc: #${item.rawSeq})` : ''}`;
     b.onclick = ()=> gotoQ(i);
     p.appendChild(b);
   });
@@ -1040,7 +1162,7 @@ function refreshPalette(){
   document.getElementById('sumRemain').textContent = remain;
 }
 
-/* ============ CÂU HỎI ============ */
+/* CÂU HỎI */
 function renderQuestion(){
   const item = quiz[current];
   document.getElementById('curNum').textContent = current + 1;
@@ -1050,6 +1172,14 @@ function renderQuestion(){
   const badge = document.getElementById('catBadge');
   badge.textContent = CAT_NAME[item.cat];
   badge.className = 'badge ' + CAT_CLASS[item.cat];
+
+  const seq = document.getElementById('seqBadge');
+  if(item.rawSeq){
+    seq.style.display = 'inline-block';
+    seq.textContent = `Gốc: #${item.rawSeq}`;
+  } else {
+    seq.style.display = 'none';
+  }
 
   const box = document.getElementById('optBox');
   box.innerHTML = '';
@@ -1086,7 +1216,7 @@ function renderQuestion(){
     div.className = 'feedback ' + (isRight ? 'ok' : 'no');
     div.innerHTML = `
       <span class="icon">${isRight ? '✅' : '❌'}</span>
-      <span>${isRight ? 'Chính xác! Bạn chọn đúng.' : `Sai rồi! Đáp án đúng là <b>${KEYS[item.correct]}. ${item.opts[item.correct].txt}</b>`}</span>
+      <span>${isRight ? 'Chính xác! Bạn chọn đúng.' : `Sai rồi! Đáp án đúng là <b>${KEYS[item.correct]}. ${escapeHtml(item.opts[item.correct].txt)}</b>`}</span>
       ${!isLast ? '<button class="next-inline" onclick="go(1)">Câu tiếp theo →</button>' : ''}
     `;
     fb.appendChild(div);
@@ -1105,6 +1235,10 @@ function renderQuestion(){
   document.getElementById('btnPrev').disabled = current === 0;
   document.getElementById('btnNext').disabled = current === quiz.length - 1;
   refreshPalette();
+}
+
+function escapeHtml(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
 function pick(i){
@@ -1128,7 +1262,25 @@ function gotoQ(i){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
-/* ============ MODAL ============ */
+/* Mở toàn bộ đáp án khi học tập */
+function revealAll(){
+  quiz.forEach((item, idx)=>{
+    if(answers[idx] === null){
+      answers[idx] = item.correct; // Đặt sẵn đáp án đúng
+    }
+  });
+  renderQuestion();
+  toast('Đã mở toàn bộ đáp án chuẩn của phần học!');
+}
+
+function goNextPart(){
+  closeModal();
+  if(currentStudyPart < 3){
+    startStudyPart(currentStudyPart + 1);
+  }
+}
+
+/* MODAL */
 function showModal(title, text, okLabel, onOk){
   document.getElementById('mTitle').textContent = title;
   document.getElementById('mText').textContent = text;
@@ -1139,13 +1291,14 @@ function showModal(title, text, okLabel, onOk){
 }
 function closeModal(){ document.getElementById('overlay').classList.remove('show'); }
 
-/* ============ NỘP BÀI ============ */
+/* NỘP BÀI */
 function askSubmit(){
   const left = quiz.length - answers.filter(a=>a!==null).length;
+  const label = appMode === 'study' ? 'Hoàn thành' : 'Nộp bài';
   if(left > 0){
-    showModal('Còn câu chưa trả lời!', `Bạn còn ${left} câu chưa trả lời. Vẫn muốn nộp bài?`, 'Vẫn nộp bài', ()=> finish(false));
+    showModal('Còn câu chưa trả lời!', `Bạn còn ${left} câu chưa chọn đáp án. Vẫn muốn hoàn thành?`, 'Vẫn nộp', ()=> finish(false));
   } else {
-    showModal('Nộp bài?', `Bạn đã trả lời đầy đủ ${quiz.length}/${quiz.length} câu. Xác nhận nộp bài?`, 'Nộp bài', ()=> finish(false));
+    showModal('Xác nhận hoàn thành?', `Bạn đã trả lời đầy đủ ${quiz.length}/${quiz.length} câu.`, label, ()=> finish(false));
   }
 }
 
@@ -1172,11 +1325,24 @@ function finish(auto){
   ring.style.background = `conic-gradient(${col} 0% ${pct}%, #e6ecf7 ${pct}% 100%)`;
   document.getElementById('scoreNum').textContent = correct;
   document.getElementById('scoreNum').style.color = col;
-  document.getElementById('verdict').textContent = pass ? '✅ ĐẠT YÊU CẦU' : '❌ CHƯA ĐẠT';
+  document.getElementById('scoreLbl').textContent = `/ ${quiz.length} câu`;
+  
+  if(appMode === 'study'){
+    document.getElementById('verdict').textContent = pass ? '🎉 HOÀN THÀNH PHẦN HỌC' : '📖 CẦN ÔN LẠI PHẦN NÀY';
+    document.getElementById('subVerdict').textContent = `Kết quả: ${correct}/${quiz.length} câu (${pct}%) – Phần ${currentStudyPart + 1}: ${STUDY_PARTS_META[currentStudyPart].title}`;
+    document.getElementById('modalNextPartBtn').style.display = currentStudyPart < 3 ? 'inline-block' : 'none';
+  } else {
+    document.getElementById('verdict').textContent = pass ? '✅ ĐẠT YÊU CẦU SÁT HẠCH' : '❌ CHƯA ĐẠT YÊU CẦU';
+    document.getElementById('subVerdict').textContent = auto
+      ? `Hết thời gian 45 phút. Kết quả: ${correct}/${quiz.length} câu (${pct}%) – Cần đạt tối thiểu 70%.`
+      : `Kết quả: ${correct}/${quiz.length} câu đúng (${pct}%) – Cần đạt tối thiểu 70%.`;
+    document.getElementById('modalNextPartBtn').style.display = 'none';
+
+    history.unshift({ time: new Date().toLocaleString('vi-VN'), correct, total: quiz.length, pct, pass });
+    history = history.slice(0, 5);
+    localStorage.setItem('quizHistory60_at', JSON.stringify(history));
+  }
   document.getElementById('verdict').style.color = col;
-  document.getElementById('subVerdict').textContent = auto
-    ? `Hết thời gian. Kết quả: ${correct}/${quiz.length} câu (${pct}%) – Cần đạt tối thiểu 70%.`
-    : `Kết quả: ${correct}/${quiz.length} câu đúng (${pct}%) – Cần đạt tối thiểu 70%.`;
 
   const cs = document.getElementById('catStats');
   cs.innerHTML = '';
@@ -1195,10 +1361,6 @@ function finish(auto){
   document.getElementById('reviewBox').classList.add('hidden');
   document.getElementById('revBtn').textContent = 'Xem chi tiết bài làm';
 
-  history.unshift({ time: new Date().toLocaleString('vi-VN'), correct, total: quiz.length, pct, pass });
-  history = history.slice(0, 5);
-  localStorage.setItem('quizHistory60', JSON.stringify(history));
-
   window.scrollTo({ top:0, behavior:'smooth' });
 }
 
@@ -1212,7 +1374,7 @@ function buildReview(){
     d.className = 'rev-item ' + (isRight ? 'right' : 'wrong');
     const head = document.createElement('div');
     head.className = 'rev-q';
-    head.textContent = `Câu ${i+1} [${CAT_NAME[item.cat]}]: ${item.q}`;
+    head.textContent = `Câu ${i+1}${item.rawSeq ? ` [Gốc: #${item.rawSeq}]` : ''} [${CAT_NAME[item.cat]}]: ${item.q}`;
     d.appendChild(head);
     if(ua === null){
       const n = document.createElement('div');
@@ -1240,7 +1402,7 @@ function toggleReview(){
   btn.textContent = hidden ? 'Xem chi tiết bài làm' : 'Ẩn chi tiết bài làm';
 }
 
-/* ============ LỊCH SỬ ============ */
+/* LỊCH SỬ */
 function renderHistory(){
   const box = document.getElementById('historyBox');
   const list = document.getElementById('historyList');
@@ -1249,13 +1411,12 @@ function renderHistory(){
   list.innerHTML = history.map((h,i)=>
     `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed var(--border);">
       <span>Lần ${history.length - i} · ${h.time}</span>
-      <span><b style="color:var(--text)">${h.correct}/${h.total}</b> (${h.pct}%) ${h.pass ? '✅' : '❌'}</span>
+      <span><b style="color:var(--text)">${h.correct}/${h.total}</b> (${h.pct}%) ${h.pass ? '✅ Đạt' : '❌ Chưa đạt'}</span>
     </div>`
   ).join('');
 }
 
-/* ============ KHỞI TẠO ============ */
-document.getElementById('bankSize').textContent = BANK.length;
+/* KHỞI TẠO */
 renderHistory();
 
 document.addEventListener('keydown', e=>{
