@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Thi trắc nghiệm – Tuabin, TB phụ, VHDN & QTNV</title>
+<title>Ôn Luyện & Thi Trắc Nghiệm – Tuabin, TB phụ, VHDN & QTNV</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{
@@ -14,15 +14,30 @@ body{
 .wrap{max-width:960px;margin:0 auto;padding:16px}
 
 #startScreen{
-  background:#fff;border-radius:20px;padding:42px 32px;text-align:center;
-  box-shadow:0 20px 60px rgba(0,0,0,.35);margin-top:30px;
+  background:#fff;border-radius:20px;padding:36px 30px;text-align:center;
+  box-shadow:0 20px 60px rgba(0,0,0,.35);margin-top:20px;
 }
-#startScreen h1{font-size:2rem;color:#1e3c72;margin-bottom:12px}
-#startScreen .sub{color:#5a6c8e;font-size:1.05rem;margin-bottom:8px}
+#startScreen h1{font-size:1.9rem;color:#1e3c72;margin-bottom:8px}
+#startScreen .sub{color:#5a6c8e;font-size:1.02rem;margin-bottom:18px}
 
-.role-select{margin:22px 0 6px;text-align:left}
+/* Tab chuyển chế độ Học tập / Thi sát hạch */
+.mode-nav{
+  display:flex;justify-content:center;gap:12px;margin-bottom:24px;
+}
+.mode-tab{
+  flex:1;max-width:280px;padding:12px 16px;border-radius:14px;
+  border:2px solid #cbd5e1;background:#f8faff;font-size:.95rem;
+  font-weight:800;color:#475569;cursor:pointer;transition:.2s;
+}
+.mode-tab:hover{border-color:#93c5fd;background:#f0f7ff}
+.mode-tab.active{
+  border-color:#2a5298;background:#2a5298;color:#fff;
+  box-shadow:0 6px 18px rgba(42,82,152,.35);
+}
+
+.role-select{margin:18px 0 6px;text-align:left}
 .role-select h3{
-  font-size:1.05rem;color:#1e3c72;margin-bottom:14px;text-align:center;
+  font-size:1.02rem;color:#1e3c72;margin-bottom:12px;text-align:center;
   font-weight:800;
 }
 .role-select h3 .req{color:#dc2626;font-size:.85rem;font-weight:600;margin-left:4px}
@@ -32,7 +47,7 @@ body{
 }
 .role-card{
   background:#f8faff;border:3px solid #e2e8f0;border-radius:16px;
-  padding:22px 16px;text-align:center;cursor:pointer;transition:.2s;
+  padding:18px 16px;text-align:center;cursor:pointer;transition:.2s;
   position:relative;user-select:none;
 }
 .role-card:hover{border-color:#9db4e0;transform:translateY(-3px);box-shadow:0 8px 20px rgba(30,60,114,.15)}
@@ -47,20 +62,47 @@ body{
   display:flex;align-items:center;justify-content:center;
   font-weight:800;font-size:.95rem;
 }
-.role-icon{font-size:2.2rem;margin-bottom:6px;line-height:1}
-.role-name{font-size:1.12rem;font-weight:800;color:#1e3c72;margin-bottom:5px}
-.role-desc{font-size:.8rem;color:#6b7a99;line-height:1.5}
+.role-icon{font-size:2rem;margin-bottom:4px;line-height:1}
+.role-name{font-size:1.1rem;font-weight:800;color:#1e3c72;margin-bottom:4px}
+.role-desc{font-size:.8rem;color:#6b7a99;line-height:1.4}
+
+/* Khối học tập theo phần */
+#studyPanel{
+  margin-top:22px;text-align:left;display:none;
+}
+.study-title{
+  font-size:1rem;color:#1e3c72;font-weight:800;margin-bottom:10px;text-align:center;
+}
+.study-grid{
+  display:grid;grid-template-columns:1fr;gap:10px;max-width:760px;margin:0 auto;
+}
+.study-card{
+  background:#fff;border:2px solid #e2e8f0;border-left:6px solid #2a5298;
+  border-radius:12px;padding:14px 18px;display:flex;align-items:center;
+  justify-content:space-between;gap:12px;cursor:pointer;transition:.2s;
+}
+.study-card:hover{
+  border-color:#2a5298;transform:translateX(4px);box-shadow:0 4px 14px rgba(42,82,152,.15);
+}
+.study-info h4{font-size:.95rem;color:#1e3c72;margin-bottom:4px}
+.study-info p{font-size:.8rem;color:#64748b;line-height:1.4}
+.study-btn{
+  background:#e8eeff;color:#2a5298;font-weight:800;font-size:.82rem;
+  padding:8px 16px;border-radius:20px;border:none;white-space:nowrap;
+}
+.study-card:hover .study-btn{background:#2a5298;color:#fff}
 
 .info-box{
   background:#f0f4ff;border-left:5px solid #2a5298;border-radius:12px;
-  padding:18px 22px;text-align:left;margin:22px 0 24px;font-size:.92rem;
-  line-height:1.85;color:#2c3e6b;
+  padding:16px 20px;text-align:left;margin:18px 0 20px;font-size:.92rem;
+  line-height:1.8;color:#2c3e6b;
 }
 .info-box b{color:#1e3c72}
 .info-box .hl{background:#fff4e0;padding:1px 6px;border-radius:5px;color:#a16207;font-weight:700}
 .info-box .hl2{background:#e3f9e5;padding:1px 6px;border-radius:5px;color:#1a7f37;font-weight:700}
+
 .btn{
-  border:none;border-radius:12px;padding:14px 40px;font-size:1.05rem;font-weight:700;
+  border:none;border-radius:12px;padding:13px 36px;font-size:1.02rem;font-weight:700;
   cursor:pointer;transition:.2s;letter-spacing:.3px;
 }
 .btn:disabled{
@@ -73,36 +115,31 @@ body{
 .btn-danger:hover{transform:translateY(-2px)}
 .btn-ghost{background:#eef2fa;color:#2a5298;border:2px solid #cdd9ee}
 .btn-ghost:hover{background:#dde7f8}
+.btn-study{background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:#fff;box-shadow:0 4px 14px rgba(109,40,217,.35)}
+.btn-study:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(109,40,217,.45)}
 .btn-home{background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;box-shadow:0 4px 12px rgba(22,163,74,.35);position:relative;z-index:1}
 .btn-home:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(22,163,74,.5)}
-/* Nút home trong modal luôn nổi trên overlay */
 #resultBox .btn-home{position:relative;z-index:10}
 
-/* ============ LỊCH SỬ THI ============ */
+/* Lịch sử thi */
 #historySection{
-  margin-top:26px;padding:20px 22px;border-radius:14px;
+  margin-top:24px;padding:18px 20px;border-radius:14px;
   background:#f8faff;border:2px solid #e2e8f0;text-align:left;
 }
 #historySection h3{
-  font-size:1rem;color:#1e3c72;margin-bottom:6px;
+  font-size:.95rem;color:#1e3c72;margin-bottom:6px;
   display:flex;align-items:center;justify-content:space-between;gap:8px;
 }
 #historySection h3 .cnt{
   background:#e8eeff;color:#3b5bb5;font-size:.72rem;font-weight:700;
   padding:3px 10px;border-radius:99px;
 }
-#historySection .hint{
-  font-size:.8rem;color:#6b7a99;margin-bottom:14px;
-}
-.hist-empty{
-  text-align:center;padding:20px 10px;color:#8899b5;font-size:.88rem;
-  font-style:italic;
-}
+#historySection .hint{font-size:.78rem;color:#6b7a99;margin-bottom:12px}
+.hist-empty{text-align:center;padding:16px 10px;color:#8899b5;font-size:.85rem;font-style:italic}
 .hist-item{
-  display:flex;align-items:center;gap:12px;padding:11px 14px;
+  display:flex;align-items:center;gap:12px;padding:10px 14px;
   background:#fff;border-radius:11px;margin-bottom:8px;
-  border-left:5px solid #94a3b8;
-  transition:.15s;
+  border-left:5px solid #94a3b8;transition:.15s;
 }
 .hist-item:hover{transform:translateX(3px);box-shadow:0 4px 12px rgba(30,60,114,.1)}
 .hist-item.pass{border-left-color:#16a34a;}
@@ -123,55 +160,80 @@ body{
   background:#e8eeff;color:#3b5bb5;font-size:.7rem;
   padding:2px 8px;border-radius:99px;font-weight:800;
 }
-.hist-line1 .score{
-  font-size:1rem;color:#2a5298;
-}
+.hist-line1 .score{font-size:1rem;color:#2a5298;}
 .hist-item.pass .hist-line1 .score{color:#16a34a;}
 .hist-item.fail .hist-line1 .score{color:#dc2626;}
-.hist-line2{
-  display:flex;flex-wrap:wrap;gap:12px;
-  font-size:.76rem;color:#6b7a99;font-weight:600;
-}
-.hist-line2 .cat-detail{
-  display:inline-flex;gap:4px;
-}
+.hist-line2{display:flex;flex-wrap:wrap;gap:12px;font-size:.75rem;color:#6b7a99;font-weight:600}
+.hist-line2 .cat-detail{display:inline-flex;gap:4px;}
 .hist-line2 b{color:#41526b;}
-.hist-time{
-  font-size:.72rem;color:#94a3b8;font-weight:600;
-  white-space:nowrap;text-align:right;
-}
+.hist-time{font-size:.72rem;color:#94a3b8;font-weight:600;white-space:nowrap;text-align:right}
 #clearHistBtn{
-  background:none;border:none;color:#dc2626;font-size:.78rem;
-  font-weight:700;cursor:pointer;padding:4px 10px;border-radius:6px;
+  background:none;border:none;color:#dc2626;font-size:.76rem;
+  font-weight:700;cursor:pointer;padding:4px 8px;border-radius:6px;
   font-family:inherit;transition:.15s;
 }
 #clearHistBtn:hover{background:#fee;}
 
+/* Topbar */
 #topbar{
   position:sticky;top:0;z-index:50;background:rgba(255,255,255,.97);
   backdrop-filter:blur(8px);border-radius:0 0 16px 16px;
-  box-shadow:0 4px 20px rgba(0,0,0,.18);padding:12px 20px;margin-bottom:18px;
-  display:none;align-items:center;gap:12px;flex-wrap:wrap;
+  box-shadow:0 4px 20px rgba(0,0,0,.18);padding:10px 18px;margin-bottom:16px;
+  display:none;align-items:center;gap:10px;flex-wrap:wrap;
 }
-#topbar .title{font-weight:800;color:#1e3c72;font-size:.95rem;flex:1;min-width:180px}
+#topbar .title{font-weight:800;color:#1e3c72;font-size:.92rem;flex:1;min-width:170px}
 .pill{
-  background:#eef2fa;border-radius:20px;padding:6px 14px;font-size:.85rem;
+  background:#eef2fa;border-radius:20px;padding:6px 12px;font-size:.83rem;
   font-weight:700;color:#2a5298;white-space:nowrap;
 }
 .pill.good{background:#e3f9e5;color:#1a7f37}
 .pill.bad{background:#fde8e8;color:#b91c1c}
 .pill.role{background:linear-gradient(135deg,#f0fdf4,#dcfce7);color:#15803d;border:1.5px solid #86efac}
+.pill.study{background:#f3e8ff;color:#6d28d9;border:1.5px solid #d8b4fe}
+
+.pill.timer{
+  background:#eff6ff;color:#1e40af;border:1.5px solid #93c5fd;
+  font-variant-numeric:tabular-nums;font-weight:900;letter-spacing:.5px;
+}
+.pill.timer.warning{background:#fffbeb;color:#b45309;border-color:#fcd34d;}
+.pill.timer.urgent{
+  background:#fef2f2;color:#b91c1c;border-color:#fca5a5;
+  animation:timerPulse 1s infinite alternate;
+}
+@keyframes timerPulse{
+  from{transform:scale(1);box-shadow:0 0 0 rgba(220,38,38,0)}
+  to{transform:scale(1.05);box-shadow:0 0 10px rgba(220,38,38,.4)}
+}
+
+/* Bộ lọc câu hỏi */
+#examFilterBar{
+  display:none;background:#fff;border-radius:14px;padding:10px 16px;
+  margin-bottom:14px;align-items:center;gap:10px;flex-wrap:wrap;
+  box-shadow:0 4px 16px rgba(0,0,0,.1);border-left:5px solid #2a5298;
+}
+#examFilterBar .filter-title{font-size:.88rem;font-weight:800;color:#1e3c72}
+
+.filter-group{display:flex;gap:8px;flex-wrap:wrap}
+.filter-btn{
+  background:#f1f5f9;border:1.5px solid #cbd5e1;color:#475569;
+  padding:5px 12px;border-radius:20px;font-size:.8rem;font-weight:700;
+  cursor:pointer;transition:.15s;font-family:inherit;
+}
+.filter-btn:hover{background:#e2e8f0;border-color:#94a3b8}
+.filter-btn.active{background:#2a5298;color:#fff;border-color:#1e3c72}
+.filter-btn.fail.active{background:#dc2626;color:#fff;border-color:#991b1b}
+.filter-btn.pass.active{background:#16a34a;color:#fff;border-color:#15803d}
 
 #examArea{display:none;padding-bottom:130px}
 .q-card{
-  background:#fff;border-radius:16px;padding:20px 22px;margin-bottom:16px;
+  background:#fff;border-radius:16px;padding:18px 20px;margin-bottom:14px;
   box-shadow:0 4px 16px rgba(0,0,0,.12);border-left:6px solid #2a5298;
   animation:fadeIn .3s ease;
 }
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 .q-card.cat-vhdn{border-left-color:#d97706}
 .q-card.cat-qtnv{border-left-color:#16a34a}
-.q-head{display:flex;align-items:flex-start;gap:12px;margin-bottom:6px;flex-wrap:wrap}
+.q-head{display:flex;align-items:flex-start;gap:10px;margin-bottom:6px;flex-wrap:wrap}
 .q-num{
   background:#2a5298;color:#fff;font-weight:800;font-size:.8rem;
   border-radius:8px;padding:4px 10px;white-space:nowrap;
@@ -186,6 +248,7 @@ body{
 .badge.cat.vhdn{background:#fff4e0;color:#a16207}
 .badge.cat.qtnv{background:#e3f9e5;color:#1a7f37}
 .badge.multi{background:#f3e8ff;color:#7c3aed}
+.badge.seq{background:#f1f5f9;color:#475569;font-variant-numeric:tabular-nums}
 .q-text{font-size:1rem;line-height:1.6;color:#1a1a2e;font-weight:600;margin:8px 0 14px;white-space:pre-line}
 
 .opt{
@@ -220,58 +283,65 @@ body{
 #bottombar{
   position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.98);
   backdrop-filter:blur(10px);box-shadow:0 -4px 24px rgba(0,0,0,.2);
-  padding:14px 20px;display:none;justify-content:center;gap:12px;
+  padding:12px 18px;display:none;justify-content:center;gap:10px;
   border-radius:20px 20px 0 0;z-index:60;flex-wrap:wrap;align-items:center;
 }
-#bottombar .stat{font-weight:800;color:#1e3c72;font-size:.95rem;display:flex;align-items:center;gap:8px}
+#bottombar .stat{font-weight:800;color:#1e3c72;font-size:.92rem;display:flex;align-items:center;gap:6px}
 
 #overlay{
   position:fixed;inset:0;background:rgba(10,20,40,.75);backdrop-filter:blur(4px);
   display:none;align-items:center;justify-content:center;z-index:100;padding:20px;
 }
 #resultBox{
-  background:#fff;border-radius:22px;max-width:640px;width:100%;max-height:88vh;
-  overflow-y:auto;padding:36px 32px;text-align:center;
+  background:#fff;border-radius:22px;max-width:680px;width:100%;max-height:88vh;
+  overflow-y:auto;padding:34px 30px;text-align:center;
   box-shadow:0 30px 80px rgba(0,0,0,.5);animation:pop .3s ease;
 }
 @keyframes pop{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
-#resultBox h2{font-size:1.5rem;color:#1e3c72;margin-bottom:6px}
+#resultBox h2{font-size:1.45rem;color:#1e3c72;margin-bottom:6px}
 .big-score{
-  font-size:3.4rem;font-weight:900;margin:14px 0 4px;
+  font-size:3.2rem;font-weight:900;margin:12px 0 4px;
   background:linear-gradient(135deg,#2a5298,#1e3c72);
   -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
 }
-.score-sub{color:#6b7a99;font-size:.92rem;margin-bottom:18px;line-height:1.6}
+.score-sub{color:#6b7a99;font-size:.9rem;margin-bottom:16px;line-height:1.6}
 .score-sub .sep{color:#cbd5e1;margin:0 4px}
-.res-grid{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:20px}
-.res-item{background:#f4f7ff;border-radius:14px;padding:14px 22px;min-width:110px}
-.res-item .n{font-size:1.6rem;font-weight:900}
-.res-item .l{font-size:.78rem;color:#6b7a99;font-weight:700;margin-top:2px}
+.res-grid{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:18px}
+.res-item{background:#f4f7ff;border-radius:14px;padding:12px 20px;min-width:105px}
+.res-item .n{font-size:1.55rem;font-weight:900}
+.res-item .l{font-size:.76rem;color:#6b7a99;font-weight:700;margin-top:2px}
 .res-item.ok .n{color:#1a7f37}
 .res-item.no .n{color:#b91c1c}
 .res-item.sk .n{color:#a16207}
-.grade{font-size:1.1rem;font-weight:800;margin-bottom:22px}
-#reviewList{text-align:left;margin-top:10px;border-top:2px dashed #e2e8f0;padding-top:18px}
-#reviewList h3{font-size:1rem;color:#1e3c72;margin-bottom:12px}
-.rev-item{background:#fafbfe;border-radius:10px;padding:12px 14px;margin-bottom:9px;font-size:.86rem;line-height:1.6;border-left:4px solid #dc2626}
-.rev-item .rq{font-weight:700;color:#1a1a2e;margin-bottom:5px}
+.grade{font-size:1.05rem;font-weight:800;margin-bottom:20px}
+
+#reviewSection{text-align:left;margin-top:16px;border-top:2px dashed #e2e8f0;padding-top:16px}
+#reviewSection h3{font-size:1rem;color:#1e3c72;margin-bottom:10px}
+.rev-filter-wrap{
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:8px;margin-bottom:12px;
+}
+.rev-item{background:#fafbfe;border-radius:10px;padding:11px 13px;margin-bottom:8px;font-size:.85rem;line-height:1.6;border-left:4px solid #dc2626}
+.rev-item.is-right{border-left-color:#16a34a}
+.rev-item.is-skip{border-left-color:#d97706}
+.rev-item .rq{font-weight:700;color:#1a1a2e;margin-bottom:4px}
 .rev-item .ra{color:#1a7f37;font-weight:700}
 .rev-item .rb{color:#b91c1c;font-weight:700}
+.rev-item .rsk{color:#d97706;font-weight:700}
 
-/* ============ MASCOT ============ */
+/* Mascot */
 .mascot-wrap{
-  position:fixed;right:20px;bottom:100px;z-index:80;
+  position:fixed;right:20px;bottom:90px;z-index:80;
   display:flex;flex-direction:column;align-items:center;
   pointer-events:none;user-select:none;
 }
 .mascot-bubble{
   background:#fff;border:2px solid #cdd9ee;
-  padding:7px 13px;border-radius:12px;font-size:.8rem;font-weight:700;
+  padding:6px 12px;border-radius:12px;font-size:.78rem;font-weight:700;
   color:#1e3c72;white-space:nowrap;margin-bottom:8px;
   opacity:0;transform:translateY(8px) scale(.85);
   transition:.28s cubic-bezier(.34,1.56,.64,1);
-  box-shadow:0 6px 18px rgba(30,60,114,.18);
-  position:relative;
+  box-shadow:0 6px 18px rgba(30,60,114,.18);position:relative;
 }
 .mascot-bubble.show{opacity:1;transform:translateY(0) scale(1);}
 .mascot-bubble::after{
@@ -285,17 +355,16 @@ body{
 .mascot-bubble.sad::after{background:#fde8e8;border-color:#fca5a5;}
 
 .mascot-stage{
-  position:relative;width:120px;height:150px;
+  position:relative;width:110px;height:140px;
   display:flex;align-items:flex-end;justify-content:center;
 }
 .mascot-shadow{
   position:absolute;bottom:0;left:50%;transform:translateX(-50%);
-  width:70px;height:11px;border-radius:50%;
-  background:radial-gradient(ellipse,rgba(0,0,0,.35),transparent 70%);
-  transition:.3s;
+  width:65px;height:10px;border-radius:50%;
+  background:radial-gradient(ellipse,rgba(0,0,0,.35),transparent 70%);transition:.3s;
 }
 .mascot{
-  position:relative;width:110px;height:145px;
+  position:relative;width:105px;height:138px;
   transform-origin:50% 96%;
   animation:mascotIdle 2.6s ease-in-out infinite;
   filter:drop-shadow(0 6px 12px rgba(0,0,0,.25));
@@ -320,58 +389,46 @@ body{
 .mascot.wrong .arm-right{transform:rotate(-20deg);}
 .mascot .leg-left,.mascot .leg-right{transform-origin:50% 0;transition:transform .3s;}
 
-/* Nhảy tung hoa */
-.mascot.correct{
-  animation:mascotJump 1s cubic-bezier(.28,.84,.42,1) 1;
-}
+.mascot.correct{animation:mascotJump 1s cubic-bezier(.28,.84,.42,1) 1;}
 @keyframes mascotJump{
-  0%   {transform:translateY(0) rotate(0) scale(1);}
-  15%  {transform:translateY(4px) rotate(0) scale(1.05,.94);}
-  32%  {transform:translateY(-42px) rotate(-10deg) scale(.94,1.08);}
-  52%  {transform:translateY(-60px) rotate(10deg) scale(1);}
-  70%  {transform:translateY(-34px) rotate(-6deg) scale(1.03,.97);}
-  86%  {transform:translateY(-8px) rotate(4deg) scale(1.05,.95);}
-  100% {transform:translateY(0) rotate(0) scale(1);}
+  0%{transform:translateY(0) rotate(0) scale(1);}
+  15%{transform:translateY(4px) rotate(0) scale(1.05,.94);}
+  32%{transform:translateY(-42px) rotate(-10deg) scale(.94,1.08);}
+  52%{transform:translateY(-60px) rotate(10deg) scale(1);}
+  70%{transform:translateY(-34px) rotate(-6deg) scale(1.03,.97);}
+  86%{transform:translateY(-8px) rotate(4deg) scale(1.05,.95);}
+  100%{transform:translateY(0) rotate(0) scale(1);}
 }
-.mascot.correct + .mascot-shadow{
-  animation:shadowPulse 1s ease-out 1;
-}
+.mascot.correct + .mascot-shadow{animation:shadowPulse 1s ease-out 1;}
 @keyframes shadowPulse{
   0%{transform:translateX(-50%) scale(1);opacity:.9;}
   45%{transform:translateX(-50%) scale(.55);opacity:.35;}
   100%{transform:translateX(-50%) scale(1);opacity:.9;}
 }
-/* Buồn ủ rũ */
-.mascot.wrong{
-  animation:mascotSlump .85s cubic-bezier(.34,1.56,.64,1) 1 forwards;
-}
+.mascot.wrong{animation:mascotSlump .85s cubic-bezier(.34,1.56,.64,1) 1 forwards;}
 @keyframes mascotSlump{
-  0%  {transform:translateY(0) rotate(0);}
-  22% {transform:translateY(-7px) rotate(-3deg);}
-  52% {transform:translateY(5px) rotate(5deg);}
-  78% {transform:translateY(9px) rotate(-2deg);}
+  0%{transform:translateY(0) rotate(0);}
+  22%{transform:translateY(-7px) rotate(-3deg);}
+  52%{transform:translateY(5px) rotate(5deg);}
+  78%{transform:translateY(9px) rotate(-2deg);}
   100%{transform:translateY(8px) rotate(0);}
 }
 .mascot.wrong .leg-left{transform:rotate(-8deg);}
 .mascot.wrong .leg-right{transform:rotate(8deg);}
-/* Nhảy múa vui vẻ khi đứng chờ */
-.mascot.dance{
-  animation:mascotDance 1.2s ease-in-out 3;
-}
+
+.mascot.dance{animation:mascotDance 1.2s ease-in-out 3;}
 @keyframes mascotDance{
-  0%  {transform:translateY(0) rotate(0) scale(1);}
-  20% {transform:translateY(-6px) rotate(-7deg) scale(1.03,.97);}
-  40% {transform:translateY(2px) rotate(7deg) scale(.98,1.02);}
-  60% {transform:translateY(-6px) rotate(-5deg) scale(1.03,.97);}
-  80% {transform:translateY(2px) rotate(5deg) scale(.98,1.02);}
+  0%{transform:translateY(0) rotate(0) scale(1);}
+  20%{transform:translateY(-6px) rotate(-7deg) scale(1.03,.97);}
+  40%{transform:translateY(2px) rotate(7deg) scale(.98,1.02);}
+  60%{transform:translateY(-6px) rotate(-5deg) scale(1.03,.97);}
+  80%{transform:translateY(2px) rotate(5deg) scale(.98,1.02);}
   100%{transform:translateY(0) rotate(0) scale(1);}
 }
-/* Nước mắt */
 .tear{
-  position:absolute;width:8px;height:12px;
-  background:#5eb3ff;border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;
-  opacity:0;pointer-events:none;
-  box-shadow:inset -2px -2px 0 rgba(255,255,255,.6);
+  position:absolute;width:8px;height:12px;background:#5eb3ff;
+  border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;
+  opacity:0;pointer-events:none;box-shadow:inset -2px -2px 0 rgba(255,255,255,.6);
 }
 .tear::after{
   content:"";position:absolute;top:-4px;left:50%;transform:translateX(-50%);
@@ -379,24 +436,16 @@ body{
   border-bottom:5px solid #5eb3ff;
 }
 .mascot.wrong .tear{animation:tearFall 1.2s ease-in infinite;}
-@keyframes tearFall{
-  0%{opacity:0;transform:translateY(0);}
-  15%{opacity:1;}
-  100%{opacity:0;transform:translateY(36px);}
-}
-/* Confetti */
-.confetti-layer{
-  position:absolute;inset:0;pointer-events:none;overflow:visible;z-index:5;
-}
+@keyframes tearFall{0%{opacity:0;transform:translateY(0);}15%{opacity:1;}100%{opacity:0;transform:translateY(36px);}}
+.confetti-layer{position:absolute;inset:0;pointer-events:none;overflow:visible;z-index:5;}
 .confetti-piece{
-  position:absolute;top:35%;left:50%;
-  width:8px;height:12px;border-radius:2px;opacity:0;
+  position:absolute;top:35%;left:50%;width:8px;height:12px;border-radius:2px;opacity:0;
   animation:confettiFly 1.25s cubic-bezier(.15,.7,.35,1) forwards;
 }
 @keyframes confettiFly{
-  0%   {transform:translate(-50%,-50%) rotate(0) scale(.4);opacity:1;}
-  60%  {opacity:1;}
-  100% {transform:translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) rotate(var(--rot)) scale(1);opacity:0;}
+  0%{transform:translate(-50%,-50%) rotate(0) scale(.4);opacity:1;}
+  60%{opacity:1;}
+  100%{transform:translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) rotate(var(--rot)) scale(1);opacity:0;}
 }
 .confetti-piece.round{border-radius:50%;width:7px;height:7px;}
 .confetti-piece.star{
@@ -405,18 +454,17 @@ body{
 }
 
 @media(max-width:600px){
-  #startScreen{padding:28px 18px}
-  #startScreen h1{font-size:1.45rem}
-  .role-cards{grid-template-columns:1fr;gap:12px}
-  .q-card{padding:16px}
-  .btn{padding:12px 22px;font-size:.9rem}
-  #topbar .title{font-size:.85rem;min-width:auto;flex-basis:100%;order:3}
-  .mascot-wrap{right:8px;bottom:88px;}
-  .mascot-stage{width:88px;height:112px;}
-  .mascot{width:82px;height:108px;}
-  .mascot-bubble{font-size:.72rem;padding:5px 10px;}
-  .hist-item{padding:9px 11px;}
-  .hist-line2{font-size:.72rem;gap:8px;}
+  #startScreen{padding:24px 16px}
+  #startScreen h1{font-size:1.38rem}
+  .role-cards{grid-template-columns:1fr;gap:10px}
+  .study-card{flex-direction:column;align-items:flex-start}
+  .study-btn{width:100%;text-align:center}
+  .q-card{padding:15px}
+  .btn{padding:11px 20px;font-size:.88rem}
+  #topbar .title{font-size:.82rem;min-width:auto;flex-basis:100%;order:3}
+  .mascot-wrap{right:8px;bottom:80px;}
+  .mascot-stage{width:84px;height:110px;}
+  .mascot{width:80px;height:105px;}
 }
 </style>
 </head>
@@ -425,46 +473,71 @@ body{
 <div class="wrap">
 
   <div id="startScreen">
-    <h1>⚙️ Thi Trắc Nghiệm</h1>
+    <h1>⚙️ Hệ Thống Ôn Luyện & Thi Sát Hạch</h1>
     <div class="sub"><b>Tuabin – Thiết bị phụ – Văn hóa DN – Quy trình nhiệm vụ</b></div>
 
+    <!-- Thanh chuyển đổi chế độ -->
+    <div class="mode-nav">
+      <button class="mode-tab active" id="tabExam" onclick="switchMode('exam')">🎯 Chế độ Thi sát hạch (60 câu)</button>
+      <button class="mode-tab" id="tabStudy" onclick="switchMode('study')">📚 Chế độ Học tập (50 câu/phần)</button>
+    </div>
+
+    <!-- Chọn chức danh -->
     <div class="role-select">
-      <h3>👤 Chọn chức danh để thi <span class="req">(bắt buộc)</span></h3>
+      <h3>👤 Chọn chức danh sát hạch <span class="req">(bắt buộc)</span></h3>
       <div class="role-cards">
         <div class="role-card" id="role-may-truong" data-role="may-truong" onclick="selectRole('may-truong')">
           <div class="role-icon">⚙️</div>
           <div class="role-name">Máy trưởng</div>
-          <div class="role-desc">5 câu QTNV về chức danh Máy trưởng</div>
+          <div class="role-desc">Toàn bộ ngân hàng &amp; 20 câu QTNV Máy trưởng</div>
         </div>
         <div class="role-card" id="role-may-pho" data-role="may-pho" onclick="selectRole('may-pho')">
           <div class="role-icon">🔧</div>
           <div class="role-name">Máy phó</div>
-          <div class="role-desc">5 câu QTNV về chức danh Máy phó</div>
+          <div class="role-desc">Toàn bộ ngân hàng &amp; 20 câu QTNV Máy phó</div>
         </div>
       </div>
     </div>
 
-    <div class="info-box">
-      📋 <b>Mỗi đề gồm 60 câu</b> được chọn ngẫu nhiên:<br>
-      • <span class="hl">50 câu</span> chuyên môn Tuabin &amp; Thiết bị phụ (Dễ ~34% · TB ~40% · Khó ~26%)<br>
-      • <span class="hl">5 câu</span> <b>Văn hóa doanh nghiệp</b> EVNGENCO3 / TPC Mông Dương<br>
-      • <span class="hl2">5 câu</span> <b>Quy trình nhiệm vụ</b> của chức danh đã chọn<br>
-      ✅ <b>Phản hồi tức thì:</b> chọn đáp án là biết đúng/sai ngay.<br>
-      ☑️ Câu hỏi <b>nhiều đáp án</b> (MMC) dùng hộp kiểm — chọn đủ mới tính điểm.
+    <!-- GIAO DIỆN CHẾ ĐỘ THI -->
+    <div id="examPanel">
+      <div class="info-box">
+        📋 <b>Mỗi đề gồm 60 câu ngẫu nhiên</b> làm bài trong <b>60 phút</b>:<br>
+        • <span class="hl">50 câu</span> chuyên môn Tuabin &amp; Thiết bị phụ (Dễ ~34% · TB ~40% · Khó ~26%)<br>
+        • <span class="hl">5 câu</span> <b>Văn hóa doanh nghiệp</b> EVNGENCO3 / TPC Mông Dương<br>
+        • <span class="hl2">5 câu</span> <b>Quy trình nhiệm vụ</b> của chức danh đã chọn<br>
+        ⏱️ <b>Thời gian:</b> 60 phút đếm ngược, tự động nộp bài khi hết giờ.<br>
+        ✅ <b>Phản hồi tức thì:</b> chọn đáp án là biết đúng/sai ngay.
+      </div>
+
+      <button id="startBtn" class="btn btn-primary" disabled onclick="startExam()">🚀 Bắt đầu thi sát hạch</button>
+      <div id="startHint" style="margin-top:12px;color:#a16207;font-size:.85rem;font-weight:700">
+        ⚠️ Vui lòng chọn chức danh trước khi bắt đầu
+      </div>
     </div>
 
-    <button id="startBtn" class="btn btn-primary" disabled onclick="startExam()">🚀 Bắt đầu làm bài</button>
-    <div id="startHint" style="margin-top:12px;color:#a16207;font-size:.85rem;font-weight:700">
-      ⚠️ Vui lòng chọn chức danh trước khi bắt đầu
+    <!-- GIAO DIỆN CHẾ ĐỘ HỌC TẬP (50 CÂU/PHẦN, KHÔNG SHUFFLE) -->
+    <div id="studyPanel">
+      <div class="info-box">
+        📖 <b>Học trước thi sau:</b> Ngân hàng gồm <b>232 câu hỏi</b> được chia đều thành <b>5 phần học</b>.<br>
+        • <b>Thứ tự chuẩn xác:</b> Các câu hỏi giữ nguyên 100% thứ tự ngân hàng gốc, không xáo trộn.<br>
+        • <b>Không áp lực:</b> Không giới hạn thời gian, có nút <b>"Hiện toàn bộ đáp án"</b> để tiện học thuộc.<br>
+        • Chọn phần bên dưới để bắt đầu học ngay:
+      </div>
+
+      <div class="study-title">📚 Danh sách các phần học (50 câu / phần)</div>
+      <div class="study-grid" id="studyGrid">
+        <!-- Render tự động bằng Javascript -->
+      </div>
     </div>
 
-    <!-- ============ LỊCH SỬ THI ============ -->
+    <!-- LỊCH SỬ THI -->
     <div id="historySection">
       <h3>
         🏆 Lịch sử thi (10 lần gần nhất)
         <span class="cnt" id="histCnt">0 / 10</span>
       </h3>
-      <div class="hint">Kết quả được lưu tự động sau mỗi lần nộp bài.</div>
+      <div class="hint">Kết quả thi được lưu tự động sau mỗi lần nộp bài.</div>
       <div id="historyList"></div>
       <div style="text-align:right;margin-top:10px">
         <button id="clearHistBtn" onclick="clearHistory()">🗑 Xoá toàn bộ lịch sử</button>
@@ -472,28 +545,45 @@ body{
     </div>
   </div>
 
+  <!-- TOPBAR -->
   <div id="topbar">
-    <button class="btn btn-home" style="padding:8px 16px;font-size:.85rem" onclick="goHome()" title="Quay về trang chủ">🏠 Trang chủ</button>
-    <div class="title">⚙️ Tuabin · TB phụ · VHDN · QTNV</div>
+    <button class="btn btn-home" style="padding:7px 14px;font-size:.82rem" onclick="goHome()" title="Quay về trang chủ">🏠 Trang chủ</button>
+    <div class="title" id="barTitle">⚙️ Tuabin · TB phụ · VHDN · QTNV</div>
+    <div class="pill study" id="pillMode" style="display:none">📚 Chế độ: Học tập</div>
+    <div class="pill timer" id="pillTimer">⏱ 60:00</div>
     <div class="pill role" id="pillRole">Chức danh: —</div>
     <div class="pill" id="pillDone">Đã làm: 0/60</div>
     <div class="pill good" id="pillRight">✔ Đúng: 0</div>
     <div class="pill bad" id="pillWrong">✘ Sai: 0</div>
   </div>
 
+  <!-- THANH LỌC CÂU HỎI -->
+  <div id="examFilterBar">
+    <span class="filter-title">🔍 Bộ lọc câu hỏi:</span>
+    <div class="filter-group">
+      <button class="filter-btn active" id="btnFilterAll" onclick="filterExamCards('all')">Tất cả</button>
+      <button class="filter-btn fail" id="btnFilterWrong" onclick="filterExamCards('wrong')">Chỉ câu làm sai / bỏ qua</button>
+      <button class="filter-btn pass" id="btnFilterRight" onclick="filterExamCards('right')">Chỉ câu làm đúng</button>
+    </div>
+  </div>
+
   <div id="examArea"></div>
 </div>
 
+<!-- BOTTOMBAR -->
 <div id="bottombar">
-  <button class="btn btn-home" style="padding:11px 20px;font-size:.9rem" onclick="goHome()">🏠 Trang chủ</button>
+  <button class="btn btn-home" style="padding:10px 18px;font-size:.88rem" onclick="goHome()">🏠 Trang chủ</button>
+  <button class="btn btn-study" id="btnRevealAll" style="padding:10px 18px;font-size:.88rem;display:none" onclick="revealAll()">👁️ Mở toàn bộ đáp án</button>
   <div class="stat" id="barStat">0/60 câu</div>
-  <button class="btn btn-ghost" style="padding:11px 22px;font-size:.9rem" onclick="resetExam()">🔄 Thi lại</button>
-  <button class="btn btn-danger" style="padding:11px 22px;font-size:.9rem" onclick="submitExam()">📤 Nộp bài</button>
+  <button class="btn btn-ghost" id="btnRetryPart" style="padding:10px 18px;font-size:.88rem" onclick="resetExam()">🔄 Làm lại</button>
+  <button class="btn btn-study" id="btnNextPart" style="padding:10px 18px;font-size:.88rem;display:none" onclick="goNextPart()">➡️ Phần tiếp theo</button>
+  <button class="btn btn-danger" id="btnSubmitExam" style="padding:10px 20px;font-size:.88rem" onclick="submitExam(false)">📤 Nộp bài</button>
 </div>
 
+<!-- OVERLAY KẾT QUẢ -->
 <div id="overlay">
   <div id="resultBox">
-    <h2>📊 Kết quả bài thi</h2>
+    <h2 id="modalTitle">📊 Kết quả bài thi</h2>
     <div class="big-score" id="finalScore">0</div>
     <div class="score-sub" id="finalSub">/ 60 câu đúng</div>
     <div class="res-grid">
@@ -502,16 +592,28 @@ body{
       <div class="res-item sk"><div class="n" id="cSkip">0</div><div class="l">BỎ TRỐNG</div></div>
     </div>
     <div class="grade" id="gradeTxt"></div>
-    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
       <button class="btn btn-primary" onclick="closeModal()">👀 Xem lại bài</button>
-      <button class="btn btn-danger" onclick="resetExam()">🔄 Thi lại</button>
+      <button class="btn btn-study" id="modalNextPartBtn" style="display:none" onclick="goNextPartFromModal()">➡️ Sang phần tiếp theo</button>
+      <button class="btn btn-danger" onclick="resetExam()">🔄 Làm lại</button>
       <button class="btn btn-home" onclick="goHomeFromModal()">🏠 Trang chủ</button>
     </div>
-    <div id="reviewList"></div>
+    
+    <div id="reviewSection">
+      <div class="rev-filter-wrap">
+        <h3>📝 Chi tiết câu hỏi ôn tập</h3>
+        <div class="filter-group">
+          <button class="filter-btn active" id="rf-wrong" onclick="setModalFilter('wrong')">Chỉ câu sai / bỏ qua</button>
+          <button class="filter-btn" id="rf-all" onclick="setModalFilter('all')">Tất cả</button>
+          <button class="filter-btn pass" id="rf-right" onclick="setModalFilter('right')">Câu đúng</button>
+        </div>
+      </div>
+      <div id="reviewList"></div>
+    </div>
   </div>
 </div>
 
-<!-- ============ MASCOT ============ -->
+<!-- MASCOT -->
 <div class="mascot-wrap" id="mascotWrap">
   <div class="mascot-bubble" id="mascotBubble">Cố lên nhé!</div>
   <div class="mascot-stage">
@@ -589,7 +691,7 @@ const CAT = {
  SC:"Sự cố chung bơm, quạt"
 };
 
-/* ---------- 50 câu chuyên môn ---------- */
+/* 183 câu chuyên môn */
 const RAW_MAIN = [
 ["T","M","MC","Để nâng công suất cho một tổ máy lò hơi – tuabin và gia tăng hiệu suất chu trình nhiệt, các nhà máy nhiệt điện thường:",3,
 "Sử dụng thông số hơi cận và trên tới hạn kết hợp với tái nhiệt trung gian, nhiệt độ hơi mới và hơi tái nhiệt thường bằng và trên 540°C.",
@@ -786,7 +888,7 @@ const RAW_MAIN = [
 ["HC","E","MC","Nhiệt độ hơi chèn tuabin cao, trung áp trong quá trình vận hành bình thường bao nhiêu là đúng",1,
 "cao áp/ hạ áp: 300/150ºC","cao áp/ hạ áp: 330/160ºC","cao áp/ hạ áp: 310/150ºC","cao áp/ hạ áp: 280/155ºC"],
 
-["HC","E","MC","Hơi cấp cho hệ thống hơi chèn được lấy từ 3 nguồn chính gồm",3,
+["HC","E","MC","Hơi cấp cho hệ thống hơi chèn được lấy từ 3 nguồn chính gồm",4,
 "Từ ống góp hơi tự dùng","Nguồn tự chèn lấy hơi rò từ tuabin cao áp – trung áp","Nguồn rút hơi rò từ ty van MSV, CV, BDV, BVV","Cả 3 phương án trên"],
 
 /* Phòng mòn */
@@ -1136,7 +1238,7 @@ const RAW_MAIN = [
 ["LMS","E","MC","Giá trị bảo vệ Trip bơm nước làm mát stator máy phát do nhiệt độ nước làm mát ra khỏi máy phát cao?",1,
 "83,2ºC","63,5ºC","50,5ºC","45ºC"],
 
-/* Nước tuần hoàn */
+/* NTH */
 ["NTH","E","MC","Số lượng bơm tuần hoàn NĐMD?",3,
 "2","3","4","5"],
 
@@ -1284,7 +1386,7 @@ const RAW_MAIN = [
 "150ºC","200ºC","250ºC","300ºC"]
 ];
 
-/* ==================== NGÂN HÀNG VHDN ==================== */
+/* 29 câu VHDN */
 const RAW_VHDN = [
 ["VHDN","M","MMC","Những đáp án nào sau đây nhận định đúng về \"Tầm nhìn và sứ mệnh\" của EVNGENCO3?",[2,3],
 "Tổng Công ty Phát điện 3 là một trong những Đơn vị hàng đầu trong phát triển nguồn điện tại Việt Nam.",
@@ -1425,7 +1527,7 @@ const RAW_VHDN = [
 "Tất cả các câu trên."]
 ];
 
-/* ==================== QTNV – MÁY TRƯỞNG ==================== */
+/* 20 câu QTNV Máy trưởng */
 const QTNV_MAY_TRUONG = [
 ["QTNV - Máy trưởng","E","MC","Trường hợp những Máy trưởng đã chuyển sang công tác khác hoặc bị đình chỉ do sự cố chủ quan, trước khi bố trí trở lại làm Máy trưởng thì phải:",4,
 "Qua thời gian tìm hiểu để nắm tình hình thực tế sản xuất không dưới 3 ngày, nếu thời gian ngừng công tác Máy trưởng từ 2 đến 3 tháng.",
@@ -1548,7 +1650,7 @@ const QTNV_MAY_TRUONG = [
 "Khi người nhận ca hỏi hoặc yêu cầu giải thích, người giao ca có nhiệm vụ giải đáp những thắc mắc đó và chỉ khi người nhận ca ký vào sổ nhật ký vận hành thì người giao ca mới được ký bàn giao và rời khỏi vị trí sản xuất."]
 ];
 
-/* ==================== QTNV – MÁY PHÓ ==================== */
+/* 20 câu QTNV Máy phó */
 const QTNV_MAY_PHO = [
 ["QTNV - Máy phó","E","MC","Trường hợp những Máy phó đã chuyển sang công tác khác hoặc bị đình chỉ do sự cố chủ quan, trước khi bố trí trở lại làm Máy phó thì phải:",4,
 "Qua thời gian tìm hiểu để nắm tình hình thực tế sản xuất không dưới 3 ngày, nếu thời gian ngừng công tác Máy phó từ 2 đến 3 tháng.",
@@ -1671,7 +1773,7 @@ const QTNV_MAY_PHO = [
 "Khi người nhận ca hỏi hoặc yêu cầu giải thích, người giao ca có nhiệm vụ giải đáp những thắc mắc đó và chỉ khi người nhận ca ký vào sổ nhật ký vận hành thì người giao ca mới được ký bàn giao và rời khỏi vị trí sản xuất."]
 ];
 
-/* ==================== TIỀN XỬ LÝ ==================== */
+/* Tiền xử lý dữ liệu */
 function mapRaw(raw){
   return raw.map(r=>{
     const [cat,diff,type,q,ans,...opts] = r;
@@ -1691,10 +1793,71 @@ const POOL_QTNV_MAY_PHO = mapRaw(QTNV_MAY_PHO);
 const DIFF_LABEL = { E:"Dễ", M:"Trung bình", H:"Khó" };
 const ROLE_LABEL = { 'may-truong': 'Máy trưởng', 'may-pho': 'Máy phó' };
 
+/* Cấu hình phần học */
+const STUDY_PARTS_META = [
+  { title: "Phần 1: Tuabin chuyên ngành, Hơi chèn & Phòng mòn", desc: "50 câu: Lý thuyết nhiệt động, chu trình, van chèn, máy hút ẩm phòng mòn" },
+  { title: "Phần 2: Bi bình ngưng, Clo, Dầu bôi trơn, Dầu chèn, EH & Khí nén", desc: "50 câu: Hệ thống bi làm sạch, châm clo, bôi trơn gối trục, dầu chèn H2, dầu điều tốc, máy nén khí" },
+  { title: "Phần 3: Nước cấp, Nước ngưng, Làm mát kín, Stator & Nước tuần hoàn", desc: "50 câu: Bơm cấp, bơm ngưng, bình khử khí, sinh hàn làm mát kín, stator, trạm bơm tuần hoàn" },
+  { title: "Phần 4: Sự cố bơm quạt, Khởi động/dừng Tuabin & Văn hóa DN (P1)", desc: "50 câu: Quy trình xử lý sự cố thiết bị quay, bảo vệ trip tuabin, văn hóa EVNGENCO3" },
+  { title: "Phần 5: Văn hóa DN (P2) & Quy trình nhiệm vụ chức danh", desc: "32 câu: Chuẩn mực ứng xử EVN & QTNV chi tiết của chức danh đã chọn" }
+];
+
+let appMode = 'exam'; // 'exam' hoặc 'study'
+let currentStudyPart = 0;
 let exam = [];
 let state = [];
 let submitted = false;
 let selectedRole = null;
+let currentExamFilter = 'all';
+let currentModalFilter = 'wrong';
+
+/* Đồng hồ đếm ngược 60 phút */
+const EXAM_DURATION_SEC = 60 * 60;
+let timerInterval = null;
+let timeLeftSec = EXAM_DURATION_SEC;
+
+function formatTime(sec){
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+}
+
+function startTimer(){
+  stopTimer();
+  timeLeftSec = EXAM_DURATION_SEC;
+  updateTimerDisplay();
+
+  timerInterval = setInterval(()=>{
+    timeLeftSec--;
+    updateTimerDisplay();
+
+    if(timeLeftSec <= 0){
+      stopTimer();
+      alert('⏰ Đã hết thời gian 60 phút làm bài! Hệ thống tự động nộp bài.');
+      submitExam(true);
+    }
+  }, 1000);
+}
+
+function stopTimer(){
+  if(timerInterval){
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+}
+
+function updateTimerDisplay(){
+  const el = document.getElementById('pillTimer');
+  if(!el) return;
+  el.textContent = `⏱ ${formatTime(timeLeftSec)}`;
+
+  el.classList.remove('warning', 'urgent');
+  if(timeLeftSec <= 300){
+    el.classList.add('urgent');
+  } else if(timeLeftSec <= 600){
+    el.classList.add('warning');
+  }
+}
 
 function shuffle(a){
   for(let i=a.length-1;i>0;i--){
@@ -1704,7 +1867,27 @@ function shuffle(a){
   return a;
 }
 
-/* ==================== CHỌN CHỨC DANH ==================== */
+/* Lấy toàn bộ ngân hàng câu hỏi theo chức danh (KHÔNG XÁO TRỘN) */
+function getFullBank(role){
+  const qtnvPool = role === 'may-truong' ? POOL_QTNV_MAY_TRUONG : POOL_QTNV_MAY_PHO;
+  return [...POOL_MAIN, ...POOL_VHDN, ...qtnvPool];
+}
+
+/* Chuyển đổi giữa Chế độ Thi và Chế độ Học */
+function switchMode(mode){
+  appMode = mode;
+  document.getElementById('tabExam').classList.toggle('active', mode === 'exam');
+  document.getElementById('tabStudy').classList.toggle('active', mode === 'study');
+
+  document.getElementById('examPanel').style.display = mode === 'exam' ? 'block' : 'none';
+  document.getElementById('studyPanel').style.display = mode === 'study' ? 'block' : 'none';
+
+  if(mode === 'study'){
+    renderStudyGrid();
+  }
+}
+
+/* Chọn chức danh */
 function selectRole(role){
   selectedRole = role;
   document.querySelectorAll('.role-card').forEach(el=>{
@@ -1715,9 +1898,42 @@ function selectRole(role){
   btn.disabled = false;
   hint.style.display = 'none';
   triggerMascotDance();
+
+  if(appMode === 'study'){
+    renderStudyGrid();
+  }
 }
 
-/* ==================== TẠO ĐỀ ==================== */
+/* Render danh sách các phần học */
+function renderStudyGrid(){
+  const grid = document.getElementById('studyGrid');
+  if(!selectedRole){
+    grid.innerHTML = '<div style="text-align:center;padding:24px;color:#a16207;font-weight:700">⚠️ Vui lòng chọn chức danh Máy trưởng hoặc Máy phó ở phía trên để mở khóa các phần học.</div>';
+    return;
+  }
+
+  const fullBank = getFullBank(selectedRole);
+  const total = fullBank.length;
+  let html = '';
+
+  STUDY_PARTS_META.forEach((meta, idx)=>{
+    const startNum = idx * 50 + 1;
+    const endNum = Math.min((idx + 1) * 50, total);
+    const count = endNum - startNum + 1;
+
+    html += `<div class="study-card" onclick="startStudyPart(${idx})">
+      <div class="study-info">
+        <h4>${meta.title} (${count} câu: #${startNum} - #${endNum})</h4>
+        <p>${meta.desc}</p>
+      </div>
+      <button class="study-btn">Vào học ngay ➔</button>
+    </div>`;
+  });
+
+  grid.innerHTML = html;
+}
+
+/* TẠO ĐỀ THI SÁT HẠCH (60 CÂU NGẪU NHIÊN) */
 const N_MAIN = 50;
 const N_VHDN = 5;
 const N_QTNV = 5;
@@ -1758,27 +1974,78 @@ function buildExam(role){
   return [...mainPicked, ...vhdnPicked, ...qtnvPicked];
 }
 
+/* Bắt đầu chế độ thi */
 function startExam(){
   if(!selectedRole){
     alert('⚠️ Vui lòng chọn chức danh (Máy trưởng hoặc Máy phó) trước khi bắt đầu!');
     return;
   }
+  appMode = 'exam';
   exam = buildExam(selectedRole);
   state = exam.map(()=>({answered:false, selected:null, correct:false}));
   submitted = false;
 
-  document.getElementById('startScreen').style.display = 'none';
-  document.getElementById('topbar').style.display = 'flex';
-  document.getElementById('bottombar').style.display = 'flex';
-  document.getElementById('examArea').style.display = 'block';
-  document.getElementById('overlay').style.display = 'none';
+  initExamUI();
+  document.getElementById('pillTimer').style.display = 'inline-block';
+  document.getElementById('pillMode').style.display = 'none';
+  document.getElementById('btnRevealAll').style.display = 'none';
+  document.getElementById('btnNextPart').style.display = 'none';
+  document.getElementById('modalNextPartBtn').style.display = 'none';
+  document.getElementById('barTitle').textContent = `⚙️ Thi: ${ROLE_LABEL[selectedRole]}`;
 
-  document.getElementById('pillRole').textContent = `Chức danh: ${ROLE_LABEL[selectedRole]}`;
+  renderExam();
+  updateStats();
+  resetMascot();
+  startTimer();
+  window.scrollTo(0,0);
+}
+
+/* Bắt đầu chế độ học tập theo từng phần 50 câu (KHÔNG SHUFFLE) */
+function startStudyPart(partIdx){
+  if(!selectedRole){
+    alert('⚠️ Vui lòng chọn chức danh trước khi học!');
+    return;
+  }
+  appMode = 'study';
+  currentStudyPart = partIdx;
+
+  const fullBank = getFullBank(selectedRole);
+  const start = partIdx * 50;
+  const end = Math.min((partIdx + 1) * 50, fullBank.length);
+
+  // Cắt trực tiếp 50 câu theo thứ tự từ trên xuống dưới
+  exam = fullBank.slice(start, end).map((q, idx)=>({
+    ...q,
+    rawSeq: start + idx + 1 // Lưu thứ tự câu gốc trong ngân hàng
+  }));
+
+  state = exam.map(()=>({answered:false, selected:null, correct:false}));
+  submitted = false;
+  stopTimer();
+
+  initExamUI();
+  document.getElementById('pillTimer').style.display = 'none';
+  document.getElementById('pillMode').style.display = 'inline-block';
+  document.getElementById('pillMode').textContent = `📚 Học: Phần ${partIdx + 1} (${exam.length} câu)`;
+  document.getElementById('btnRevealAll').style.display = 'inline-block';
+  document.getElementById('btnNextPart').style.display = partIdx < 4 ? 'inline-block' : 'none';
+  document.getElementById('modalNextPartBtn').style.display = partIdx < 4 ? 'inline-block' : 'none';
+  document.getElementById('barTitle').textContent = `📚 Học tập: Phần ${partIdx + 1} (Câu #${start+1} - #${end})`;
 
   renderExam();
   updateStats();
   resetMascot();
   window.scrollTo(0,0);
+}
+
+function initExamUI(){
+  document.getElementById('startScreen').style.display = 'none';
+  document.getElementById('topbar').style.display = 'flex';
+  document.getElementById('bottombar').style.display = 'flex';
+  document.getElementById('examArea').style.display = 'block';
+  document.getElementById('examFilterBar').style.display = 'none';
+  document.getElementById('overlay').style.display = 'none';
+  document.getElementById('pillRole').textContent = `Chức danh: ${ROLE_LABEL[selectedRole]}`;
 }
 
 function catClass(cat){
@@ -1803,9 +2070,12 @@ function renderExam(){
 
   exam.forEach((q, idx)=>{
     const diffCls = q.diff === 'E' ? 'easy' : q.diff === 'M' ? 'medium' : 'hard';
+    const rawTag = q.rawSeq ? `<span class="badge seq">Gốc: #${q.rawSeq}</span>` : '';
+
     html += `<div class="q-card ${catClass(q.cat)}" id="card-${idx}">
       <div class="q-head">
         <span class="q-num">Câu ${idx+1}</span>
+        ${rawTag}
         <span class="badge ${catBadgeClass(q.cat)}">${catLabel(q.cat)}</span>
         <span class="badge ${diffCls}">${DIFF_LABEL[q.diff]}</span>
         ${q.type==='MMC' ? '<span class="badge multi">Nhiều đáp án</span>' : ''}
@@ -1893,16 +2163,16 @@ function chooseOption(qIdx, oIdx){
       el.querySelector('.mark').textContent = isRight ? '✓' : '✕';
     }
 
-    const sel = [...set].sort().join(',');
-    const cor = [...q.correct].sort().join(',');
-    const wasAnswered = st.answered;
+    const sel = [...set].sort((a,b)=>a-b).join(',');
+    const cor = [...q.correct].sort((a,b)=>a-b).join(',');
+    const wasCorrectBefore = st.correct;
     st.correct = (sel === cor);
     st.answered = set.size > 0;
 
     const exp = document.getElementById(`exp-${qIdx}`);
     if(st.correct){
       exp.innerHTML = '<span class="explain ok">✔ Đúng hoàn toàn!</span>';
-      if(!wasAnswered) { justRevealed = true; wasCorrect = true; }
+      if(!wasCorrectBefore) { justRevealed = true; wasCorrect = true; }
     }else{
       exp.innerHTML = '<span class="explain no">Đang chọn — cần chọn đủ các đáp án đúng.</span>';
     }
@@ -1929,9 +2199,10 @@ function updateStats(){
   document.getElementById('barStat').textContent   = `${done}/${exam.length} câu`;
 }
 
-function submitExam(){
+function submitExam(isAuto = false){
   if(submitted) { document.getElementById('overlay').style.display='flex'; return; }
   submitted = true;
+  stopTimer();
 
   let right=0, wrong=0, skip=0;
   let rMain=0, rVhdn=0, rQtnv=0;
@@ -1956,12 +2227,12 @@ function submitExam(){
 
   const pct = Math.round(right / exam.length * 100);
 
+  document.getElementById('modalTitle').textContent = appMode === 'study' ? `📖 Kết quả Phần học ${currentStudyPart + 1}` : '📊 Kết quả bài thi sát hạch';
   document.getElementById('finalScore').textContent = right;
   document.getElementById('finalSub').innerHTML =
-    `/ ${exam.length} câu đúng  (${pct}%)<br>
-     Chuyên môn: ${rMain}/${tMain} <span class="sep">·</span>
-     VHDN: ${rVhdn}/${tVhdn} <span class="sep">·</span>
-     QTNV <b>${ROLE_LABEL[selectedRole]}</b>: ${rQtnv}/${tQtnv}`;
+    `/ ${exam.length} câu đúng (${pct}%)<br>
+     ${appMode === 'exam' ? `Chuyên môn: ${rMain}/${tMain} · VHDN: ${rVhdn}/${tVhdn} · QTNV: ${rQtnv}/${tQtnv}` : `Phần ${currentStudyPart + 1}: ${STUDY_PARTS_META[currentStudyPart].title}`}`;
+  
   document.getElementById('cRight').textContent = right;
   document.getElementById('cWrong').textContent = wrong;
   document.getElementById('cSkip').textContent  = skip;
@@ -1969,58 +2240,38 @@ function submitExam(){
   let grade = '';
   if(pct >= 90) grade = '🏆 Xuất sắc!';
   else if(pct >= 80) grade = '🎉 Giỏi!';
-  else if(pct >= 70) grade = '👍 Khá!';
-  else if(pct >= 50) grade = '📖 Trung bình — cần ôn thêm.';
-  else grade = '⚠️ Yếu — hãy ôn tập lại nhé!';
+  else if(pct >= 70) grade = '👍 Đạt chuẩn!';
+  else if(pct >= 50) grade = '📖 Cần ôn luyện thêm.';
+  else grade = '⚠️ Chưa đạt — hãy học kỹ lại phần này nhé!';
+  if(isAuto) grade += ' (Tự động nộp do hết giờ)';
   document.getElementById('gradeTxt').textContent = grade;
 
   revealAll();
+  renderReviewList();
 
-  const rev = document.getElementById('reviewList');
-  let html = '';
-  const wrongItems = [];
-  exam.forEach((q,i)=>{
-    const st = state[i];
-    if(!st.answered || !st.correct) wrongItems.push({q, st, i});
-  });
-
-  if(wrongItems.length === 0){
-    html = '<h3>🎯 Bạn đã trả lời đúng tất cả các câu!</h3>';
-  }else{
-    html = `<h3>📝 Chi tiết ${wrongItems.length} câu cần xem lại</h3>`;
-    wrongItems.forEach(({q,st,i})=>{
-      const correctLetters = q.correct.map(x=>String.fromCharCode(65+x)).join(', ');
-      const chosenLetters = st.answered
-        ? (q.type==='MC'
-            ? String.fromCharCode(65+st.selected)
-            : [...st.selected].sort().map(x=>String.fromCharCode(65+x)).join(', '))
-        : '— bỏ trống —';
-      html += `<div class="rev-item">
-        <div class="rq">Câu ${i+1} [${catLabel(q.cat)}] — ${escapeHtml(q.q)}</div>
-        <div>Bạn chọn: <span class="rb">${chosenLetters}</span></div>
-        <div>Đáp án đúng: <span class="ra">${correctLetters}</span></div>
-      </div>`;
+  // Chỉ ghi nhận vào lịch sử nếu là chế độ thi thử sát hạch
+  if(appMode === 'exam'){
+    saveHistory({
+      role: selectedRole,
+      roleLabel: ROLE_LABEL[selectedRole],
+      right, wrong, skip,
+      total: exam.length,
+      pct, pass: pct >= 70,
+      rMain, tMain, rVhdn, tVhdn, rQtnv, tQtnv,
+      time: new Date().toLocaleString('vi-VN')
     });
   }
-  rev.innerHTML = html;
-
-  // Lưu lịch sử
-  saveHistory({
-    role: selectedRole,
-    roleLabel: ROLE_LABEL[selectedRole],
-    right, wrong, skip,
-    total: exam.length,
-    pct, pass: pct >= 70,
-    rMain, tMain, rVhdn, tVhdn, rQtnv, tQtnv,
-    time: new Date().toLocaleString('vi-VN')
-  });
 
   updateStats();
-  // Ẩn bottombar để modal không bị che
+  document.getElementById('examFilterBar').style.display = 'flex';
+  document.getElementById('btnFilterWrong').textContent = `Chỉ câu sai / bỏ qua (${wrong + skip})`;
+  document.getElementById('btnFilterRight').textContent = `Chỉ câu làm đúng (${right})`;
+
   document.getElementById('bottombar').style.display = 'none';
   document.getElementById('overlay').style.display = 'flex';
 }
 
+/* Mở toàn bộ đáp án */
 function revealAll(){
   exam.forEach((q,i)=>{
     q.options.forEach((_,oi)=>{
@@ -2033,48 +2284,141 @@ function revealAll(){
         el.querySelector('.mark').textContent = '✓';
       }
     });
+    const exp = document.getElementById(`exp-${i}`);
+    if(exp && !exp.innerHTML){
+      exp.innerHTML = '<span class="explain ok">✔ Đáp án chuẩn đã hiển thị.</span>';
+    }
+  });
+}
+
+function goNextPart(){
+  if(currentStudyPart < 4){
+    startStudyPart(currentStudyPart + 1);
+  }
+}
+function goNextPartFromModal(){
+  closeModal();
+  goNextPart();
+}
+
+/* Bộ lọc trong Modal */
+function setModalFilter(type){
+  currentModalFilter = type;
+  document.querySelectorAll('#reviewSection .filter-btn').forEach(btn => btn.classList.remove('active'));
+  const activeBtn = document.getElementById(`rf-${type}`);
+  if(activeBtn) activeBtn.classList.add('active');
+  renderReviewList();
+}
+
+function renderReviewList(){
+  const rev = document.getElementById('reviewList');
+  let items = [];
+
+  exam.forEach((q, i)=>{
+    const st = state[i];
+    const isRight = st.answered && st.correct;
+    const isSkip = !st.answered;
+    const isWrong = st.answered && !st.correct;
+
+    if(currentModalFilter === 'wrong' && isRight) return;
+    if(currentModalFilter === 'right' && !isRight) return;
+
+    items.push({q, st, i, isRight, isSkip, isWrong});
+  });
+
+  if(items.length === 0){
+    rev.innerHTML = '<div style="text-align:center;padding:16px;color:#15803d;font-weight:700">✨ Không có câu hỏi nào trong danh mục này!</div>';
+    return;
+  }
+
+  let html = '';
+  items.forEach(({q, st, i, isRight, isSkip})=>{
+    const correctLetters = q.correct.map(x=>String.fromCharCode(65+x)).join(', ');
+    let chosenLetters = '— bỏ trống —';
+    let statusCls = isRight ? 'is-right' : (isSkip ? 'is-skip' : '');
+
+    if(st.answered){
+      chosenLetters = q.type==='MC'
+        ? String.fromCharCode(65+st.selected)
+        : [...st.selected].sort((a,b)=>a-b).map(x=>String.fromCharCode(65+x)).join(', ');
+    }
+
+    const rawSeqTxt = q.rawSeq ? `[Gốc: #${q.rawSeq}] ` : '';
+
+    html += `<div class="rev-item ${statusCls}">
+      <div class="rq">Câu ${i+1} ${rawSeqTxt}[${catLabel(q.cat)}] — ${escapeHtml(q.q)}</div>
+      <div>Bạn chọn: <span class="${isRight ? 'ra' : (isSkip ? 'rsk' : 'rb')}">${chosenLetters}</span></div>
+      <div>Đáp án đúng: <span class="ra">${correctLetters}</span></div>
+    </div>`;
+  });
+  rev.innerHTML = html;
+}
+
+/* Bộ lọc trên trang */
+function filterExamCards(type){
+  currentExamFilter = type;
+  document.querySelectorAll('#examFilterBar .filter-btn').forEach(b => b.classList.remove('active'));
+  
+  if(type === 'all') document.getElementById('btnFilterAll').classList.add('active');
+  if(type === 'wrong') document.getElementById('btnFilterWrong').classList.add('active');
+  if(type === 'right') document.getElementById('btnFilterRight').classList.add('active');
+
+  exam.forEach((q, i)=>{
+    const card = document.getElementById(`card-${i}`);
+    const st = state[i];
+    const isRight = st.answered && st.correct;
+
+    if(type === 'all'){
+      card.style.display = 'block';
+    } else if(type === 'wrong'){
+      card.style.display = !isRight ? 'block' : 'none';
+    } else if(type === 'right'){
+      card.style.display = isRight ? 'block' : 'none';
+    }
   });
 }
 
 function closeModal(){
   document.getElementById('overlay').style.display = 'none';
-  // Hiện lại bottombar nếu đang có bài thi
   if(exam.length > 0){
     document.getElementById('bottombar').style.display = 'flex';
   }
 }
 
 function resetExam(){
+  stopTimer();
   document.getElementById('overlay').style.display = 'none';
-  startExam();
+  if(appMode === 'study'){
+    startStudyPart(currentStudyPart);
+  } else {
+    startExam();
+  }
 }
 
-/* ============ ĐÃ SỬA: goHome & goHomeFromModal ============ */
 function goHome(){
   const answered = state.filter(s => s && s.answered).length;
-
   const isDoing = !submitted && answered > 0;
   const isDone  = submitted;
 
   if(isDoing){
     const ok = confirm(
-      '⚠️ Bạn đang làm dở bài thi.\n\n' +
-      'Nếu quay về Trang chủ, toàn bộ kết quả sẽ bị xóa và bạn phải làm lại từ đầu.\n\n' +
-      'Bạn có chắc muốn quay về Trang chủ không?'
+      '⚠️ Bạn đang làm dở nội dung này.\n\n' +
+      'Nếu quay về Trang chủ, kết quả hiện tại sẽ bị hủy.\n\n' +
+      'Bạn có chắc muốn thoát không?'
     );
-    if(!ok) return;   // Cancel → KHÔNG làm gì, giữ nguyên trạng thái
+    if(!ok) return;
   } else if(isDone){
     const ok = confirm(
       '🏠 Quay về Trang chủ?\n\n' +
-      'Bài thi hiện tại sẽ kết thúc. Bạn có thể bắt đầu đề mới sau khi quay về.\n\n' +
-      'Tiếp tục?'
+      'Bạn có thể chọn làm đề thi mới hoặc học phần khác sau khi quay về.'
     );
-    if(!ok) return;   // Cancel → modal kết quả vẫn còn nguyên
+    if(!ok) return;
   }
 
-  // Chỉ ẩn/hiện SAU KHI đã xác nhận (hoặc khi không cần xác nhận)
+  stopTimer();
   document.getElementById('overlay').style.display = 'none';
   document.getElementById('examArea').style.display = 'none';
+  document.getElementById('examFilterBar').style.display = 'none';
   document.getElementById('topbar').style.display = 'none';
   document.getElementById('bottombar').style.display = 'none';
   document.getElementById('startScreen').style.display = 'block';
@@ -2100,9 +2444,7 @@ window.addEventListener('beforeunload', function(e){
   }
 });
 
-/* ==================================================================
-   LỊCH SỬ THI
-   ================================================================== */
+/* Lịch sử thi */
 const HIST_KEY = 'qtnv_hist_60_v1';
 const HIST_MAX = 10;
 
@@ -2162,9 +2504,7 @@ function renderHistory(){
   }).join('');
 }
 
-/* ==================================================================
-   MASCOT
-   ================================================================== */
+/* Mascot */
 const MASCOT_HAPPY = ['Giỏi lắm! 🎉','Xuất sắc! 🌟','Đúng rồi! 💯','Tuyệt vời! 👏','Chuẩn luôn! ✨','Bạn giỏi quá! 🏆','Quá đỉnh! 🚀','Chính xác! 🎯'];
 const MASCOT_SAD   = ['Cố lên nào... 😢','Sai mất rồi!','Đừng nản nhé!','Lần sau nhớ kỹ hơn!','Tiếc quá...','Bình tĩnh ôn lại nhé!','Ủ rũ quá đi... 😞','Sai cũng là học mà!'];
 const MASCOT_DANCE = ['Chọn xong rồi! 🎊','Sẵn sàng chưa? 💪','Chiến thôi nào! 🔥','Cùng cố gắng nhé! ✨'];
@@ -2263,7 +2603,7 @@ function burstConfetti(){
   setTimeout(()=>{ cont.innerHTML = ''; }, 1500);
 }
 
-/* ==================== KHỞI TẠO ==================== */
+/* Khởi tạo */
 renderHistory();
 </script>
 </body>
