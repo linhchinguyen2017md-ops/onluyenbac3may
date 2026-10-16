@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Báo cáo – Trạng thái khởi động Tuabin & Runback</title>
+<style>
+  :root {
+    --bg: #f4f6f9;
+    --paper: #ffffff;
+    --ink: #1a2333;
+    --muted: #5a6b80;
+    --line: #d8e0ea;
+    --primary: #14508c;
+    --primary-soft: #e8f1fb;
+    --accent: #c0392b;
+    --accent-soft: #fdecea;
+    --warm: #d68910;
+    --warm-soft: #fef5e7;
+    --hot: #b03a2e;
+    --hot-soft: #f9ebea;
+    --superhot: #7b241c;
+    --superhot-soft: #f2d7d5;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Segoe UI", "Helvetica Neue", Roboto, system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 40px 20px 80px;
+  }
+
+  /* ================= HEADER ================= */
+  .cover {
+    background: linear-gradient(135deg, #0f3b6b 0%, #14508c 55%, #1f6fb2 100%);
+    color: #fff;
+    border-radius: 14px;
+    padding: 44px 40px 38px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 12px 32px rgba(20, 80, 140, 0.28);
+  }
+  .cover::before {
+    content: "";
+    position: absolute;
+    right: -90px; top: -90px;
+    width: 320px; height: 320px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.14), transparent 65%);
+  }
+  .cover::after {
+    content: "";
+    position: absolute;
+    left: 0; bottom: 0;
+    width: 100%; height: 4px;
+    background: linear-gradient(90deg, #4fa8ff, #ffc247, #ff8a3d, #ff4d4d);
+  }
+  .cover .tag {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: 2.4px;
+    text-transform: uppercase;
+    font-weight: 700;
+    background: rgba(255,255,255,0.14);
+    border: 1px solid rgba(255,255,255,0.28);
+    padding: 5px 14px;
+    border-radius: 30px;
+    margin-bottom: 18px;
+  }
+  .cover h1 {
+    margin: 0 0 10px;
+    font-size: 30px;
+    line-height: 1.25;
+    font-weight: 800;
+    letter-spacing: -0.4px;
+  }
+  .cover .subtitle {
+    margin: 0;
+    font-size: 15.5px;
+    color: rgba(255,255,255,0.82);
+    max-width: 640px;
+  }
+  .cover .meta {
+    margin-top: 26px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 26px;
+    font-size: 12.5px;
+    color: rgba(255,255,255,0.72);
+    border-top: 1px solid rgba(255,255,255,0.18);
+    padding-top: 18px;
+  }
+  .cover .meta b { color: #fff; display: block; font-size: 13.5px; }
+
+  /* ================= TOC ================= */
+  .toc {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--primary);
+    border-radius: 10px;
+    padding: 22px 26px;
+    margin-top: 28px;
+  }
+  .toc h2 {
+    margin: 0 0 12px;
+    font-size: 13px;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    color: var(--primary);
+    font-weight: 800;
+  }
+  .toc ol {
+    margin: 0;
+    padding-left: 20px;
+    columns: 2;
+    column-gap: 40px;
+    font-size: 14px;
+  }
+  .toc li { margin-bottom: 5px; break-inside: avoid; }
+  .toc a { color: var(--ink); text-decoration: none; border-bottom: 1px dashed transparent; }
+  .toc a:hover { color: var(--primary); border-bottom-color: var(--primary); }
+
+  /* ================= SECTION ================= */
+  section {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 30px 34px 34px;
+    margin-top: 26px;
+    box-shadow: 0 2px 10px rgba(20, 40, 70, 0.04);
+  }
+
+  .sec-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 2px solid var(--line);
+  }
+  .sec-num {
+    flex: 0 0 auto;
+    width: 38px; height: 38px;
+    border-radius: 9px;
+    background: var(--primary);
+    color: #fff;
+    display: grid;
+    place-items: center;
+    font-weight: 800;
+    font-size: 16px;
+    box-shadow: 0 4px 10px rgba(20,80,140,0.3);
+  }
+  .sec-head h2 {
+    margin: 0;
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: -0.2px;
+    color: var(--ink);
+  }
+
+  h3 {
+    font-size: 14.5px;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    color: var(--primary);
+    margin: 26px 0 12px;
+    font-weight: 800;
+  }
+  h3:first-of-type { margin-top: 4px; }
+
+  p { margin: 0 0 12px; color: #2c3a4d; }
+
+  /* ================= STATE TABLE ================= */
+  .state-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 8px 0 6px;
+    font-size: 14px;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+  }
+  .state-table th {
+    background: #eef3f9;
+    color: var(--primary);
+    font-size: 12px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    padding: 12px 10px;
+    border-bottom: 1px solid var(--line);
+    border-right: 1px solid var(--line);
+  }
+  .state-table th:last-child { border-right: none; }
+  .state-table td {
+    padding: 16px 10px;
+    text-align: center;
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    font-weight: 600;
+  }
+  .state-table td:last-child { border-right: none; }
+  .state-table tr:last-child td { border-bottom: none; }
+  .state-table td.label {
+    text-align: left;
+    background: #f7f9fc;
+    color: var(--muted);
+    font-weight: 700;
+    font-size: 12.5px;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    width: 190px;
+  }
+  .temp-range {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .chip {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    border: 1.5px solid;
+  }
+  .chip.cold    { color: var(--primary); background: var(--primary-soft); border-color: #a8c8ea; }
+  .chip.warm    { color: var(--warm);    background: var(--warm-soft);    border-color: #edc37a; }
+  .chip.hot     { color: var(--hot);     background: var(--hot-soft);     border-color: #e6a49b; }
+  .chip.shot    { color: var(--superhot);background: var(--superhot-soft);border-color: #cf8b82; }
+
+  /* ================= CALLOUT ================= */
+  .callout {
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 14px;
+    border-left: 4px solid;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .callout .ico { font-size: 17px; line-height: 1.4; }
+  .callout.info  { background: var(--primary-soft); border-color: var(--primary); color: #14406e; }
+  .callout.warn  { background: var(--warm-soft);    border-color: var(--warm);    color: #8a5a06; }
+  .callout.danger{ background: var(--accent-soft);  border-color: var(--accent);  color: #8a211a; }
+  .callout b { font-weight: 800; }
+
+  /* ================= GRID / CARDS ================= */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 16px 0;
+  }
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin: 16px 0;
+  }
+
+  .card {
+    background: #f9fbfd;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 16px 18px;
+  }
+  .card h4 {
+    margin: 0 0 10px;
+    font-size: 13px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--primary);
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card h4::before {
+    content: "";
+    width: 5px; height: 15px;
+    border-radius: 2px;
+    background: var(--primary);
+  }
+  .card ul { margin: 0; padding-left: 18px; font-size: 13.5px; color: #3b4a5e; }
+  .card li { margin-bottom: 5px; }
+  .card li b { color: var(--ink); }
+
+  /* ================= DATA TABLE ================= */
+  table.data {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+    margin: 12px 0;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  table.data th {
+    background: #eef3f9;
+    color: var(--primary);
+    text-align: left;
+    padding: 10px 14px;
+    font-size: 11.5px;
+    letter-spacing: 0.9px;
+    text-transform: uppercase;
+    font-weight: 800;
+    border-bottom: 1px solid var(--line);
+  }
+  table.data td {
+    padding: 10px 14px;
+    border-bottom: 1px solid #eef2f7;
+    vertical-align: top;
+    color: #33445a;
+  }
+  table.data tr:last-child td { border-bottom: none; }
+  table.data tr:nth-child(even) td { background: #fbfcfe; }
+  table.data td.k { font-weight: 700; color: var(--ink); white-space: nowrap; }
+  .val {
+    display: inline-block;
+    background: var(--primary-soft);
+    color: var(--primary);
+    font-weight: 800;
+    padding: 2px 9px;
+    border-radius: 5px;
+    font-size: 12.5px;
+    font-variant-numeric: tabular-nums;
+  }
+  .val.red { background: var(--accent-soft); color: var(--accent); }
+  .val.amber { background: var(--warm-soft); color: #8a5a06; }
+
+  /* ================= CONDITION LIST ================= */
+  .cond {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .cond li {
+    position: relative;
+    padding: 7px 0 7px 30px;
+    border-bottom: 1px dashed #e4eaf2;
+    font-size: 13.8px;
+    color: #33445a;
+  }
+  .cond li:last-child { border-bottom: none; }
+  .cond li::before {
+    content: "✓";
+    position: absolute;
+    left: 0; top: 6px;
+    width: 19px; height: 19px;
+    border-radius: 50%;
+    background: var(--primary-soft);
+    color: var(--primary);
+    font-size: 11px;
+    font-weight: 900;
+    display: grid;
+    place-items: center;
+  }
+  .cond li.and::before { content: "+"; }
+  .cond li.reset::before {
+    content: "↺";
+    background: var(--warm-soft);
+    color: var(--warm);
+  }
+  .cond li.target::before {
+    content: "★";
+    background: #eafaf0;
+    color: #1e8449;
+  }
+  .cond li b { color: var(--ink); font-weight: 800; }
+
+  /* ================= FOOTER ================= */
+  footer {
+    margin-top: 34px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+    padding: 20px;
+    border-top: 1px solid var(--line);
+  }
+  footer b { color: var(--primary); }
+
+  /* ================= RESPONSIVE ================= */
+  @media (max-width: 720px) {
+    .page { padding: 20px 12px 60px; }
+    .cover { padding: 30px 22px; }
+    .cover h1 { font-size: 22px; }
+    section { padding: 22px 18px; }
+    .toc ol { columns: 1; }
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .state-table td.label { width: auto; font-size: 11px; }
+    .state-table { font-size: 12px; }
+    .chip { padding: 4px 10px; font-size: 11px; }
+  }
+
+  @media print {
+    body { background: #fff; }
+    section, .cover, .toc { box-shadow: none; break-inside: avoid; }
+    .cover { background: #14508c !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ================= COVER ================= -->
+  <header class="cover">
+    <span class="tag">Tài liệu kỹ thuật vận hành</span>
+    <h1>Trạng thái khởi động Tuabin &amp; Điều kiện Runback</h1>
+    <p class="subtitle">
+      Phân loại trạng thái khởi động theo nhiệt độ Roto cao áp, tốc độ tăng giảm
+      Tuabin Master, các điều kiện chuyển Man và logic Runback hệ thống phụ.
+    </p>
+    <div class="meta">
+      <div><b>Hệ thống</b>Tuabin – Lò hơi – Máy phát</div>
+      <div><b>Phạm vi</b>Khởi động &amp; Runback</div>
+      <div><b>Đơn vị</b>°C · bar · MW · %/s</div>
+    </div>
+  </header>
+
+  <!-- ================= TOC ================= -->
+  <nav class="toc">
+    <h2>Mục lục</h2>
+    <ol>
+      <li><a href="#s1">Trạng thái khởi động theo nhiệt độ Roto</a></li>
+      <li><a href="#s2">Tốc độ tăng giảm Tuabin Master</a></li>
+      <li><a href="#s3">Điều kiện Tuabin chuyển Man</a></li>
+      <li><a href="#s4">Bypass hạ áp – Quick Open / Quick Close</a></li>
+      <li><a href="#s5">Điều kiện Runback bơm tuần hoàn</a></li>
+      <li><a href="#s6">Điều kiện Runback bơm ngưng</a></li>
+      <li><a href="#s7">Điều kiện Runback bơm cấp</a></li>
+    </ol>
+  </nav>
+
+  <!-- ================= 1. STATE ================= -->
+  <section id="s1">
+    <div class="sec-head">
+      <div class="sec-num">1</div>
+      <h2>Trạng thái khởi động theo nhiệt độ Roto cao áp</h2>
+    </div>
+
+    <p>
+      Trạng thái khởi động của Tuabin được phân loại dựa trên
+      <b>nhiệt độ Roto cao áp (HP Rotor)</b> tại thời điểm khởi động.
+      Có bốn trạng thái tương ứng với bốn dải nhiệt độ:
+    </p>
+
+    <table class="state-table">
+      <thead>
+        <tr>
+          <th>Nhiệt độ Roto cao áp</th>
+          <th>&lt; 150&nbsp;°C</th>
+          <th>150 – 217&nbsp;°C</th>
+          <th>217 – 417&nbsp;°C</th>
+          <th>&gt; 417&nbsp;°C</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="label">Trạng thái khởi động</td>
+          <td>
+            <span class="temp-range">&lt; 150 °C</span>
+            <span class="chip cold">Lạnh</span>
+          </td>
+          <td>
+            <span class="temp-range">150 °C &lt; T &lt; 217 °C</span>
+            <span class="chip warm">Ấm</span>
+          </td>
+          <td>
+            <span class="temp-range">217 °C &lt; T &lt; 417 °C</span>
+            <span class="chip hot">Nóng</span>
+          </td>
+          <td>
+            <span class="temp-range">T &gt; 417 °C</span>
+            <span class="chip shot">Cực nóng</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout info">
+      <span class="ico">ℹ</span>
+      <div>
+        Trạng thái khởi động quyết định <b>biểu đồ gia nhiệt</b>, <b>tốc độ tăng tải</b>
+        và <b>giới hạn ứng suất nhiệt</b> cho phép trên Roto và thân Tuabin. Nhiệt độ
+        Roto càng cao, yêu cầu gia nhiệt và tăng tải càng phải thận trọng.
+      </div>
+    </div>
+
+    <h3>Tóm tắt nhanh</h3>
+    <div class="grid-2">
+      <div class="card">
+        <h4>Khởi động Lạnh</h4>
+        <ul>
+          <li>Nhiệt độ Roto <b>&lt; 150 °C</b></li>
+          <li>Cần gia nhiệt ban đầu trước khi tăng tải</li>
+          <li>Kiểm soát chặt chẽ tốc độ gia nhiệt</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Khởi động Ấm</h4>
+        <ul>
+          <li>Nhiệt độ Roto <b>150 – 217 °C</b></li>
+          <li>Thời gian gia nhiệt rút ngắn</li>
+          <li>Theo dõi giãn nở nhiệt của Roto</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Khởi động Nóng</h4>
+        <ul>
+          <li>Nhiệt độ Roto <b>217 – 417 °C</b></li>
+          <li>Cần kiểm soát làm mát tránh sốc nhiệt</li>
+          <li>Giới hạn tốc độ tăng tải</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Khởi động Cực nóng</h4>
+        <ul>
+          <li>Nhiệt độ Roto <b>&gt; 417 °C</b></li>
+          <li>Yêu cầu quy trình đặc biệt</li>
+          <li>Nguy cơ ứng suất nhiệt rất cao</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 2. RATE ================= -->
+  <section id="s2">
+    <div class="sec-head">
+      <div class="sec-num">2</div>
+      <h2>Tốc độ tăng giảm Tuabin Master</h2>
+    </div>
+
+    <p>
+      Tốc độ thay đổi tải của Tuabin Master được chia thành hai chế độ rõ ràng:
+      vận hành bình thường và Runback.
+    </p>
+
+    <table class="data">
+      <thead>
+        <tr>
+          <th style="width:38%">Chế độ</th>
+          <th style="width:24%">Tốc độ</th>
+          <th>Điều kiện kích hoạt</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="k">Bình thường</td>
+          <td><span class="val">0,167 %/giây</span></td>
+          <td>Tăng/giảm tải theo biểu đồ vận hành tiêu chuẩn</td>
+        </tr>
+        <tr>
+          <td class="k">Runback Tuabin</td>
+          <td><span class="val red">10 %/giây</span></td>
+          <td>
+            Máy cắt đầu cực không đóng, PLU, Tuabin trip,
+            tách lưới giữ điện tự dùng
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout danger">
+      <span class="ico">⚠</span>
+      <div>
+        Runback Tuabin giảm tải với tốc độ <b>10 %/giây</b> – nhanh gấp ~60 lần so với
+        chế độ bình thường. Đây là biện pháp bảo vệ khẩn cấp nhằm tránh hư hỏng
+        Tuabin và các hệ thống phụ trợ.
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 3. MAN ================= -->
+  <section id="s3">
+    <div class="sec-head">
+      <div class="sec-num">3</div>
+      <h2>Điều kiện Tuabin chuyển Man</h2>
+    </div>
+
+    <p>
+      Tuabin chuyển sang chế độ <b>Manual (Man)</b> khi xuất hiện một trong các
+      điều kiện lỗi hoặc sai lệch sau:
+    </p>
+
+    <ul class="cond">
+      <li>Tải thực tế tổ máy lỗi sau <b>2 giây</b> và BM nhà máy ở chế độ Auto.</li>
+      <li>Áp lực thực tế hơi chính lỗi sau <b>2 giây</b>.</li>
+      <li>Tải tham chiếu của Tuabin lỗi sau <b>2 giây</b>.</li>
+      <li>
+        Chênh lệch tải đặt và tải tham chiếu <b>&gt; 2 %</b> trong <b>60 giây</b>
+        và Tuabin cùng các hệ thống phụ (Nước cấp, nước ngưng, tuần hoàn)
+        <b>không runback</b>.
+      </li>
+      <li>Hệ thống nước làm mát stator Runback.</li>
+      <li>
+        Tuabin Runback: Máy cắt đầu cực không đóng, PLU, Tuabin trip,
+        tách lưới giữ điện tự dùng.
+      </li>
+      <li>Tuabin không ở chế độ UMC.</li>
+      <li>
+        Trong quá trình Runback Tuabin, các hệ thống phụ (Nước cấp, nước ngưng,
+        tuần hoàn) và tải đặt Tuabin lớn hơn tải tham chiếu <b>&gt; 10 %</b>.
+      </li>
+    </ul>
+
+    <div class="callout warn">
+      <span class="ico">⚙</span>
+      <div>
+        Việc chuyển Man cho phép người vận hành can thiệp trực tiếp vào tải Tuabin
+        khi hệ thống tự động không còn đáng tin cậy.
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 4. BYPASS ================= -->
+  <section id="s4">
+    <div class="sec-head">
+      <div class="sec-num">4</div>
+      <h2>Bypass hạ áp – Quick Open / Quick Close</h2>
+    </div>
+
+    <h3>Quick Open – Van điều chỉnh áp lực &amp; phun giảm ôn</h3>
+    <p>Lệnh Quick Open được kích hoạt khi:</p>
+    <ul class="cond">
+      <li>Áp lực hơi chính <b>&gt; 184 bar</b> giữ trong <b>3 giây</b>.</li>
+      <li>
+        Runback Tuabin (Máy cắt đầu cực không đóng, PLU, Tuabin trip,
+        tách lưới giữ điện tự dùng) giữ trong <b>3 giây</b> kết hợp với
+        áp lực hơi chính <b>&gt; 120 bar</b> giữ trong <b>3 giây</b>.
+      </li>
+    </ul>
+
+    <h3>Quick Close – Van điều chỉnh áp lực, van phun giảm ôn bypass, van đóng ngắt nhanh bypass hạ áp</h3>
+    <p>Lệnh Quick Close được kích hoạt sau <b>5 giây</b> khi:</p>
+    <ul class="cond">
+      <li>
+        Van phun giảm ôn bypass hạ áp mở <b>&gt; 2 %</b> và nhiệt độ hơi thoát
+        bypass hạ áp <b>&gt; 250 °C</b> sau <b>10 giây</b>.
+      </li>
+      <li>
+        Chân không bình ngưng cao cao <b>&gt; 0,254 bar</b> sau <b>10 giây</b>.
+      </li>
+      <li>
+        Van đóng ngắt nhanh phun giảm ôn bypass hạ áp không đóng và
+        áp lực nước phun giảm ôn thấp thấp <b>&lt; 8 bar</b> sau <b>10 giây</b>.
+      </li>
+      <li>Không có bơm tuần hoàn nào làm việc sau <b>5 giây</b>.</li>
+    </ul>
+
+    <table class="data">
+      <thead>
+        <tr>
+          <th>Thông số</th>
+          <th>Ngưỡng tác động</th>
+          <th>Thời gian trễ</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="k">Áp lực hơi chính (Quick Open)</td>
+          <td><span class="val">&gt; 184 bar</span></td>
+          <td>3 giây</td>
+        </tr>
+        <tr>
+          <td class="k">Áp lực hơi chính kết hợp Runback</td>
+          <td><span class="val">&gt; 120 bar</span></td>
+          <td>3 giây</td>
+        </tr>
+        <tr>
+          <td class="k">Nhiệt độ hơi thoát bypass hạ áp</td>
+          <td><span class="val amber">&gt; 250 °C</span></td>
+          <td>10 giây</td>
+        </tr>
+        <tr>
+          <td class="k">Chân không bình ngưng cao cao</td>
+          <td><span class="val red">&gt; 0,254 bar</span></td>
+          <td>10 giây</td>
+        </tr>
+        <tr>
+          <td class="k">Áp lực nước phun giảm ôn thấp thấp</td>
+          <td><span class="val red">&lt; 8 bar</span></td>
+          <td>10 giây</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ================= 5. CIRC WATER ================= -->
+  <section id="s5">
+    <div class="sec-head">
+      <div class="sec-num">5</div>
+      <h2>Điều kiện Runback bơm tuần hoàn</h2>
+    </div>
+
+    <p>
+      Logic Runback bơm tuần hoàn được kích hoạt sau <b>5 giây</b> khi thỏa mãn
+      đồng thời các điều kiện sau:
+    </p>
+
+    <div class="grid-2">
+      <div class="card">
+        <h4>Điều kiện Auto</h4>
+        <ul>
+          <li>BM lò 2A: Auto</li>
+          <li>BM lò 2B: Auto</li>
+          <li>Biến tần quạt khói A hoặc B lò 2A: Auto</li>
+          <li>Biến tần quạt khói A hoặc B lò 2B: Auto</li>
+          <li>BM tổng: Auto</li>
+          <li>Tuabin Master: Auto</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Điều kiện tải</h4>
+        <ul>
+          <li>Tải tổ máy <b>&gt; 315 MW</b></li>
+          <li>Tốc độ giảm tải <b>9 MW/s</b></li>
+          <li>Mục tiêu giảm về <b>216 MW</b></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <span class="ico">↺</span>
+      <div>
+        <b>Reset Runback:</b> Khi tải tổ máy giảm xuống dưới <b>310 MW</b>,
+        tín hiệu Runback bơm tuần hoàn sẽ được Reset và tải sẽ giữ ở <b>310 MW</b>.
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 6. CONDENSATE ================= -->
+  <section id="s6">
+    <div class="sec-head">
+      <div class="sec-num">6</div>
+      <h2>Điều kiện Runback bơm ngưng</h2>
+    </div>
+
+    <p>
+      Logic Runback bơm ngưng được kích hoạt sau <b>8 giây</b> khi thỏa mãn
+      đồng thời các điều kiện sau:
+    </p>
+
+    <div class="grid-2">
+      <div class="card">
+        <h4>Điều kiện Auto</h4>
+        <ul>
+          <li>BM lò 2A: Auto</li>
+          <li>BM lò 2B: Auto</li>
+          <li>Biến tần quạt khói A hoặc B lò 2A: Auto</li>
+          <li>Biến tần quạt khói A hoặc B lò 2B: Auto</li>
+          <li>BM tổng: Auto</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Điều kiện tải</h4>
+        <ul>
+          <li>Tải tổ máy <b>&gt; 320 MW</b></li>
+          <li>Tốc độ giảm tải <b>9 MW/s</b></li>
+          <li>Mục tiêu giảm về <b>216 MW</b></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <span class="ico">↺</span>
+      <div>
+        <b>Reset Runback:</b> Khi tải tổ máy giảm xuống dưới <b>310 MW</b>,
+        tín hiệu Runback bơm ngưng sẽ được Reset và tải sẽ giữ ở <b>310 MW</b>.
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 7. FEEDWATER ================= -->
+  <section id="s7">
+    <div class="sec-head">
+      <div class="sec-num">7</div>
+      <h2>Điều kiện Runback bơm cấp</h2>
+    </div>
+
+    <p>
+      Logic Runback bơm cấp có <b>hai nhánh điều kiện</b> khác nhau tùy theo
+      dải tải tổ máy.
+    </p>
+
+    <h3>Trường hợp 1 – Tải tổ máy 270 MW &lt; X &lt; 385 MW</h3>
+    <p>Runback bơm cấp kích hoạt sau <b>8 giây</b> khi:</p>
+    <div class="grid-2">
+      <div class="card">
+        <h4>Điều kiện Auto</h4>
+        <ul>
+          <li>BM lò 2A: Auto</li>
+          <li>BM lò 2B: Auto</li>
+          <li>Biến tần quạt khói A hoặc B lò 2A: Auto</li>
+          <li>Biến tần quạt khói A hoặc B lò 2B: Auto</li>
+          <li>BM tổng: Auto</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Điều kiện tải</h4>
+        <ul>
+          <li>Tải tổ máy <b>&gt; 320 MW</b></li>
+          <li>Tốc độ giảm tải <b>9 MW/s</b></li>
+          <li>Mục tiêu giảm về <b>216 MW</b></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <span class="ico">↺</span>
+      <div>
+        <b>Reset Runback:</b> Khi tải tổ máy giảm xuống dưới <b>310 MW</b>,
+        tín hiệu Runback bơm cấp sẽ được Reset và tải sẽ giữ ở <b>310 MW</b>.
+      </div>
+    </div>
+
+    <h3>Trường hợp 2 – Tải tổ máy &gt; 385 MW</h3>
+    <p>Runback bơm cấp kích hoạt sau <b>8 giây</b> khi:</p>
+    <div class="grid-2">
+      <div class="card">
+        <h4>Điều kiện Auto</h4>
+        <ul>
+          <li>Biến tần quạt khói A hoặc B lò 2A: Auto</li>
+          <li>Biến tần quạt khói A hoặc B lò 2B: Auto</li>
+          <li>Fuel Master: Auto</li>
+          <li>Tuabin Master: Auto</li>
+          <li>BM lò 2A hoặc 2B: <b>&gt; 70 %</b></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Hành động</h4>
+        <ul>
+          <li>MFT lò hơi nào có lưu lượng hơi chính thấp hơn</li>
+          <li>BM lò sẽ giảm về <b>68 %</b></li>
+          <li>Trip quạt gió sơ cấp lò đấy sau <b>5 giây</b></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout danger">
+      <span class="ico">↺</span>
+      <div>
+        <b>Reset Runback:</b> Chỉ Reset tín hiệu Runback bơm cấp khi
+        <b>BM lò &lt; 68,1 %</b>.
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FOOTER ================= -->
+  <footer>
+    <p>
+      <b>Báo cáo kỹ thuật – Trạng thái khởi động Tuabin &amp; Điều kiện Runback</b><br>
+      Tài liệu tổng hợp từ: <i>TRẠNG THÁI NÓNG LẠNH ẤM.docx</i>
+    </p>
+  </footer>
+
+</div>
+</body>
+</html>
