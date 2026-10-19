@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ảnh hưởng của nhiệt độ hơi chính tới thiết bị và hiệu suất tuabin</title>
+<style>
+  :root{
+    --primary: #0b5394;
+    --primary-dark: #073b6b;
+    --primary-light: #e8f0fb;
+    --accent: #c0392b;
+    --accent-light: #fdecea;
+    --warning: #f39c12;
+    --warning-light: #fff8e1;
+    --success: #27ae60;
+    --success-light: #e8f8ef;
+    --purple: #7d3c98;
+    --purple-light: #f4ecf7;
+    --border: #d0d7de;
+    --bg: #f7f9fc;
+    --text: #1f2328;
+    --muted: #57606a;
+  }
+  *{box-sizing: border-box;}
+  body{
+    margin: 0;
+    font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    font-size: 16px;
+  }
+  .container{
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 32px 22px 80px;
+  }
+  header{
+    background: linear-gradient(135deg, #b9770e 0%, #f39c12 50%, #f1c40f 100%);
+    color: #fff;
+    padding: 38px 28px;
+    text-align: center;
+    border-radius: 12px;
+    margin-bottom: 28px;
+    box-shadow: 0 6px 24px rgba(243,156,18,0.35);
+    position: relative;
+    overflow: hidden;
+  }
+  header::before{
+    content: "🌡";
+    position: absolute;
+    font-size: 12rem;
+    opacity: 0.1;
+    top: -10px;
+    right: 20px;
+    line-height: 1;
+  }
+  header h1{
+    margin: 0 0 12px;
+    font-size: 1.6rem;
+    line-height: 1.35;
+    position: relative;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  }
+  header .subtitle{
+    margin: 0;
+    opacity: 0.97;
+    font-size: 1rem;
+    font-style: italic;
+    position: relative;
+  }
+  header .scope{
+    display: inline-block;
+    margin-top: 14px;
+    background: rgba(0,0,0,0.25);
+    border: 1px solid rgba(255,255,255,0.35);
+    padding: 6px 18px;
+    border-radius: 20px;
+    font-size: 0.88rem;
+    font-weight: 500;
+    position: relative;
+  }
+  h2{
+    color: var(--primary);
+    border-left: 5px solid var(--primary);
+    padding-left: 14px;
+    margin-top: 42px;
+    margin-bottom: 16px;
+    font-size: 1.35rem;
+  }
+  h3{
+    color: var(--primary-dark);
+    margin-top: 24px;
+    margin-bottom: 10px;
+    font-size: 1.14rem;
+  }
+  h4{
+    color: #1a4d80;
+    margin-top: 18px;
+    margin-bottom: 8px;
+    font-size: 1.02rem;
+  }
+  p{margin: 10px 0;}
+  ul, ol{margin: 8px 0 12px; padding-left: 24px;}
+  li{margin: 6px 0;}
+  code{
+    background: #eef2f7;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 0.9em;
+    color: #b83280;
+    white-space: nowrap;
+  }
+  .section-card{
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .callout{
+    background: var(--primary-light);
+    border-left: 4px solid var(--primary);
+    padding: 14px 18px;
+    border-radius: 6px;
+    margin: 18px 0;
+  }
+  .callout.warning{
+    background: var(--warning-light);
+    border-left-color: var(--warning);
+  }
+  .callout.danger{
+    background: var(--accent-light);
+    border-left-color: var(--accent);
+  }
+  .callout.success{
+    background: var(--success-light);
+    border-left-color: var(--success);
+  }
+  .callout.purple{
+    background: var(--purple-light);
+    border-left-color: var(--purple);
+  }
+  .callout strong{color: var(--primary-dark);}
+  .callout.danger strong{color: var(--accent);}
+  .callout.warning strong{color: #b9770e;}
+  .callout.success strong{color: #1e8449;}
+  .callout.purple strong{color: var(--purple);}
+
+  .badge{
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #fff;
+  }
+  .badge.blue{background: var(--primary);}
+  .badge.red{background: var(--accent);}
+  .badge.green{background: var(--success);}
+  .badge.orange{background: var(--warning);}
+  .badge.purple{background: var(--purple);}
+  .badge.gray{background: #6b7280;}
+
+  /* Effect cards */
+  .effect-card{
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+  }
+  .effect-header{
+    padding: 15px 22px;
+    color: #fff;
+    font-size: 1.12rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .effect-header.up{background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);}
+  .effect-header.down{background: linear-gradient(135deg, #0b5394 0%, #1a73c9 100%);}
+  .effect-header .arrow{
+    background: rgba(255,255,255,0.25);
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    flex-shrink: 0;
+    font-size: 1.3rem;
+  }
+  .effect-body{
+    padding: 18px 24px 10px;
+  }
+  .effect-body h4{
+    color: var(--primary-dark);
+    margin-top: 14px;
+    margin-bottom: 8px;
+    font-size: 1.04rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .effect-body h4::before{
+    content: "▸";
+    color: var(--primary);
+    font-size: 1.1rem;
+  }
+  .effect-body .group-label{
+    display: inline-block;
+    background: var(--primary-light);
+    color: var(--primary-dark);
+    padding: 3px 12px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-top: 12px;
+    margin-bottom: 6px;
+  }
+  .effect-body .group-label.eff{
+    background: var(--success-light);
+    color: #1e8449;
+  }
+  .effect-body .group-label.safe{
+    background: var(--accent-light);
+    color: var(--accent);
+  }
+  .effect-body .group-label.eco{
+    background: var(--warning-light);
+    color: #b9770e;
+  }
+
+  /* Cause table */
+  table{
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    font-size: 0.92rem;
+  }
+  thead{
+    background: var(--primary);
+    color: #fff;
+  }
+  th, td{
+    padding: 11px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tbody tr:nth-child(even){background: #f4f7fb;}
+  tbody tr:hover{background: #e8f0fb;}
+  th{font-weight: 600; font-size: 0.88rem;}
+  .cause-table th:nth-child(1){width: 30%;}
+  .cause-table th:nth-child(2){width: 70%;}
+
+  /* Step cards */
+  .action-step{
+    background: #f9fbfd;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 14px;
+    border-left: 5px solid var(--success);
+    display: flex;
+    gap: 16px;
+  }
+  .action-num{
+    background: var(--success);
+    color: #fff;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    flex-shrink: 0;
+    font-size: 1rem;
+  }
+  .action-content{flex: 1;}
+  .action-content .title{
+    font-weight: 700;
+    color: #1e8449;
+    margin-bottom: 6px;
+    font-size: 1.05rem;
+  }
+  .action-content ul{margin: 6px 0;}
+
+  .emergency-box{
+    background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
+    color: #fff;
+    padding: 22px 26px;
+    border-radius: 10px;
+    margin: 22px 0;
+    box-shadow: 0 6px 20px rgba(192,57,43,0.3);
+  }
+  .emergency-box h3{
+    color: #fff;
+    margin-top: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.15rem;
+  }
+  .emergency-box h3::before{
+    content: "⚠";
+    font-size: 1.5rem;
+  }
+  .emergency-box p{margin: 10px 0;}
+  .emergency-box strong{color: #ffe082;}
+  .emergency-box ul{margin: 10px 0 0; padding-left: 22px;}
+
+  .toc{
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 22px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .toc h3{
+    margin-top: 0;
+    color: var(--primary);
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .toc ol{
+    margin: 0;
+    padding-left: 22px;
+  }
+  .toc li{margin: 6px 0;}
+  .toc a{
+    color: var(--primary-dark);
+    text-decoration: none;
+    transition: color .2s;
+  }
+  .toc a:hover{
+    color: var(--accent);
+    text-decoration: underline;
+  }
+
+  .params-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+    margin: 18px 0;
+  }
+  .param-box{
+    background: linear-gradient(135deg, #f4f8fd 0%, #e8f0fb 100%);
+    border: 1px solid #c9dcf0;
+    border-radius: 8px;
+    padding: 14px 16px;
+    border-left: 4px solid var(--primary);
+  }
+  .param-box .label{
+    font-size: 0.82rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 4px;
+  }
+  .param-box .value{
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+    font-family: "Consolas", monospace;
+  }
+  .param-box.danger{
+    background: linear-gradient(135deg, #fdf3f2 0%, #fdecea 100%);
+    border-color: #f5c6c0;
+    border-left-color: var(--accent);
+  }
+  .param-box.danger .value{color: var(--accent);}
+  .param-box.warning{
+    background: linear-gradient(135deg, #fffcf0 0%, #fff8e1 100%);
+    border-color: #f5dfa0;
+    border-left-color: var(--warning);
+  }
+  .param-box.warning .value{color: #b9770e;}
+
+  footer{
+    margin-top: 50px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.88rem;
+  }
+
+  @media(max-width: 720px){
+    header h1{font-size: 1.2rem;}
+    header::before{font-size: 7rem; top: 10px;}
+    h2{font-size: 1.15rem;}
+    .effect-body{padding: 14px 16px 8px;}
+    .action-step{padding: 12px 14px; gap: 12px;}
+    .action-num{width: 32px; height: 32px; font-size: 0.9rem;}
+    table{font-size: 0.82rem;}
+    th, td{padding: 9px 10px;}
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <h1>Ảnh hưởng của nhiệt độ hơi chính tới thiết bị và hiệu suất tuabin</h1>
+    <p class="subtitle">Hiện tượng – Nguyên nhân – Biện pháp xử lý sự cố nhiệt độ hơi chính tăng cao</p>
+    <span class="scope">Nhà máy nhiệt điện – Chu trình Rankine</span>
+  </header>
+
+  <!-- TOC -->
+  <div class="toc">
+    <h3>Mục lục</h3>
+    <ol>
+      <li><a href="#s1">Ảnh hưởng của nhiệt độ hơi chính tới thiết bị và hiệu suất tuabin</a></li>
+      <li><a href="#s2">Hiện tượng, nguyên nhân và biện pháp xử lý sự cố nhiệt độ hơi chính tăng cao</a></li>
+    </ol>
+  </div>
+
+  <!-- I -->
+  <section id="s1">
+    <h2>1. Ảnh hưởng của nhiệt độ hơi chính tới thiết bị và hiệu suất tuabin</h2>
+
+    <!-- a. Tăng cao -->
+    <div class="effect-card">
+      <div class="effect-header up">
+        <span class="arrow">↑</span>
+        <span>a. Khi nhiệt độ hơi chính tăng cao</span>
+      </div>
+      <div class="effect-body">
+        <div class="group-label eff">Đối với hiệu suất tuabin</div>
+        <ul>
+          <li>Khi áp lực hơi chính (p₀) và áp suất hơi thoát (p<sub>k</sub>) không đổi, nếu tăng nhiệt độ hơi mới (T₀) thì <strong>nhiệt độ trung bình cấp nhiệt của chu trình tăng lên</strong>, làm tăng nhiệt giáng lý thuyết, từ đó <strong>làm tăng hiệu suất nhiệt của tuabin</strong>.</li>
+          <li>Đồng thời, <strong>độ khô của hơi ở các tầng cánh cuối tuabin hạ áp (LP) tăng</strong>, giảm độ ẩm của hơi thoát.</li>
+        </ul>
+
+        <div class="group-label safe">Đối với an toàn kim loại thiết bị</div>
+        <p>Nhiệt độ hơi vượt ngưỡng định mức làm kim loại các bộ phận chịu nhiệt, chịu áp bị <strong>quá nhiệt</strong>:</p>
+        <ul>
+          <li>Bộ quá nhiệt lò hơi;</li>
+          <li>Đường ống hơi chính;</li>
+          <li>Cụm van Stop MSV, van điều chỉnh CV;</li>
+          <li>Cánh tĩnh/động tuabin cao áp.</li>
+        </ul>
+        <ul>
+          <li>Thúc đẩy quá trình <strong>dão nhiệt (creep)</strong> của kim loại, suy giảm độ bền cơ học và làm giảm tuổi thọ làm việc của tổ máy.</li>
+          <li>Nếu nhiệt độ tăng đột ngột còn gây ra <strong>ứng suất nhiệt và độ chênh giãn nở lớn</strong> giữa rotor và stator.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- b. Giảm thấp -->
+    <div class="effect-card">
+      <div class="effect-header down">
+        <span class="arrow">↓</span>
+        <span>b. Khi nhiệt độ hơi chính giảm thấp</span>
+      </div>
+      <div class="effect-body">
+        <div class="group-label eco">Đối với tính kinh tế chu trình</div>
+        <ul>
+          <li>Giảm nhiệt độ hơi mới làm <strong>giảm nhiệt giáng lý thuyết</strong> của chu trình Rankine, làm sụt giảm công suất và hiệu suất của tuabin.</li>
+          <li>Muốn duy trì tải tổ máy bắt buộc phải <strong>tăng lưu lượng hơi</strong>, làm gia tăng tổn thất áp lực và <strong>tăng lực dọc trục</strong> lên gối đỡ chặn.</li>
+        </ul>
+
+        <div class="group-label safe">Nguy cơ xói mòn và thủy kích (Water Hammer)</div>
+        <ul>
+          <li>Hơi sớm bị bão hòa làm <strong>độ ẩm ở các tầng cánh cuối tuabin hạ áp tăng cao</strong>, các hạt nước ngưng li ti va đập với vận tốc lớn gây <strong>rỗ, mòn cánh động</strong>.</li>
+          <li>Đặc biệt, nếu nhiệt độ hơi chính giảm đột ngột (giảm <code>≥ 50 °C trong 15 phút</code> hoặc <code>−65,5 °C trong 15 phút</code>), nguy cơ rất cao dẫn đến <strong>thủy kích tuabin</strong>, làm <strong>cong trục rotor</strong>, <strong>cháy hỏng gối chặn</strong> và buộc phải ngừng máy khẩn cấp có phá hoại chân không.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- II -->
+  <section id="s2">
+    <h2>2. Hiện tượng, nguyên nhân và biện pháp xử lý sự cố nhiệt độ hơi chính tăng cao</h2>
+
+    <!-- 2.1 Dấu hiệu -->
+    <h3>2.1. Dấu hiệu hiện tượng</h3>
+    <div class="section-card">
+      <ul>
+        <li>Hệ thống DCS/TCS phát tín hiệu chuông và cảnh báo hiển thị <strong>nhiệt độ hơi chính (hơi quá nhiệt) cao</strong>.</li>
+        <li>Dải nhiệt độ làm việc trung bình của vùng quá nhiệt trên lò hơi tăng lên.</li>
+        <li>Các van phun nước giảm ôn hơi chính <strong>tự động mở tăng dần độ mở lên 100 %</strong> nhưng nhiệt độ hơi vẫn tiếp tục tăng cao.</li>
+      </ul>
+    </div>
+
+    <!-- 2.2 Nguyên nhân -->
+    <h3>2.2. Nguyên nhân sự cố</h3>
+    <table class="cause-table">
+      <thead>
+        <tr>
+          <th>Nhóm nguyên nhân</th>
+          <th>Chi tiết</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="badge red">1</span> <strong>Hệ thống phun giảm ôn bị lỗi</strong></td>
+          <td>Áp lực nước cấp bị tụt; van điều chỉnh phun giảm ôn kẹt đóng/lỗi bộ định vị; tắc rọ lọc van phun làm lưu lượng nước phun giảm ôn không đủ.</td>
+        </tr>
+        <tr>
+          <td><span class="badge red">2</span> <strong>Chế độ cháy lò hơi mất cân đối</strong></td>
+          <td>Điều chỉnh tỉ lệ than – gió không hợp lý; trung tâm ngọn lửa bị đẩy lên cao về phía các cyclone; nhiệt độ vùng thu hồi nhiệt HRA tăng cao.</td>
+        </tr>
+        <tr>
+          <td><span class="badge red">3</span> <strong>Biến động thông số</strong></td>
+          <td>Áp lực hơi chính tăng nhanh hoặc nhiệt độ nước cấp đầu vào lò bị giảm.</td>
+        </tr>
+        <tr>
+          <td><span class="badge red">4</span> <strong>Cháy lại đuôi lò</strong></td>
+          <td>Cháy lại ở phần đuôi lò đối lưu làm nhiệt độ khói tăng vọt.</td>
+        </tr>
+        <tr>
+          <td><span class="badge red">5</span> <strong>Lỗi tín hiệu C&amp;I</strong></td>
+          <td>Cảm biến nhiệt độ (can nhiệt) hiển thị sai giá trị cao hoặc gửi tín hiệu giả làm vòng lặp điều khiển tự động đóng nhầm van phun giảm ôn.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- 2.3 Xử lý -->
+    <h3>2.3. Quy trình biện pháp xử lý sự cố trong ca vận hành</h3>
+
+    <div class="action-step">
+      <div class="action-num">1</div>
+      <div class="action-content">
+        <div class="title">Báo cáo &amp; Xác minh điểm đo</div>
+        <p>Kịp thời báo cáo <strong>Trưởng ca, Trưởng kíp lò máy</strong>; liên hệ nhân viên C&amp;I kiểm tra đối chiếu các điểm đo để loại trừ nguyên nhân <strong>tín hiệu đo bị lỗi ảo</strong>.</p>
+      </div>
+    </div>
+
+    <div class="action-step">
+      <div class="action-num">2</div>
+      <div class="action-content">
+        <div class="title">Xử lý hệ thống giảm ôn &amp; Nước cấp</div>
+        <ul>
+          <li>Chuyển các van phun giảm ôn hơi chính từ <strong>AUTO sang MANUAL</strong> trên DCS để mở lớn tối đa lưu lượng nước giảm ôn.</li>
+          <li>Nếu do thiếu áp lực nước cấp, can thiệp điều chỉnh <strong>khớp nối thủy lực bơm cấp sang MAN</strong> để tăng áp lực hoặc chủ động <strong>khởi động thêm tổ bơm cấp dự phòng</strong> để đảm bảo đủ nước phun.</li>
+          <li>Nếu tắc rọ lọc van phun, <strong>tăng chênh áp giữa ống góp nước cấp và bao hơi</strong> để tăng cường lưu lượng.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="action-step">
+      <div class="action-num">3</div>
+      <div class="action-content">
+        <div class="title">Phối hợp điều chỉnh quá trình cháy lò hơi</div>
+        <ul>
+          <li>Liên hệ <strong>Lò trưởng</strong> điều chỉnh lại quá trình cháy của lò hơi: giảm bớt lượng than cấp (giảm máy cấp than), điều chỉnh lại tỉ lệ phân phối gió sơ cấp – thứ cấp để <strong>hạ thấp trung tâm ngọn lửa buồng đốt</strong>.</li>
+          <li>Nếu áp lực hơi chính tăng quá cao, phối hợp đưa áp lực hơi về <strong>giá trị vận hành định mức</strong>.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="action-step">
+      <div class="action-num">4</div>
+      <div class="action-content">
+        <div class="title">Tương tác phía Tuabin</div>
+        <p>Chuyển <strong>Tuabin Master sang điều khiển bằng tay (MAN)</strong> và tăng phụ tải/tăng lưu lượng hơi qua bộ quá nhiệt để <strong>giải nhiệt hỗ trợ hạ nhiệt độ hơi chính</strong>.</p>
+      </div>
+    </div>
+
+    <div class="action-step">
+      <div class="action-num">5</div>
+      <div class="action-content">
+        <div class="title">Bảo vệ ngừng máy khẩn cấp</div>
+        <ul>
+          <li>Giám sát chặt chẽ <strong>nhiệt độ kim loại các ống vách lò</strong> và <strong>đường ống hơi chính</strong>.</li>
+          <li>Khi nhiệt độ hơi chính tăng lên đến <strong>565 °C</strong> mà không thể điều chỉnh khống chế được, sau <strong>15 phút</strong> hệ thống bảo vệ sẽ tác động <strong>TRIP Tuabin</strong>.</li>
+          <li>Nếu bảo vệ không tự động tác động, người vận hành phải <strong>ấn nút dừng khẩn cấp tuabin bằng tay</strong> và báo cáo Trưởng ca xin lệnh <strong>ngừng lò khẩn cấp (MFT)</strong>.</li>
+          <li><strong>Tuyệt đối không khởi động lại tổ máy</strong> khi chưa xác định và loại trừ triệt để nguyên nhân gây quá nhiệt.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="emergency-box">
+      <h3>LƯU Ý AN TOÀN</h3>
+      <ul>
+        <li>Khi nhiệt độ hơi chính tăng đến <strong>565 °C</strong> không điều chỉnh được trong <strong>15 phút</strong> → <strong>TRIP Tuabin</strong>.</li>
+        <li>Nếu bảo vệ không tác động → <strong>dừng tuabin bằng tay</strong> và <strong>xin lệnh MFT</strong>.</li>
+        <li><strong>Không khởi động lại tổ máy</strong> khi chưa loại trừ triệt để nguyên nhân quá nhiệt.</li>
+      </ul>
+    </div>
+
+    <div class="params-grid">
+      <div class="param-box danger">
+        <span class="label">Ngưỡng Trip Tuabin</span>
+        <span class="value">565 °C / 15 phút</span>
+      </div>
+      <div class="param-box warning">
+        <span class="label">Giảm nhiệt độ đột ngột (nguy cơ thủy kích)</span>
+        <span class="value">≥ 50 °C / 15 phút</span>
+      </div>
+      <div class="param-box warning">
+        <span class="label">Ngưỡng nguy hiểm khác</span>
+        <span class="value">−65,5 °C / 15 phút</span>
+      </div>
+    </div>
+
+    <div class="callout success">
+      <strong>Nguyên tắc chung:</strong> Nhiệt độ hơi chính ảnh hưởng trực tiếp đến <strong>hiệu suất chu trình, tuổi thọ kim loại và an toàn thiết bị</strong>. Khi nhiệt độ tăng cao, phải hành động theo đúng trình tự: <strong>xác minh điểm đo → xử lý giảm ôn → phối hợp lò hơi → điều chỉnh tuabin → sẵn sàng Trip/MFT</strong>. Ưu tiên tuyệt đối bảo vệ tuabin và đường ống hơi chính khỏi quá nhiệt.
+    </div>
+  </section>
+
+  <footer>
+    Tài liệu vận hành – Ảnh hưởng nhiệt độ hơi chính tới thiết bị và hiệu suất tuabin<br>
+    Quy trình xử lý sự cố nhiệt độ hơi chính tăng cao
+  </footer>
+
+</div>
+</body>
+</html>
