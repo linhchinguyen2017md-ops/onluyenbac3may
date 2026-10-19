@@ -1,0 +1,1409 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giáo Trình Kỹ Thuật Nhiệt - GS. Trợ Lý</title>
+    <style>
+        :root {
+            --primary: #1a365d;
+            --secondary: #2b6cb0;
+            --bg: #f0f4f8;
+            --text: #2d3748;
+            --card-bg: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* --- UI CHUNG --- */
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        header h1 {
+            font-size: 24px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px;
+            transition: all 0.3s ease;
+        }
+
+        /* --- VIEW: DANH SÁCH CÂU HỎI --- */
+        #view-list {
+            display: block;
+        }
+
+        .category-title {
+            font-size: 20px;
+            color: var(--secondary);
+            border-bottom: 2px solid var(--secondary);
+            padding-bottom: 10px;
+            margin: 30px 0 20px 0;
+            font-weight: bold;
+        }
+
+        .question-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .question-card {
+            background: var(--card-bg);
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s, border-left 0.2s;
+            border-left: 4px solid var(--secondary);
+            display: flex;
+            align-items: center;
+        }
+
+        .question-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            background-color: #e6f0fa;
+        }
+
+        .question-card span {
+            font-weight: bold;
+            color: var(--primary);
+            margin-right: 10px;
+        }
+
+        /* --- VIEW: CHI TIẾT CÂU TRẢ LỜI --- */
+        #view-detail {
+            display: none;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .btn-back {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-family: Arial, sans-serif;
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 20px;
+            transition: background 0.2s;
+        }
+
+        .btn-back:hover {
+            background: var(--primary);
+        }
+
+        .btn-back svg {
+            margin-right: 8px;
+        }
+
+        .detail-question-title {
+            font-size: 20px;
+            color: #b7791f;
+            background-color: #fefcbf;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            line-height: 1.5;
+        }
+
+        .detail-content h3 {
+            margin: 15px 0 10px 0;
+            color: var(--primary);
+        }
+
+        .detail-content ul, .detail-content ol {
+            padding-left: 25px;
+            margin-bottom: 15px;
+        }
+
+        .detail-content li {
+            margin-bottom: 8px;
+        }
+
+        .formula {
+            text-align: center;
+            font-style: italic;
+            font-weight: bold;
+            font-size: 18px;
+            margin: 15px 0;
+            color: #2b6cb0;
+        }
+
+        .diagram-box {
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            background: #fafafa;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+
+        .caption {
+            font-size: 14px;
+            font-style: italic;
+            color: #718096;
+            margin-top: 10px;
+            display: block;
+        }
+
+        /* --- TRỢ LÝ 3D (CHUYÊN GIA) --- */
+        .expert-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            align-items: flex-end;
+            flex-direction: column;
+        }
+
+        .chat-window {
+            width: 320px;
+            height: 400px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+            display: none;
+            flex-direction: column;
+            margin-bottom: 15px;
+            overflow: hidden;
+            border: 1px solid #cbd5e0;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .chat-header {
+            background: var(--primary);
+            color: white;
+            padding: 15px;
+            font-weight: bold;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-body {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            background: #f7fafc;
+        }
+
+        .message {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            max-width: 85%;
+            line-height: 1.4;
+        }
+
+        .msg-bot {
+            background: #e2e8f0;
+            align-self: flex-start;
+            border-bottom-left-radius: 0;
+        }
+
+        .msg-user {
+            background: #bee3f8;
+            align-self: flex-end;
+            margin-left: auto;
+            border-bottom-right-radius: 0;
+        }
+
+        .chat-input {
+            padding: 10px;
+            border-top: 1px solid #cbd5e0;
+            display: flex;
+            background: white;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            outline: none;
+            font-family: Arial, sans-serif;
+        }
+
+        .chat-input button {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            margin-left: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: Arial, sans-serif;
+        }
+
+        .expert-avatar {
+            width: 100px;
+            height: 100px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.2));
+        }
+
+        .expert-avatar:hover {
+            transform: scale(1.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .question-grid { grid-template-columns: 1fr; }
+            .chat-window { width: 280px; height: 350px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Ngân Hàng Câu Hỏi Kỹ Thuật Nhiệt</h1>
+    </header>
+
+    <div class="container">
+        <!-- VIEW 1: DANH SÁCH CÂU HỎI -->
+        <div id="view-list">
+            <div class="category-title">I. Nhiệt động Kỹ thuật</div>
+            <div class="question-grid">
+                <div class="question-card" onclick="showDetail('c1-1')"><span>1.1</span> Nước bão hoà, Hơi bão hòa ẩm, Hơi quá nhiệt?</div>
+                <div class="question-card" onclick="showDetail('c1-2')"><span>1.2</span> Vật chất tồn tại ở những pha nào?</div>
+                <div class="question-card" onclick="showDetail('c1-3')"><span>1.3</span> Khái niệm Nhiệt độ, phân loại nhiệt kế?</div>
+                <div class="question-card" onclick="showDetail('c1-4')"><span>1.4</span> Khái niệm áp suất, dụng cụ đo?</div>
+            </div>
+
+            <div class="category-title">II. Truyền nhiệt</div>
+            <div class="question-grid">
+                <div class="question-card" onclick="showDetail('c2-1')"><span>2.1</span> Các phương thức trao đổi nhiệt cơ bản?</div>
+                <div class="question-card" onclick="showDetail('c2-2')"><span>2.2</span> Trường nhiệt độ, Gradient nhiệt độ?</div>
+                <div class="question-card" onclick="showDetail('c2-3')"><span>2.3</span> Định luật Newton, hệ số tỏa nhiệt?</div>
+            </div>
+
+            <div class="category-title">III. Lò hơi</div>
+            <div class="question-grid">
+                <div class="question-card" onclick="showDetail('c3-1')"><span>3.1</span> Đặc tính cơ bản của lò hơi?</div>
+                <div class="question-card" onclick="showDetail('c3-2')"><span>3.2</span> Đặc tính công nghệ của Nhiên liệu?</div>
+                <div class="question-card" onclick="showDetail('c3-3')"><span>3.3</span> Phương trình cân bằng nhiệt lò hơi?</div>
+                <div class="question-card" onclick="showDetail('c3-4')"><span>3.4</span> Quá trình cháy của nhiên liệu?</div>
+                <div class="question-card" onclick="showDetail('c3-5')"><span>3.5</span> Tính chất than bột, độ mịn kinh tế?</div>
+                <div class="question-card" onclick="showDetail('c3-6')"><span>3.6</span> Ăn mòn kim loại, phương pháp phòng mòn?</div>
+                <div class="question-card" onclick="showDetail('c3-7')"><span>3.7</span> Xử lý nước, phốt phát hóa?</div>
+            </div>
+
+            <div class="category-title">IV. Tuabin & Nhà máy điện</div>
+            <div class="question-grid">
+                <div class="question-card" onclick="showDetail('c4-1')"><span>4.1</span> Tổn thất hơi và nước ngưng?</div>
+                <div class="question-card" onclick="showDetail('c4-2')"><span>4.2</span> Tuabin xung lực & phản lực?</div>
+                <div class="question-card" onclick="showDetail('c4-3')"><span>4.3</span> Ảnh hưởng p0 tăng, t0 giảm?</div>
+                <div class="question-card" onclick="showDetail('c4-4')"><span>4.4</span> Ảnh hưởng P0, t0, Pk đến Tuabin?</div>
+                <div class="question-card" onclick="showDetail('c4-5')"><span>4.5</span> Độ phân lực là gì?</div>
+                <div class="question-card" onclick="showDetail('c4-6')"><span>4.6</span> Chu trình Cacno, tại sao không áp dụng?</div>
+                <div class="question-card" onclick="showDetail('c4-7')"><span>4.7</span> Các tổn thất của Tuabin hơi?</div>
+                <div class="question-card" onclick="showDetail('c4-8')"><span>4.8</span> Chu trình Rankine trên đồ thị T-S?</div>
+                <div class="question-card" onclick="showDetail('c4-9')"><span>4.9</span> Vòng tuần hoàn tự nhiên của lò hơi?</div>
+            </div>
+        </div>
+
+        <!-- VIEW 2: CHI TIẾT CÂU TRẢ LỜI -->
+        <div id="view-detail">
+            <button class="btn-back" onclick="showList()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                Quay lại danh sách
+            </button>
+            <div id="detail-content-area">
+                <!-- Nội dung sẽ được JS đổ vào đây -->
+            </div>
+        </div>
+    </div>
+
+    <!-- TRỢ LÝ 3D -->
+    <div class="expert-container">
+        <div class="chat-window" id="chatWindow">
+            <div class="chat-header">
+                <span>GS. Nhiệt Học</span>
+                <span style="cursor:pointer;" onclick="toggleChat()">✖</span>
+            </div>
+            <div class="chat-body" id="chatBody">
+                <div class="message msg-bot">Chào bạn! Tôi là Giáo sư trợ lý môn Kỹ thuật Nhiệt. Bạn cần giải đáp thắc mắc gì không?</div>
+            </div>
+            <div class="chat-input">
+                <input type="text" id="chatInput" placeholder="Hỏi: Rankine, Tuabin, Lò hơi..." onkeypress="handleChat(event)">
+                <button onclick="sendMessage()">Gửi</button>
+            </div>
+        </div>
+        
+        <!-- Nhân vật 3D (SVG) -->
+        <div onclick="toggleChat()">
+            <svg class="expert-avatar" viewBox="0 0 100 100">
+                <!-- Áo Blouse -->
+                <path d="M 20 100 L 20 60 Q 50 40 80 60 L 80 100 Z" fill="#e2e8f0" stroke="#cbd5e0" stroke-width="2"/>
+                <!-- Cổ áo -->
+                <path d="M 40 60 L 50 75 L 60 60" fill="none" stroke="#a0aec0" stroke-width="2"/>
+                <!-- Đầu -->
+                <circle cx="50" cy="40" r="25" fill="#ffedd5" stroke="#fdba74" stroke-width="2"/>
+                <!-- Tóc -->
+                <path d="M 25 40 Q 25 10 50 10 Q 75 10 75 40 Q 60 25 50 25 Q 40 25 25 40" fill="#4a5568"/>
+                <!-- Kính -->
+                <circle cx="40" cy="40" r="8" fill="none" stroke="#2d3748" stroke-width="2"/>
+                <circle cx="60" cy="40" r="8" fill="none" stroke="#2d3748" stroke-width="2"/>
+                <line x1="48" y1="40" x2="52" y2="40" stroke="#2d3748" stroke-width="2"/>
+                <!-- Mắt -->
+                <circle cx="40" cy="40" r="2" fill="#000"/>
+                <circle cx="60" cy="40" r="2" fill="#000"/>
+                <!-- Miệng cười -->
+                <path d="M 40 55 Q 50 65 60 55" fill="none" stroke="#e53e3e" stroke-width="2" stroke-linecap="round"/>
+                <!-- Cà vạt -->
+                <polygon points="48,75 52,75 55,90 50,95 45,90" fill="#2b6cb0"/>
+            </svg>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // DỮ LIỆU CÂU HỎI VÀ TRẢ LỜI CHI TIẾT (TỪ FILE GỐC)
+        // ==========================================
+        const data = {
+            // --- PHẦN I ---
+            'c1-1': {
+                title: "Câu 1: Anh (Chị) hãy nêu các khái niệm: Nước bão hoà? Hơi bão hòa ẩm? Hơi bão hòa khô? Hơi quá nhiệt? Nhiệt ẩn hóa hơi? (Câu 3 – D2)",
+                content: `
+                    <ol>
+                        <li><strong>Nước bão hòa</strong> là nước bắt đầu quá trình hóa hơi hoặc kết thúc ngưng tụ, cũng là pha nước cùng tồn tại với hơi.</li>
+                        <li><strong>Hơi bão hòa ẩm</strong> là hơi mà trong đó quá trình hóa hơi nó vẫn còn lẫn những giọt nước (hoặc là hỗn hợp hơi bão hòa khô và nước bão hòa). Tỷ số giữa khối lượng hơi bão hòa khô và hơi bão hòa ẩm gọi là độ khô. Tỷ số giữa khối lượng nước sôi và hơi bão hòa ẩm gọi là độ ẩm của hơi bão hòa ẩm.</li>
+                        <li><strong>Hơi bão hòa khô</strong> là hơi mà tại thời điểm nào đó chất lỏng hóa hơi hoàn toàn (là hơi ở trạng thái bắt đầu ngưng tụ hoặc khi vừa hóa hơi xong cũng là phần hơi khi hai pha hơi và nước cùng tồn tại).</li>
+                        <li><strong>Hơi quá nhiệt</strong> là hơi có nhiệt độ cao hơn nhiệt độ bão hòa ứng với cùng áp suất (là hơi có nhiệt độ lớn hơn nhiệt độ bão hòa ở cùng áp suất).</li>
+                        <li><strong>Nhiệt ẩn hóa hơi</strong> là lượng nhiệt cần truyền cho 1 đơn vị khối lượng chất lỏng để nó chuyển thành hơi, đơn vị J/kg.</li>
+                    </ol>
+                `
+            },
+            'c1-2': {
+                title: "Câu 2: Vật chất thường tồn tại ở những pha (thể) nào? Chúng chuyển hóa lẫn nhau như thế nào?",
+                content: `
+                    <ul>
+                        <li>Vật chất thường gặp có thể tồn tại ở 3 pha: rắn, lỏng và hơi hoặc khí. Tuỳ theo điều kiện áp suất và nhiệt độ, có thể tồn tại ở một pha riêng biệt, có thể hai pha cùng tồn tại và có một trạng thái duy nhất cả 3 pha cùng tồn tại gọi là trạng thái 3 pha.</li>
+                        <li>Vật chất thường thay đổi trạng thái và chuyển pha trong điều kiện đẳng áp khi có trao đổi nhiệt. Tuỳ theo áp suất khi tiến hành trao đổi nhiệt, có thể gặp 3 trường hợp sau:
+                            <ul>
+                                <li><strong>Nếu lớn hơn áp suất 3 pha (p3) và nhỏ hơn áp suất tới hạn (pk):</strong> Khi nhận nhiệt, vật chất từ thể rắn sẽ chuyển thành thể lỏng, rồi thể hơi, nói chung nhiệt độ tăng lên trừ khi chuyển pha nhiệt độ không thay đổi; khi thải nhiệt thì ngược lại, thể hơi chuyển thành thể lỏng, rồi thể rắn, nhiệt độ giảm xuống trừ khi chuyển pha, nhiệt độ vẫn không thay đổi.</li>
+                                <li><strong>Cao hơn áp suất tới hạn:</strong> Khi nhận nhiệt thể rắn chuyển thành thể lỏng, còn giữa thể lỏng và thể hơi không có ranh giới phân biệt rõ ràng, có thể nói là không có sự khác nhau giữa thể lỏng và thể hơi.</li>
+                                <li><strong>Thấp hơn áp suất 3 pha (p3):</strong> Thì khi nhận nhiệt, thể rắn biến thẳng thành thể hơi và khi thải nhiệt từ thể hơi biến thành thể rắn (tuyết).</li>
+                            </ul>
+                        </li>
+                    </ul>
+                `
+            },
+            'c1-3': {
+                title: "Câu 3: Hãy trình bày khái niệm cơ bản về Nhiệt độ. Dựa vào các nguyên tắc đo khác nhau hãy phân loại các loại nhiệt kế?",
+                content: `
+                    <p><strong>Khái niệm:</strong> Nhiệt độ là đại lượng vật lý đặc trưng cho trạng thái nhiệt (nóng, lạnh). Nó biểu thị cho tốc độ chuyển động của các phân tử trong vật chất. Thường dùng các thang đo nhiệt độ sau để xác định nhiệt độ.</p>
+                    <ul>
+                        <li><strong>Nhiệt độ bách phân:</strong> t (<sup>o</sup>C). Thang đo nhiệt độ bách phân lấy 0 <sup>o</sup>C ứng với nước đá đang tan, 100 <sup>o</sup>C ứng với nước sôi ở áp suất P = 760 mmHg và chia đều thành 100 khoảng, mỗi phần ứng với 1 <sup>o</sup>C.</li>
+                        <li><strong>Nhiệt độ tuyệt đối:</strong> (nhiệt độ Kelvin). T(<sup>o</sup>K)</li>
+                    </ul>
+                    <p>Quan hệ giữa 2 thang nhiệt độ trên biểu thị bằng biểu thức:</p>
+                    <div class="formula">0 <sup>o</sup>C = 273,15 <sup>o</sup>K &asymp; 273 <sup>o</sup>K</div>
+                    <div class="formula">T = 273 + t &nbsp;&nbsp;&nbsp;&nbsp; (1)</div>
+                    <p>Giá trị 1 độ trong 2 thang đo trên bằng nhau, tức là &Delta;T = &Delta;t.</p>
+                    <p>Theo thuyết động học phân tử: Nhiệt độ thấp nhất của vật chất là nhiệt độ mà ở đó các phân tử ngừng chuyển động gọi là không độ tuyệt đối. Từ quan hệ (1) ta có: 0 <sup>o</sup>K = - 273 <sup>o</sup>C</p>
+                    <p><strong>Phân loại nhiệt kế:</strong> Dụng cụ đo nhiệt độ gọi là nhiệt kế. Dựa vào các nguyên tắc đo khác nhau người ta có các loại nhiệt kế:</p>
+                    <ul>
+                        <li><strong>Nhiệt kế chất lỏng:</strong> Dựa vào sự giãn nở của chất lỏng theo nhiệt độ.</li>
+                        <li><strong>Nhiệt kế điện trở:</strong> Dựa vào sự thay đổi của điện trở theo nhiệt độ.</li>
+                        <li><strong>Nhiệt kế cặp nhiệt:</strong> Dựa vào hiệu ứng nhiệt điện (Sự xuất hiện suất điện động trong 2 dây kim loại có bản chất khác nhau khi chúng có các đầu tiếp xúc nhau đặt ở 2 vùng có nhiệt độ khác nhau).</li>
+                    </ul>
+                `
+            },
+            'c1-4': {
+                title: "Câu 4: Hãy trình bày khái niệm cơ bản về áp suất. Kể tên các loại dụng cụ đo áp suất và nêu một số đơn vị đo áp suất thường sử dụng trong vận hành Lò hơi?",
+                content: `
+                    <p><strong>* Khái niệm:</strong> Là lực tác dụng của chất khí (hoặc lỏng) theo phương pháp tuyến lên mặt một đơn vị diện tích bình chứa.</p>
+                    
+                    <div class="diagram-box">
+                        <svg viewBox="0 0 200 200" width="150" height="150">
+                            <circle cx="100" cy="100" r="60" fill="none" stroke="#000" stroke-width="2"/>
+                            <text x="100" y="105" font-size="22" text-anchor="middle" font-family="Times New Roman">P</text>
+                            <g stroke="#000" stroke-width="1.5" marker-end="url(#arrowIso)">
+                                <line x1="160" y1="100" x2="185" y2="100" />
+                                <line x1="40" y1="100" x2="15" y2="100" />
+                                <line x1="100" y1="160" x2="100" y2="185" />
+                                <line x1="100" y1="40" x2="100" y2="15" />
+                                <line x1="142" y1="142" x2="160" y2="160" />
+                                <line x1="58" y1="58" x2="40" y2="40" />
+                                <line x1="142" y1="58" x2="160" y2="40" />
+                                <line x1="58" y1="142" x2="40" y2="160" />
+                            </g>
+                        </svg>
+                        <span class="caption">Hình H-1</span>
+                    </div>
+
+                    <div class="formula">P = F / S &nbsp;&nbsp; ; &nbsp;&nbsp; (N/m<sup>2</sup>) &nbsp;&nbsp; (7-1)</div>
+                    <p>F: Lực tác dụng của chất khí hoặc lỏng lên thành bình. (N)</p>
+                    <p>S: Diện tích thành bình chứa đang xét. (m<sup>2</sup>)</p>
+                    <p>Đơn vị đo áp suất là N/m<sup>2</sup>, Pascal (Pa), bar. Các bội số của nó là: 1kPa = 10<sup>3</sup> Pa, 1 MPa = 10<sup>6</sup>Pa, 1bar = 10<sup>5</sup> Pa. Ngoài ra còn dùng các đơn vị đo áp suất khác là Psi, atmôphe (at), mmHg, mmHg<sub>2</sub>O.</p>
+                    <div class="formula">1at = 0,98bar = 735,5mmHg = 10mH<sub>2</sub>O</div>
+                    <div class="formula">1bar = 750mmHg, 1Psi = 6895 Pa &asymp; 0,07 at</div>
+                    <p>Quy đổi các đơn vị đo áp suất ở 0<sup>o</sup>C nhưng thông thường người ta bỏ qua sự hiệu chỉnh này.</p>
+                    
+                    <p><strong>* Phân loại:</strong> Dụng cụ đo áp suất là áp kế. Thường dùng áp kế lò so, áp kế chất lỏng để đo áp suất.</p>
+                    <ul>
+                        <li><strong>Barômet</strong> là áp kế dùng đo áp suất tuyệt đối của khí quyển. (p<sub>kt</sub>)</li>
+                        <li><strong>Manômet</strong> là áp kế dùng đo phần áp suất của chất khí lớn hơn áp suất khí quyển, gọi là áp suất dư. (P<sub>d</sub>)</li>
+                        <li><strong>Chân không kế</strong> là áp kế dùng đo phần áp suất của chất khí nhỏ hơn áp suất khí quyển, gọi là độ chân không. (P<sub>ck</sub>)</li>
+                    </ul>
+                    <p>Như vậy khi áp suất tuyệt đối lớn hơn áp suất khí quyển ta có: (H - 2a)</p>
+                    <p class="formula">P = P<sub>kt</sub> + P<sub>d</sub></p>
+                    
+                    <div class="diagram-box">
+                        <svg viewBox="0 0 300 200" width="250" height="150">
+                            <g stroke="#000" stroke-width="1.5">
+                                <line x1="20" y1="40" x2="280" y2="40" stroke-width="2"/>
+                                <line x1="20" y1="100" x2="280" y2="100" stroke-width="2"/>
+                                <line x1="20" y1="160" x2="280" y2="160" stroke-width="2"/>
+                            </g>
+                            <text x="290" y="45" font-size="16" font-family="Times New Roman">P</text>
+                            <text x="290" y="105" font-size="16" font-family="Times New Roman">P<tspan dy="5" font-size="12">kt</tspan></text>
+                            <text x="290" y="165" font-size="16" font-family="Times New Roman">P<tspan dy="5" font-size="12">d</tspan></text>
+                            <g stroke="#000" stroke-width="1.5" marker-start="url(#arrowIsoStart)" marker-end="url(#arrowIsoEnd)">
+                                <line x1="60" y1="40" x2="60" y2="160" />
+                                <line x1="140" y1="40" x2="140" y2="100" />
+                            </g>
+                            <text x="30" y="105" font-size="16" font-family="Times New Roman">P</text>
+                            <text x="150" y="75" font-size="16" font-family="Times New Roman">P<tspan dy="5" font-size="12">d</tspan></text>
+                        </svg>
+                        <span class="caption">H - 2a</span>
+                    </div>
+
+                    <p>Và khi áp suất tuyệt đối nhỏ hơn áp suất khí quyển ta có: (H - 2b)</p>
+                    <p class="formula">P = P<sub>kt</sub> - P<sub>ck</sub></p>
+
+                    <div class="diagram-box">
+                        <svg viewBox="0 0 300 200" width="250" height="150">
+                            <g stroke="#000" stroke-width="1.5">
+                                <line x1="20" y1="40" x2="280" y2="40" stroke-width="2"/>
+                                <line x1="20" y1="100" x2="280" y2="100" stroke-width="2"/>
+                                <line x1="20" y1="160" x2="280" y2="160" stroke-width="2"/>
+                            </g>
+                            <text x="290" y="45" font-size="16" font-family="Times New Roman">P<tspan dy="5" font-size="12">kt</tspan></text>
+                            <text x="290" y="105" font-size="16" font-family="Times New Roman">P<tspan dy="5" font-size="12">ck</tspan></text>
+                            <text x="290" y="165" font-size="16" font-family="Times New Roman">P</text>
+                            <g stroke="#000" stroke-width="1.5" marker-start="url(#arrowIsoStart)" marker-end="url(#arrowIsoEnd)">
+                                <line x1="60" y1="40" x2="60" y2="160" />
+                                <line x1="140" y1="100" x2="140" y2="160" />
+                            </g>
+                            <text x="30" y="105" font-size="16" font-family="Times New Roman">P<tspan dy="5" font-size="12">kt</tspan></text>
+                            <text x="150" y="135" font-size="16" font-family="Times New Roman">P<tspan dy="5" font-size="12">ck</tspan></text>
+                        </svg>
+                        <span class="caption">H - 2b</span>
+                    </div>
+                `
+            },
+
+            // --- PHẦN II ---
+            'c2-1': {
+                title: "Câu 1: Nêu các phương thức trao đổi nhiệt cơ bản? Định nghĩa và phân biệt các phương thức đó?",
+                content: `
+                    <p>Quá trình trao đổi nhiệt có thể thực hiện bằng 3 phương thức cơ bản sau đây và được phân biệt theo phương thức truyền động năng giữa các phân tử thuộc hai vật:</p>
+                    <ol>
+                        <li><strong>Dẫn nhiệt:</strong> Dẫn nhiệt là hiện tượng các phân tử vật 1 va chạm (trực tiếp hoặc thông qua các điện tử trong vật) vào các phân tử vật 2 để truyền một phần động năng. Dẫn nhiệt xảy ra khi có sự chênh lệch nhiệt độ giữa các phần tử 1 vật hoặc giữa 2 vật tiếp xúc nhau. Dẫn nhiệt thuần túy xảy ra trong hệ gồm các vật rắn có sự tiếp xúc trực tiếp.</li>
+                        <li><strong>Trao đổi nhiệt đối lưu (hay tỏa nhiệt):</strong> Trao đổi nhiệt đối lưu là quá trình trao đổi nhiệt được thực hiện nhờ sự chuyển động của chất lỏng hay chất khí giữa các vùng nhiệt độ khác nhau. Vì trong khối chất lỏng hoặc chất khí không thể tránh khỏi những phần tử có nhiệt độ khác nhau tiếp xúc trực tiếp với nhau, nghĩa là có sự dẫn nhiệt trong chất lỏng hoặc chất khí, do đó trao đổi nhiệt đối lưu luôn luôn kèm theo hiện tượng dẫn nhiệt. Tuy nhiên, quá trình truyền nhiệt ở đây chủ yếu thực hiện bằng đối lưu vì thế ta gọi là trao đổi nhiệt đối lưu hay đơn giản là tỏa nhiệt.</li>
+                        <li><strong>Trao đổi nhiệt bức xạ:</strong> Trao đổi nhiệt bức xạ là hiện tượng các phân tử vật 1 bức xạ ra các hạt truyền đi trong không gian dưới dạng sóng điện từ, mang năng lượng đến truyền cho các phân tử vật 2. Khác với 2 phương thức trên, trao đổi nhiệt bức xạ có thể xảy ra giữa hai vật ở cách xa nhau rất xa, không cần tiếp xúc trực tiếp hoặc thông qua môi trường chất lỏng và khí, và luôn xảy ra với sự chuyển hóa giữa năng lượng nhiệt và năng lượng điện từ.</li>
+                    </ol>
+                `
+            },
+            'c2-2': {
+                title: "Câu 2: Nêu các khái niệm: Trường nhiệt độ, Mặt đẳng nhiệt, Gradient nhiệt độ, dòng nhiệt và mật độ dòng nhiệt?",
+                content: `
+                    <ul>
+                        <li><strong>Trường nhiệt độ:</strong> Tập hợp mọi giá trị nhiệt độ của các điểm khác nhau trong một vật tại thời điểm nào đó gọi là trường nhiệt độ.</li>
+                        <li><strong>Mặt đẳng nhiệt:</strong> Bề mặt chứa tất cả các điểm có cùng giá trị nhiệt độ tại một thời điểm gọi là mặt đẳng nhiệt. Các mặt đẳng nhiệt không thể cắt nhau, chúng chỉ có thể là các mặt khép kín hay kết thúc trên biên của vật.</li>
+                        <li><strong>Gradient nhiệt độ:</strong>
+                            <div class="formula">G<sub>radt</sub> = lim<sub>&Delta;n&rarr;0</sub> (&Delta;t / &Delta;n) = &part;t / &part;n &nbsp;&nbsp; [K/m]</div>
+                            <p>Gradient nhiệt độ là một đại lượng vec tơ có hướng vuông góc với các mặt đẳng nhiệt, chiều dương là chiều giảm nhiệt độ.</p>
+                        </li>
+                        <li><strong>Dòng nhiệt:</strong> Là lượng nhiệt truyền qua toàn bộ diện tích bề mặt đẳng nhiệt trong một đơn vị thời gian, ký hiệu là Q (W).</li>
+                        <li><strong>Mật độ dòng nhiệt:</strong> là lượng nhiệt truyền qua một đơn vị diện tích bề mặt đẳng nhiệt vuông góc với hướng truyền nhiệt trong một đơn vị thời gian, ký hiệu là q (W/m<sup>2</sup>).</li>
+                    </ul>
+                `
+            },
+            'c2-3': {
+                title: "Câu 3: Định luật Newton về trao đổi nhiệt đối lưu? Khái niệm về hệ số trao đổi nhiệt đối lưu?",
+                content: `
+                    <p><strong>* Định luật Newton về trao đổi nhiệt đối lưu:</strong></p>
+                    <p>Quá trình trao đổi nhiệt đối lưu là 1 quá trình phức tạp, phụ thuộc vào nhiều yếu tố, để xác định lượng nhiệt trao đổi giữa bề mặt vách và chất lỏng hay chất khí người ta dùng công thức Newton:</p>
+                    <div class="formula">q = &alpha; &middot; (t<sub>w</sub> - t<sub>f</sub>), &nbsp; [W/m<sup>2</sup>]</div>
+                    <p>Hay</p>
+                    <div class="formula">Q = q &middot; F = &alpha; &middot; F &middot; (t<sub>w</sub> - t<sub>f</sub>), &nbsp; [W]</div>
+                    <p>Ở đây:</p>
+                    <ul>
+                        <li>q và Q – mật độ dòng nhiệt và dòng nhiệt</li>
+                        <li>F – diện tích bề mặt trao đổi nhiệt</li>
+                        <li>t<sub>w</sub> – nhiệt độ của bề mặt vách</li>
+                        <li>t<sub>f</sub> – nhiệt độ của chất lỏng ở xa bề mặt vách (ở đây t<sub>w</sub> > t<sub>f</sub>)</li>
+                        <li>&Delta;t = t<sub>w</sub> - t<sub>f</sub>, hiệu nhiệt độ, nếu t<sub>f</sub> > t<sub>w</sub> thì công thức trên phải viết &Delta;t = t<sub>f</sub> - t<sub>w</sub></li>
+                        <li>&alpha; - hệ số tỏa nhiệt hay hệ trao đổi nhiệt đối lưu.</li>
+                    </ul>
+                    <p><strong>* Khái niệm về hệ số trao đổi nhiệt đối lưu:</strong></p>
+                    <p>Hệ số trao đổi nhiệt đối lưu &alpha; là lượng nhiệt truyền qua một đơn vị diện tích bề mặt trong một đơn vị thời gian khi độ chênh nhiệt độ giữa bề mặt vách và chất lỏng hay chất khí là 1 độ K.</p>
+                    <div class="formula">&alpha; = Q / [F &middot; (t<sub>w</sub> - t<sub>f</sub>)], &nbsp; [W/m<sup>2</sup>K]</div>
+                `
+            },
+
+            // --- PHẦN III ---
+            'c3-1': {
+                title: "Câu 1: Nêu các đặc tính cơ bản của lò hơi?",
+                content: `
+                    <p>Đặc tính kỹ thuật chính của lò là các đại lượng thể hiện số lượng và chất lượng hơi được sản xuất ra. Số lượng hơi sản xuất ra được xác định bằng sản lượng hơi còn chất lượng hơi được xác định bằng thông số hơi.</p>
+                    <p><strong>1. Thông số hơi của lò:</strong> Đối với lò hơi của nhà máy điện, hơi sản xuất ra là quá nhiệt nên thông số hơi của lò được biểu thị bằng áp suất và nhiệt độ hơi quá nhiệt: P<sub>qn</sub> (Mpa), t<sub>qn</sub> (<sup>0</sup>C).</p>
+                    <p><strong>2. Sản lượng hơi của lò:</strong> Là lượng hơi mà lò sản xuất ra được trong một đơn vị thời gian (Kg/h hoặc Tấn/h). Thường dùng 3 khái niệm sản lượng:</p>
+                    <ul>
+                        <li><strong>Sản lượng hơi định mức (D<sub>dm</sub>):</strong> là sản lượng hơi lớn nhất lò có thể đạt được, đảm bảo vận hành trong thời gian lâu dài, ổn định với các thông số hơi đã cho mà không phá hủy hoặc gây ảnh hưởng xấu đến chế độ làm việc của lò.</li>
+                        <li><strong>Sản lượng hơi cực đại (D<sub>max</sub>):</strong> là sản lượng hơi lớn nhất mà lò có thể đạt được, nhưng chỉ trong một thời gian ngắn.
+                            <div class="formula">D<sub>max</sub> = (1,1 - 1,2)D<sub>dm</sub></div>
+                        </li>
+                        <li><strong>Sản lượng hơi kinh tế:</strong> là sản lượng hơi mà ở đó lò làm việc với hiệu quả kinh tế cao nhất.
+                            <div class="formula">D<sub>kt</sub> = (0,8 - 0,9)D<sub>dm</sub></div>
+                        </li>
+                    </ul>
+                    <p><strong>3. Hiệu suất của lò:</strong> Là tỉ số giữa lượng nhiệt mà môi chất hấp thụ được (hay còn gọi là lượng nhiệt có ích) với lượng nhiệt cung cấp vào cho lò. Hiệu suất của lò ký hiệu bằng &eta;:</p>
+                    <div class="formula">&eta; = [D &middot; (i<sub>qn</sub> - i'<sub>hw</sub>)] / (B &middot; Q<sub>v</sub><sup>iv</sup>)</div>
+                    <p>Trong đó: D là sản lượng hơi, (kg/h); i<sub>qn</sub> là entanpi của hơi quá nhiệt, (kJ/kg); i'<sub>hw</sub> là entanpi của nước đi vào bộ hâm nước, (kJ/kg); B là lượng nhiên liệu tiêu hao trong một giờ, (kg/h); Q<sub>v</sub><sup>iv</sup> : Nhiệt trị thấp làm việc của nhiên liệu, (kJ/kg).</p>
+                    <p><strong>4. Nhiệt thể tích của buồng lửa:</strong> Là lượng nhiệt sinh ra trong một đơn vị thời gian trên một đơn vị thể tích của buồng lửa:</p>
+                    <div class="formula">q<sub>v</sub> = (B &middot; Q<sub>v</sub><sup>iv</sup>) / V<sub>bl</sub>, &nbsp; (W/m<sup>3</sup>)</div>
+                    <p>Trong đó: V<sub>bl</sub> : Thể tích buồng lửa, (m<sup>3</sup>), B (kg/s)</p>
+                    <p>Đối với các lò hơi nhỏ, người ta còn chú ý đến các đặc tính sau đây:</p>
+                    <p><strong>5. Nhiệt thể diện tích trên ghi:</strong> Là nhiệt lượng sinh ra trong một đơn vị thời gian trên một đơn vị diện tích bề mặt của ghi:</p>
+                    <div class="formula">q<sub>r</sub> = (B &middot; Q<sub>r</sub><sup>iv</sup>) / R, &nbsp; (W/m<sup>2</sup>)</div>
+                    <p>R: diện tích mặt ghi, (m<sup>2</sup>).</p>
+                    <p><strong>6. Năng suất bốc hơi của bề mặt sinh hơi:</strong> Là khả năng bốc hơi của một đơn vị diện tích bề mặt đốt (bề mặt sinh hơi) trong một đơn vị thời gian, ký hiệu là S,</p>
+                    <div class="formula">S = D / H, &nbsp; (kg/m<sup>2</sup>h)</div>
+                    <p>D: Sản lượng hơi của lò, (kg/h). H: diện tích bề mặt sinh hơi (bề mặt đốt), (m<sup>2</sup>)</p>
+                `
+            },
+            'c3-2': {
+                title: "Câu 2: Nêu các đặc tính công nghệ của Nhiên liệu? Sự ảnh hưởng của các đặc tính đó đến quá trình cháy?",
+                content: `
+                    <p>Đặc tính công nghệ của nhiên liệu bao gồm: độ ẩm, chất bốc, cốc, tro và nhiệt trị.</p>
+                    <p><strong>1. Độ ẩm (W):</strong> Là lượng nước chứa trong nhiên liệu, lượng nước này làm nhiệt trị của nhiên liệu giảm xuống. Mặt khác khi nhiên liệu cháy cần cung cấp một nhiệt lượng để bốc ẩm thành hơi nước.</p>
+                    <ul>
+                        <li><em>Độ ẩm trong:</em> Có sẵn trong quá trình hình thành nhiên liệu, thường ở dạng tinh thể ngậm nước và chỉ tách ra khỏi nhiên liệu khi nung nhiên liệu ở nhiệt độ khoảng 800<sup>0</sup>C.</li>
+                        <li><em>Độ ẩm ngoài:</em> Xuất hiện trong quá trình khai thác, vận chuyển và bảo quản nhiên liệu. Độ ẩm ngoài tách ra khỏi nhiên liệu khi sấy ở nhiệt độ khoảng 105<sup>0</sup>C.</li>
+                    </ul>
+                    <p><strong>2. Chất bốc (V):</strong> Khi đốt nóng nhiên liệu trong điều kiện không có ôxi ở nhiệt độ 800-850<sup>0</sup>C thì có chất khí thoát ra gọi là chất bốc, đó là kết quả của sự phân hủy nhiệt các liên kết hữu cơ của nhiên liệu. Nó là thành phần cháy ở thể khí gồm: hyđrô, cacbuahydrô, cacbon, oxitcacbon, cacbonic, oxi và nitơ... Nhiên liệu càng già thì lượng chất bốc càng ít, nhưng nhiệt trị của chất bốc càng cao. Nhiên liệu càng nhiều chất bốc càng dễ cháy.</p>
+                    <p><strong>3. Chất cốc:</strong> Sau khi chất bốc bốc ra, phần rắn còn lại của nhiên liệu có thể tham gia quá trình cháy gọi là cốc. Nhiên liệu càng nhiều chất bốc thì cốc càng xốp, nhiên liệu càng có khả năng phản ứng cao. Khi đốt nhiên liệu ít chất bốc như than antraxit, cần thiết phải duy trì nhiệt độ ở vùng bốc cháy cao, đồng thời phải tăng chiều dài buồng lửa để đảm bảo cho cốc cháy hết trước khi ra khỏi buồng lửa.</p>
+                    <p><strong>4. Độ tro (A):</strong> Tro của nhiên liệu là phần rắn ở dạng chất khoáng còn lại sau khi nhiên liệu cháy. Sự có mặt của nó làm giảm thành phần cháy được của nhiên liệu, do đó giảm nhiệt trị của nhiên liệu. Tác hại: Cản trở quá trình cháy, khi bay theo khói tro sẽ mài mòn các bề mặt đốt của lò hơi.</p>
+                    <p><strong>5. Nhiệt trị:</strong> Là lượng nhiệt sinh ra khi cháy hoàn toàn 1kg nhiên liệu rắn hoặc lỏng hay 1m<sup>3</sup> tiêu chuẩn nhiên liệu khí (kJ/kg, kJ/m<sup>3</sup>tc). Gồm nhiệt trị cao (kể đến nhiệt ngưng tụ hơi nước) và nhiệt trị thấp (không kể đến nhiệt ngưng tụ hơi nước).</p>
+                `
+            },
+            'c3-3': {
+                title: "Câu 3: Hãy trình bày phương trình cân bằng nhiệt tổng quát của lò hơi? Nêu các tổn thất nhiệt trong lò hơi?",
+                content: `
+                    <p>Nhiệt lượng sinh ra khi đốt cháy nhiên liệu trong lò hơi chính là năng lượng do nhiên liệu và không khí mang vào. Nhiệt lượng này một phần được sử dụng hữu ích để sinh hơi, còn một phần nhỏ hơn bị mất mát đi gọi là tổn thất nhiệt.</p>
+                    <div class="formula">Q<sub>dv</sub> = Q<sub>nl</sub> + Q<sub>kk</sub> = Q<sub>1</sub> + Q<sub>2</sub> + Q<sub>3</sub> + Q<sub>4</sub> + Q<sub>5</sub> + Q<sub>6</sub></div>
+                    <p>Trong đó:</p>
+                    <ul>
+                        <li><strong>Q<sub>1</sub>:</strong> là nhiệt lượng sử dụng hữu ích để sinh hơi, (kJ/kg).</li>
+                        <li><strong>Q<sub>2</sub>:</strong> là lượng tổn thất nhiệt do khói thải mang ra ngoài lò hơi, (kJ/kg).</li>
+                        <li><strong>Q<sub>3</sub>:</strong> là lượng nhiệt tổn thất do cháy không hoàn toàn về mặt hóa học, (kJ/kg) (CO, CH<sub>4</sub>).</li>
+                        <li><strong>Q<sub>4</sub>:</strong> là lượng nhiệt tổn thất do cháy không hoàn toàn về mặt cơ học, (kJ/kg).</li>
+                        <li><strong>Q<sub>5</sub>:</strong> là lượng nhiệt tổn thất do tỏa nhiệt từ bề mặt ngoài tường lò ra không khí xung quanh, (kJ/kg).</li>
+                        <li><strong>Q<sub>6</sub>:</strong> là lượng nhiệt tổn thất do xỉ nóng mang ra ngoài, (kJ/kg).</li>
+                    </ul>
+                `
+            },
+            'c3-4': {
+                title: "Câu 4: Hãy nêu khái niệm quá trình cháy của nhiên liệu? Thế nào là quá trình cháy hoàn toàn và cháy không hoàn toàn? Nêu các giai đoạn của quá trình cháy nhiên liệu?",
+                content: `
+                    <p><strong>Khái niệm:</strong> Quá trình cháy nhiên liệu là quá trình phản ứng hóa học giữa các nguyên tố hóa học của nhiên liệu với oxy và sinh ra nhiệt, quá trình cháy còn là quá trình oxy hóa.</p>
+                    <p><strong>* Quá trình cháy hoàn toàn:</strong> là quá trình cháy trong đó các thành phần cháy được của nhiên liệu đều được oxy hóa hoàn toàn và sản phẩm cháy của nó gồm các khí CO<sub>2</sub>, SO<sub>2</sub>, H<sub>2</sub>O, N<sub>2</sub>, và O<sub>2</sub>.</p>
+                    <p><strong>* Quá trình cháy không hoàn toàn:</strong> là quá trình cháy trong đó còn những chất có thể cháy được chưa được oxy hóa hoàn toàn. Khi cháy không hoàn toàn, ngoài những sản phẩm của quá trình cháy hoàn toàn trong khói còn có những sản phẩm khác: CO, CH<sub>4</sub>...</p>
+                    <p><strong>* Các giai đoạn của quá trình cháy nhiên liệu:</strong></p>
+                    <ul>
+                        <li><strong>Giai đoạn sấy nóng và sinh chất bốc:</strong> là giai đoạn chuẩn bị cho nhiên liệu bốc cháy, cần thiết phải có không khí nóng có nhiệt độ khoảng 150 đến 400 <sup>o</sup>C để sấy nóng, bốc ẩm và bốc chất bốc khỏi nhiên liệu.</li>
+                        <li><strong>Giai đoạn bắt lửa:</strong> bắt đầu ở nhiệt độ cao hơn, khi nhiên liệu tiếp xúc với không khí nóng.</li>
+                        <li><strong>Giai đoạn cháy chất bốc và cốc:</strong> kèm theo quá trình tỏa nhiệt, nhiệt lượng này có tác dụng làm tăng nhiệt độ hỗn hợp để phản ứng oxy hóa cốc xảy ra nhanh hơn, đây là giai đoạn oxy hóa mãnh liệt nhất.</li>
+                        <li><strong>Giai đoạn kết thúc quá trình cháy:</strong> là giai đoạn tạo thành tro và xỉ.</li>
+                    </ul>
+                `
+            },
+            'c3-5': {
+                title: "Câu 5: Trình bày tính chất của than bột? Nêu khái niệm về độ mịn kinh tế?",
+                content: `
+                    <p><em>Nói R<sub>90</sub> = 5 % nghĩa là gì?</em></p>
+                    <p>Bột than là những hạt bột khô có kích thước rất khác nhau từ vài đến 500&mu;m trong đó những hạt bột than 20 - 50&mu;m chiếm nhiều nhất.</p>
+                    <p><strong>* Các tính chất của than bột:</strong></p>
+                    <ul>
+                        <li>Có đặc tính tự chảy gần như nước, bột than hỗn hợp với không khí thì vận chuyển dễ dàng nhưng khi tách bột than khỏi không khí tương đối phức tạp.</li>
+                        <li>Dễ bị tự bốc cháy và gây ra nổ. Than nhiều chất bốc càng dễ tự cháy nổ.</li>
+                        <li>Bột than có khả năng hút ẩm lớn và dễ bị kết dính khó vận chuyển do đó than bột phải có độ khô nhất định, tuỳ theo loại than mà người ta quy định độ ẩm sao cho phù hợp.</li>
+                    </ul>
+                    <p><strong>* Độ mịn kinh tế:</strong></p>
+                    <div class="diagram-box">
+                        <svg viewBox="0 0 400 280" width="300" height="200">
+                            <line x1="50" y1="230" x2="350" y2="230" stroke="#000" stroke-width="1.5" marker-end="url(#arrowIso)"/>
+                            <line x1="50" y1="230" x2="50" y2="20" stroke="#000" stroke-width="1.5" marker-end="url(#arrowIso)"/>
+                            <text x="360" y="235" font-size="14" font-family="Times New Roman">R<tspan dy="5" font-size="10">90</tspan></text>
+                            <path d="M 50 40 Q 150 180 350 215" fill="none" stroke="#000" stroke-width="1.5"/>
+                            <text x="80" y="110" font-size="14" font-family="Times New Roman" transform="rotate(-60 80 110)">q<tspan dy="5" font-size="10">E</tspan></text>
+                            <path d="M 50 215 Q 250 180 350 40" fill="none" stroke="#000" stroke-width="1.5"/>
+                            <text x="280" y="80" font-size="14" font-family="Times New Roman" transform="rotate(60 280 80)">q<tspan dy="5" font-size="10">tt</tspan></text>
+                            <path d="M 50 120 Q 150 210 210 200 Q 280 180 350 80" fill="none" stroke="#000" stroke-width="1.5"/>
+                            <text x="100" y="130" font-size="14" font-family="Times New Roman">Tổng</text>
+                            <line x1="210" y1="200" x2="210" y2="230" stroke="#000" stroke-width="1.5" stroke-dasharray="4,4"/>
+                            <text x="190" y="245" font-size="14" font-family="Times New Roman">R<tspan dy="5" font-size="10">90 kt</tspan></text>
+                        </svg>
+                        <span class="caption">Độ mịn kinh tế</span>
+                    </div>
+                    <p>Độ mịn của than ứng với tổng số tiêu hao năng lượng nghiền và tổn thất cháy không hoàn toàn nhỏ nhất gọi là độ mịn kinh tế.</p>
+                    <p>q<sub>E</sub> - Chi phí điện năng nghiền. q<sub>tt</sub> - Chi phí do tổn thất cháy không hoàn toàn.</p>
+                    <p>Nói R<sub>90</sub> = 5% có nghĩa là có 5% bột than có kích thước lớn hơn 90&mu;m còn lại trên rây R<sub>90</sub>.</p>
+                `
+            },
+            'c3-6': {
+                title: "Câu 6: Ăn mòn kim loại bề mặt đốt là gì? Trong Lò hơi có mấy dạng ăn mòn kim loại? Nêu mục đích và nhiệm vụ của việc phòng mòn lò hơi? Có mấy phương pháp phòng mòn?",
+                content: `
+                    <ul>
+                        <li><strong>Ăn mòn kim loại bề mặt đốt:</strong> là quá trình phá huỷ vật liệu dưới tác dụng của môi trường bên ngoài do kết quả của quá trình hoá học hay điện hoá học gây ra. Quá trình phá huỷ do tương tác trực tiếp giữa kim loại và môi trường bên ngoài gọi là ăn mòn hoá học, còn quá trình ăn mòn điện hoá học là quá trình xảy ra khi phản ứng có kèm theo việc sinh ra dòng điện.</li>
+                        <li><strong>Trong lò hơi có 3 dạng ăn mòn:</strong> Ăn mòn điện hoá học, Ăn mòn hoá học, Ăn mòn khí nghi.</li>
+                        <li><strong>Mục đích và nhiệm vụ của việc phòng mòn:</strong> Phòng mòn là biện pháp bảo vệ lò hơi khỏi bị ăn mòn khi nghỉ; nhằm ngăn ngừa việc lọt khí vào trong lò, giữ cho lò được khô hạn chế hoà tan oxy trong các màng ẩm.</li>
+                        <li><strong>Có 3 phương pháp phòng mòn:</strong>
+                            <ul>
+                                <li><em>Phương pháp phòng mòn khô:</em> người ta giữ cho không gian lò có độ khô cao bằng cách sấy khô lò khi đã xả hết nước ra khỏi lò. Để hấp thụ độ ẩm còn lại cũng như độ ẩm do không khí lọt vào, người ta đặt vào đó những chất hút ẩm như CaCl<sub>2</sub>, CaO.</li>
+                                <li><em>Phương pháp phòng mòn ướt:</em> Người ta đổ đầy nước có độ kiềm vào trong lò như xút với nồng độ 1500 – 2000mg/l hay Na<sub>3</sub>PO<sub>4</sub> có nồng độ 5000mg/l. Chúng sẽ tạo nên những màng oxyt trên bề mặt kim loại để ngăn ngừa việc oxy hoá tiếp theo ngay cả khi có một lượng oxy đáng kể trong nước.</li>
+                                <li><em>Phương pháp phòng mòn khí:</em> Người ta đưa vào lò khí amôniac với áp suất dư khoảng 100N/m<sup>2</sup>. Khi ấy phân áp suất của oxy giảm đi, do đó giảm độ hoà tan của oxy trong các màng ẩm. Hiện nay người ta còn dùng Nitơ để phòng mòn.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                `
+            },
+            'c3-7': {
+                title: "Câu 7: Để ngăn ngừa việc sinh cáu trong lò hơi người ta đã dùng hai phương pháp xử lý nước cơ bản nào? Tại sao người ta không đưa phốt phát vào lò theo đường nước cấp mà đưa thẳng vào bao hơi? Phân tích mối quan hệ giữa việc đưa phốt phát vào lò với việc xả định kỳ?",
+                content: `
+                    <ul>
+                        <li><strong>Để ngăn ngừa việc sinh cáu trong lò hơi người ta đã dùng hai phương pháp xử lý nước cơ bản sau:</strong>
+                            <ul>
+                                <li><em>Phương pháp xử lý nước trước khi đưa vào lò:</em> Nhằm hạn chế tới mức tối thiểu những vật chất có khả năng sinh cáu trong lò trước khi đưa nước vào lò.</li>
+                                <li><em>Phương pháp xử lý nước trong Lò:</em> Do nước cấp đưa vào lò chưa xử lý hết được vì vậy cần phải biến những vật chất có khả năng sinh ra cáu có trong lò thành những vật chất tách ra ở pha cứng dưới dạng bùn rồi dùng phương pháp xả lò để xả chúng ra khỏi lò.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Tại sao không đưa phốt phát theo đường nước cấp:</strong> Việc đưa phốt phát (Na<sub>3</sub>PO<sub>4</sub>) vào lò theo đường nước cấp sẽ tạo nên cáu cứng Ca<sub>3</sub>(PO<sub>4</sub>)<sub>2</sub> trong đường nước cấp, nhất là khi nước cấp có độ cứng lớn. Cáu cứng Ca<sub>3</sub>(PO<sub>4</sub>)<sub>2</sub> sẽ bám chắc trên bề mặt đốt gây ảnh hưởng lớn đến hiệu quả truyền nhiệt. Vì vậy người ta phải đưa phốt phát trực tiếp vào bao hơi.</li>
+                        <li><strong>Mối quan hệ với việc xả định kỳ:</strong> Việc đưa phốt phát vào lò nhằm để tách ra các ion Ca<sup>2+</sup>, Mg<sup>2+</sup> (là những ion gây ra đóng cáu trên bề mặt đốt) ra khỏi nước lò. Những ion này sẽ được phốt phát hoá thành dạng hyđrôxyn apatit 3Ca<sub>3</sub>(PO<sub>4</sub>)<sub>2</sub>.Ca(OH)<sub>2</sub> dưới dạng bùn không bám cáu. Vì vậy sau 1 thời gian lò vận hành cần phải định kì xả đi một lượng nước lò có chứa tạp chất dưới dạng bùn.</li>
+                    </ul>
+                `
+            },
+
+            // --- PHẦN IV ---
+            'c4-1': {
+                title: "Câu 1: Nêu các tổn thất hơi và nước ngưng trong nhà máy điện, các biện pháp bù tổn thất?",
+                content: `
+                    <p>Trong quá trình vận hành nhà máy điện, luôn luôn có tổn thất hơi và nước, gọi chung là tổn thất môi chất, bao gồm:</p>
+                    <p><strong>1. Tổn thất trong:</strong> Là tổn thất nước do xả lò, do rò rỉ ở các chỗ hở trên đường ống, do mất mát hơi để sấy ống khi khởi động nhà máy, do các hộ tiêu thụ dùng hơi mà không trả lại nước ngưng đọng, hơi dùng cho thiết bị thổi sạch dàn ống sinh hơi của lò (để chống bám tro, xỉ), hơi để sấy dầu mazút, đưa vào vòi phun phun mazút...</p>
+                    <p><em>Biện pháp:</em> Thay thế các mối nối mặt bích bằng mối nối bằng hàn, tăng cường độ kín của tất cả các van, tận dụng lại nước đọng trong các ống dẫn, trong các thiết bị và các van, giảm tổn thất hơi và nước ngưng khi khởi động và khi ngừng máy. Có thể giảm tổn thất xả lò bằng cách dùng các thiết bị bốc hơi từ nước xả lò...</p>
+                    <p><strong>2. Tổn thất ngoài:</strong> Là tổn thất do các hộ tiêu thụ nhiệt không hoàn trả lại nước ngưng đọng cho nhà máy hoặc trả lại không đầy đủ. Khi nước ngưng đọng ở các hộ tiêu thụ được trả lại hoàn toàn thì tổn thất ngoài bằng không.</p>
+                    <p>Toàn bộ các tổn thất trong và ngoài của nhà máy điện đều được liên tục bù lại bằng lượng nước bổ sung đã được xử lý. Để xử lý nước bổ sung bằng phương pháp bốc hơi, người ta dùng hơi trích từ tuốc bin để gia nhiệt cho nước cần xử lý đến sôi và biến thành hơi trong một thiết bị đặc biệt gọi là bình bốc hơi...</p>
+                `
+            },
+            'c4-2': {
+                title: "Câu 2: Thế nào là tua bin xung lực và tua bin phản lực? Về thuyết minh nêu quá trình biến đổi áp suất (p) và tốc độ tuyệt đối (C) của hơi qua một tầng áp lực của 2 loại tua bin đó?",
+                content: `
+                    <p><strong>* Tua bin xung lực:</strong> là tua bin mà nhiệt giáng được tạo ra hoàn toàn ở phần tĩnh (trên ống phun hay cánh tĩnh) không thực hiện nhiệt giáng trên hàng cánh động.</p>
+                    <div class="diagram-box">
+                        <svg viewBox="0 0 400 250" width="100%" height="200">
+                            <line x1="50" y1="220" x2="350" y2="220" stroke="#000" stroke-width="1.5" marker-end="url(#arrowIso)"/>
+                            <line x1="50" y1="220" x2="50" y2="20" stroke="#000" stroke-width="1.5" marker-end="url(#arrowIso)"/>
+                            <text x="360" y="225" font-size="14" font-family="Times New Roman">s</text>
+                            <text x="40" y="20" font-size="14" font-family="Times New Roman">i</text>
+                            <path d="M 100 50 Q 150 60 250 40" fill="none" stroke="#000"/>
+                            <text x="260" y="45" font-size="14" font-family="Times New Roman">P<tspan dy="5" font-size="10">0</tspan></text>
+                            <path d="M 160 100 L 250 100" fill="none" stroke="#000"/>
+                            <text x="260" y="105" font-size="14" font-family="Times New Roman">t<tspan dy="5" font-size="10">0</tspan></text>
+                            <path d="M 200 70 Q 250 130 300 210" fill="none" stroke="#000"/>
+                            <text x="305" y="215" font-size="14" font-family="Times New Roman">x=1</text>
+                            <line x1="200" y1="60" x2="200" y2="120" stroke="#000" stroke-width="1.5"/>
+                            <text x="210" y="90" font-size="12" font-family="Times New Roman">ống phun</text>
+                            <line x1="200" y1="120" x2="250" y2="120" stroke="#000" stroke-width="1.5"/>
+                            <text x="210" y="135" font-size="14" font-family="Times New Roman">p<tspan dy="5" font-size="10">1</tspan> = p<tspan dy="5" font-size="10">2</tspan></text>
+                        </svg>
+                        <span class="caption">Đồ thị i-s tua bin xung lực</span>
+                    </div>
+                    <p>Quá trình biến đổi áp suất (p) và tốc độ tuyệt đối (C) của hơi qua một tầng áp lực của loại tua bin xung lực như sau:</p>
+                    <p>+ Từ giản đồ trên ta thấy dòng hơi vào tua bin có thông số p<sub>0</sub>, t<sub>0</sub>, C<sub>0</sub> khi vào ống phun (hàng cánh tĩnh) thực hiện một quá trình dãn nở đoạn nhiệt, do không thực hiện sinh công nên áp suất giảm, tốc độ tăng, áp suất giảm từ p<sub>0</sub> đến p<sub>1</sub> và tốc độ tăng từ C<sub>0</sub> đến C<sub>1</sub> ra khỏi ống phun, như vậy dòng hơi ra khỏi ống phun có áp suất p<sub>1</sub> và tốc độ C<sub>1</sub> khi vào hàng cánh động dòng hơi thực hiện qua trình sinh công nên tốc độ hơi giảm từ C<sub>1</sub> đến C<sub>2</sub>, vì tua bin xung lực không thực hiện dãn nở phụ trên hàng cánh động nên áp suất p<sub>2</sub> ra khỏi hàng cánh động không giảm do vậy p<sub>2</sub> = p<sub>1</sub>. ở chỗ ra khỏi cánh động do sự đổi hướng dòng hơi trên rãnh cánh động tạo nên một xung lực tác dụng lên cánh động làm quay rô to tua bin.</p>
+                    
+                    <p><strong>* Tua bin Phản lực:</strong> là tua bin mà nhiệt giáng được tạo ra cả ở phần tĩnh (trên ống phun hay cánh tĩnh) và cả ở phần động (ở rãnh cánh động).</p>
+                    <div class="diagram-box">
+                        <svg viewBox="0 0 400 250" width="100%" height="200">
+                            <line x1="50" y1="220" x2="350" y2="220" stroke="#000" stroke-width="1.5" marker-end="url(#arrowIso)"/>
+                            <line x1="50" y1="220" x2="50" y2="20" stroke="#000" stroke-width="1.5" marker-end="url(#arrowIso)"/>
+                            <text x="360" y="225" font-size="14" font-family="Times New Roman">s</text>
+                            <text x="40" y="20" font-size="14" font-family="Times New Roman">i</text>
+                            <path d="M 100 50 Q 150 60 250 40" fill="none" stroke="#000"/>
+                            <text x="260" y="45" font-size="14" font-family="Times New Roman">P<tspan dy="5" font-size="10">0</tspan></text>
+                            <path d="M 160 100 L 250 100" fill="none" stroke="#000"/>
+                            <text x="260" y="105" font-size="14" font-family="Times New Roman">t<tspan dy="5" font-size="10">0</tspan></text>
+                            <path d="M 200 70 Q 250 130 300 210" fill="none" stroke="#000"/>
+                            <text x="305" y="215" font-size="14" font-family="Times New Roman">x=1</text>
+                            <line x1="180" y1="60" x2="180" y2="120" stroke="#000" stroke-width="1.5"/>
+                            <text x="150" y="90" font-size="12" font-family="Times New Roman">ống phun</text>
+                            <line x1="180" y1="120" x2="220" y2="150" stroke="#000" stroke-width="1.5"/>
+                            <text x="230" y="140" font-size="12" font-family="Times New Roman">Cánh động</text>
+                            <text x="185" y="135" font-size="14" font-family="Times New Roman">p<tspan dy="5" font-size="10">1</tspan></text>
+                            <text x="225" y="165" font-size="14" font-family="Times New Roman">p<tspan dy="5" font-size="10">2</tspan></text>
+                        </svg>
+                        <span class="caption">Đồ thị i-s tua bin phản lực</span>
+                    </div>
+                    <p>Quá trình biến đổi áp suất (p) và tốc độ tuyệt đối (C) của hơi qua một tầng áp lực của loại tua bin phản lực như sau:</p>
+                    <p>+ Thông số hơi với p<sub>0</sub>, t<sub>0</sub> giãn nở một phần trong ống phun, áp suất P<sub>0</sub> giảm đến P<sub>1</sub> ở chỗ ra và tốc độ C<sub>0</sub> tăng đến C<sub>1</sub>, sau đó dòng hơi với P<sub>1</sub>C<sub>1</sub> đi qua cánh động tiếp tục giãn nở sinh công với p<sub>1</sub> giảm xuống p<sub>2</sub> và tốc độ C<sub>1</sub> giảm đến C<sub>2</sub> ở chỗ ra khỏi cánh động. Khi dòng hơi qua rãnh cánh động ngoài lực tác dụng lên vách do hướng dòng hơi thay đổi còn có thêm một phần lực (do sự giản nở dòng hơi p<sub>1</sub> giảm xuống p<sub>2</sub>) tác dụng lên cánh động 2 lực này làm quay rô to tua bin.</p>
+                `
+            },
+            'c4-3': {
+                title: "Câu 3: Hơi vào tua bin có áp suất p0 và nhiệt độ t0; giả sử áp suất p0 tăng cao đồng thời với nhiệt độ t0 giảm thấp ảnh hưởng đến tính an toàn và kinh tế của tua bin như thế nào? Hãy phân tích và nêu biện pháp xử lý?",
+                content: `
+                    <p>* Hơi vào tua bin với áp suất hơi ban đầu p<sub>0</sub>, t<sub>0</sub>, p<sub>k</sub>.</p>
+                    <p>Tua bin làm việc bình thường với thông số dòng hơi vào định mức P<sub>0</sub>, t<sub>0</sub>, p<sub>k</sub> thì dòng hơi làm việc ở những tầng cuối là trong vùng hơi ẩm. Độ ẩm cho phép của dòng hơi ở những tầng cuối tua bin là không được lớn hơn 12% (x > 0.88). Nếu ở những tầng cuối mà làm việc với độ ẩm cao thì những tầng cánh cuối của tua bin sẽ bị ăn mòn các mép lá cánh. Với thông số dòng hơi vào định mức P<sub>0</sub>, t<sub>0</sub> thì thiết bị tua bin đảm bảo độ bền cao.</p>
+                    <p>+ Trường hợp t<sub>0</sub> giảm (P<sub>0</sub> = const) (hình a) ta thấy nhiệt giáng giảm nhiều đồng thời với dòng hơi nằm trong vùng có độ ẩm cao.</p>
+                    <p>+ Trường hợp P<sub>0</sub> tăng (t<sub>0</sub> = const) (hình b) ta thấy nhiệt giáng thay đổi ít những dòng hơi nằm sâu trong vùng có độ ẩm cao.</p>
+                    <p>* Trường hợp P<sub>0</sub> tăng đồng thời với t<sub>0</sub> giảm (hình c) nhìn vào đồ thị ta thấy các tầng cuối tua bin làm việc trong vùng hơi có độ ẩm cao rất không tốt cho tua bin đồng thời với ảnh hưởng của độ ẩm hiệu suất tua bin cũng giảm đáng kể (H<sub>0</sub>' < H<sub>0</sub>).</p>
+                    <div class="diagram-box">
+                        <svg viewBox="0 0 500 250" width="100%" height="200">
+                            <g transform="translate(0, 0)">
+                                <line x1="50" y1="220" x2="220" y2="220" stroke="#000" stroke-width="1.5" marker-end="url(#arrowIso)"/>
+                                <line x1="50" y1="220" x2="50" y2="20" stroke="#000" stroke-width="1.5" marker-end="url(#arrowIso)"/>
+                                <text x="230" y="225" font-size="12" font-family="Times New Roman">s</text>
+                                <text x="40" y="20" font-size="12" font-family="Times New Roman">i</text>
+                                <path d="M 80 50 L 200 50" fill="none" stroke="#000"/>
+                                <text x="210" y="55" font-size="12" font-family="Times New Roman">t<tspan dy="4" font-size="10">0</tspan></text>
+                                <path d="M 100 40 L 200 40" fill="none" stroke="#000"/>
+                                <text x="210" y="35" font-size="12" font-family="Times New Roman">P<tspan dy="4" font-size="10">0</tspan></text>
+                                <path d="M 120 30 L 150 140" fill="none" stroke="#000"/>
+                                <text x="160" y="145" font-size="12" font-family="Times New Roman">x=1</text>
+                                <line x1="120" y1="40" x2="120" y2="150" stroke="#000" stroke-width="1.5"/>
+                                <text x="90" y="100" font-size="12" font-family="Times New Roman">H<tspan dy="4" font-size="10">0</tspan></text>
+                                <line x1="150" y1="30" x2="150" y2="130" stroke="#000" stroke-width="1.5"/>
+                                <text x="155" y="100" font-size="12" font-family="Times New Roman">H'<tspan dy="4" font-size="10">0</tspan></text>
+                                <text x="120" y="240" font-size="12" font-family="Times New Roman">Hình a - t0 giảm</text>
+                            </g>
+                            <g transform="translate(250, 0)">
+                                <line x1="50" y1="220" x2="220" y2="220" stroke="#000" stroke-width="1.5" marker-end="url(#arrowIso)"/>
+                                <line x1="50" y1="220" x2="50" y2="20" stroke="#000" stroke-width="1.5" marker-end="url(#arrowIso)"/>
+                                <text x="230" y="225" font-size="12" font-family="Times New Roman">s</text>
+                                <text x="40" y="20" font-size="12" font-family="Times New Roman">i</text>
+                                <path d="M 80 50 L 200 50" fill="none" stroke="#000"/>
+                                <text x="210" y="55" font-size="12" font-family="Times New Roman">t<tspan dy="4" font-size="10">0</tspan></text>
+                                <path d="M 100 30 L 200 30" fill="none" stroke="#000"/>
+                                <text x="210" y="25" font-size="12" font-family="Times New Roman">P'<tspan dy="4" font-size="10">0</tspan></text>
+                                <path d="M 120 30 Q 150 100 180 140" fill="none" stroke="#000"/>
+                                <text x="190" y="145" font-size="12" font-family="Times New Roman">x=1</text>
+                                <line x1="120" y1="40" x2="120" y2="150" stroke="#000" stroke-width="1.5"/>
+                                <text x="90" y="100" font-size="12" font-family="Times New Roman">H<tspan dy="4" font-size="10">0</tspan></text>
+                                <line x1="150" y1="30" x2="150" y2="140" stroke="#000" stroke-width="1.5"/>
+                                <text x="155" y="100" font-size="12" font-family="Times New Roman">H'<tspan dy="4" font-size="10">0</tspan></text>
+                                <text x="120" y="240" font-size="12" font-family="Times New Roman">Hình b - P0 tăng</text>
+                            </g>
+                        </svg>
+                        <span class="caption">Hình a, b - Biểu diễn sự thay đổi của t0 giảm và P0 tăng trên đồ thị I-S</span>
+                    </div>
+                    <div class="diagram-box">
+                        <svg viewBox="0 0 300 250" width="250" height="200">
+                            <line x1="50" y1="220" x2="250" y2="220" stroke="#000" stroke-width="1.5" marker-end="url(#arrowIso)"/>
+                            <line x1="50" y1="220" x2="50" y2="20" stroke="#000" stroke-width="1.5" marker-end="url(#arrowIso)"/>
+                            <text x="260" y="225" font-size="12" font-family="Times New Roman">s</text>
+                            <text x="40" y="20" font-size="12" font-family="Times New Roman">i</text>
+                            <path d="M 80 50 L 200 50" fill="none" stroke="#000"/>
+                            <text x="210" y="55" font-size="12" font-family="Times New Roman">t<tspan dy="4" font-size="10">0</tspan></text>
+                            <path d="M 100 30 L 200 30" fill="none" stroke="#000"/>
+                            <text x="210" y="25" font-size="12" font-family="Times New Roman">P'<tspan dy="4" font-size="10">0</tspan></text>
+                            <path d="M 120 30 Q 140 100 160 140" fill="none" stroke="#000"/>
+                            <text x="170" y="145" font-size="12" font-family="Times New Roman">x=1</text>
+                            <line x1="120" y1="40" x2="120" y2="150" stroke="#000" stroke-width="1.5"/>
+                            <text x="90" y="100" font-size="12" font-family="Times New Roman">H<tspan dy="4" font-size="10">0</tspan></text>
+                            <line x1="140" y1="30" x2="140" y2="150" stroke="#000" stroke-width="1.5"/>
+                            <text x="145" y="100" font-size="12" font-family="Times New Roman">H'<tspan dy="4" font-size="10">0</tspan></text>
+                            <text x="100" y="240" font-size="12" font-family="Times New Roman">Hình c - P0 tăng và t0 giảm</text>
+                        </svg>
+                        <span class="caption">Hình c - Biểu diễn sự thay đổi của áp suất P0 tăng và t0 giảm trên I-S</span>
+                    </div>
+                    <p>Trong vận hành người trực ban phải chú ý thường xuyên điều chỉnh kịp thời các thông số trong định mức, khi có thông số thay đổi cần liên hệ với trường kíp và các trực ban liên quan (Lò trường). Khi nhiệt độ thấp tiến hành mở xả theo qui trình tránh để xảy ra trường hợp vừa tăng P<sub>0</sub> vừa giảm t<sub>0</sub> Tua bin dễ bị thuỷ kích do phải làm việc trong vùng có độ ẩm quá lớn.</p>
+                    <p>Vì vậy trong vận hành người vận hành tua bin luôn cố gắng giữ các thông số ở giới hạn định mức vừa đảm bảo tính kinh tế lại vừa đảm bảo độ bền cho thiết bị vận hành lâu dài.</p>
+                `
+            },
+            'c4-4': {
+                title: "Câu 4: Nêu sự ảnh hưởng của các thông số P0, t0, Pk đến hiệu quả kinh tế và độ bền của thiết bị Tuabin như thế nào?",
+                content: `
+                    <p><strong>a. Ảnh hưởng của áp suất hơi ban đầu p<sub>0</sub> (t<sub>0</sub>, p<sub>k</sub> = const).</strong></p>
+                    <p>* Trường hợp P<sub>0</sub> tăng:</p>
+                    <p>- Ở áp suất đầu p<sub>0</sub> công tương ứng là H.</p>
+                    <p>- Ở áp suất P<sub>0</sub>' > P<sub>0</sub> &rArr; H' > H do đó &eta;<sub>t</sub> tăng khi P<sub>0</sub> tăng.</p>
+                    <p><em>Nhược điểm:</em> Khi tăng P<sub>0</sub> cao quá sẽ làm tăng độ ẩm tăng cuối của tua bin ảnh hưởng đến độ bền của cánh.</p>
+                    
+                    <p>* Trường hợp P<sub>0</sub> giảm:</p>
+                    <p>- Ở áp suất đầu p<sub>0</sub> công tương ứng là H<sub>0</sub>.</p>
+                    <p>- Ở áp suất P<sub>0</sub>' < P<sub>0</sub> &rArr; H<sub>0</sub>' < H<sub>0</sub> do đó &eta;<sub>t</sub> giảm rất nhiều khi P<sub>0</sub> giảm.</p>
+                    <p><em>Nhược điểm:</em> Khi giảm P<sub>0</sub> đến P<sub>0</sub>' mà giữ nguyên t<sub>0</sub>, P<sub>k</sub> làm cho nhiệt giáng giảm nhiều muốn tăng Công suất ta phải tăng Lưu lượng hơi rất nhiều Giá thành cao, không kinh tế và ảnh hưởng đến tuổi thọ tua bin.</p>
+
+                    <p><strong>b. Ảnh hưởng của nhiệt độ hơi ban đầu t<sub>0</sub> (p<sub>0</sub>, p<sub>K</sub> = const).</strong></p>
+                    <p>* Trường hợp t<sub>0</sub> tăng:</p>
+                    <p>Do đường đẳng áp phân kỳ nên khi tăng nhiệt độ thì H tăng lên.</p>
+                    <p>- Ở t<sub>0</sub> có H<sub>0</sub> tương ứng, ở t<sub>0</sub>' có H<sub>0</sub>' > H<sub>0</sub> do đó &eta;<sub>t</sub> tăng lên khi t<sub>0</sub> tăng.</p>
+                    <p><em>Nhược điểm:</em> Việc tăng t<sub>0</sub> bị giới hạn bởi sức bền nhiệt của kim loại. Người ta thường kết hợp đồng thời tăng cả p<sub>0</sub> và t<sub>0</sub>.</p>
+                    
+                    <p>* Trường hợp t<sub>0</sub> giảm:</p>
+                    <p>Do đường đẳng áp phân kỳ nên khi giảm nhiệt độ thì H giảm.</p>
+                    <p>- Ở t<sub>0</sub> có H<sub>0</sub> tương ứng, ở t<sub>0</sub>' có H<sub>0</sub>' < H<sub>0</sub> do đó &eta;<sub>t</sub> giảm lên khi t<sub>0</sub> giảm đến t<sub>0</sub>'.</p>
+                    <p><em>Nhược điểm:</em> Khi giảm t<sub>0</sub> tầng cuối tua bin làm việc trong vùng hơi ẩm gây nên các hiện tượng ăn mòn cánh động, tăng tổn thất hơi ẩm làm giảm &eta;<sub>t</sub> và giảm tuổi thọ tua bin.</p>
+
+                    <p><strong>c. Ảnh hưởng của áp suất hơi thoát p<sub>k</sub> (p<sub>0</sub>, t<sub>0</sub> = const):</strong></p>
+                    <p>Khi giảm P<sub>K</sub>' < P<sub>K</sub> , nhiệt độ t<sub>k</sub>' < t<sub>k</sub> thì H<sub>0</sub>' > H<sub>0</sub>. Hiệu suất nhiệt của chu trình tăng lên.</p>
+                    
+                    <p><em>Nhận xét:</em> Để nâng cao hiệu suất của Tua bin người ta phải kết hợp thay đổi ba thông số trên đồng thời là tốt nhất và các thông số phải nằm trong giới hạn cho phép. Vì vậy trong vận hành người vận hành tua bin luôn cố gắng giữ các thông số ở giới hạn định mức vừa đảm bảo tính kinh tế lại vừa đảm bảo độ bền cho thiết bị vận hành lâu dài.</p>
+                `
+            },
+            'c4-5': {
+                title: "Câu 5: Độ phân lực &rho; là gì? Hãy nêu công thức tính và phân loại tuabin theo độ phân lực?",
+                content: `
+                    <p><strong>Độ phân lực:</strong> Là tỷ số giữa nhiệt giáng cánh động và nhiệt giáng toàn tầng.</p>
+                    <div class="diagram-box">
+                        <svg viewBox="0 0 300 250" width="250" height="200">
+                            <line x1="50" y1="220" x2="250" y2="220" stroke="#000" stroke-width="1.5" marker-end="url(#arrowIso)"/>
+                            <line x1="50" y1="220" x2="50" y2="20" stroke="#000" stroke-width="1.5" marker-end="url(#arrowIso)"/>
+                            <text x="260" y="225" font-size="14" font-family="Times New Roman">s</text>
+                            <text x="40" y="20" font-size="14" font-family="Times New Roman">i</text>
+                            <path d="M 100 40 L 200 40" fill="none" stroke="#000"/>
+                            <text x="210" y="45" font-size="14" font-family="Times New Roman">t<tspan dy="5" font-size="10">0</tspan></text>
+                            <path d="M 100 30 L 200 30" fill="none" stroke="#000"/>
+                            <text x="210" y="25" font-size="14" font-family="Times New Roman">P<tspan dy="5" font-size="10">0</tspan></text>
+                            <path d="M 150 100 L 200 100" fill="none" stroke="#000"/>
+                            <text x="210" y="105" font-size="14" font-family="Times New Roman">P<tspan dy="5" font-size="10">1</tspan></text>
+                            <path d="M 120 40 Q 150 100 180 150" fill="none" stroke="#000"/>
+                            <line x1="140" y1="40" x2="140" y2="100" stroke="#000" stroke-width="1.5"/>
+                            <text x="90" y="70" font-size="14" font-family="Times New Roman">h<tspan dy="5" font-size="10">01</tspan></text>
+                            <line x1="140" y1="100" x2="140" y2="150" stroke="#000" stroke-width="1.5"/>
+                            <text x="90" y="130" font-size="14" font-family="Times New Roman">h<tspan dy="5" font-size="10">02</tspan></text>
+                        </svg>
+                        <span class="caption">Đồ thị i-s minh họa</span>
+                    </div>
+                    <div class="formula">&rho; = h<sub>02</sub> / (h<sub>01</sub> + h<sub>02</sub>)</div>
+                    <p>+ h<sub>01</sub> : là nhiệt giáng ống phun.</p>
+                    <p>+ h<sub>02</sub>: là nhiệt giáng cánh động.</p>
+                    <p>Căn cứ vào &rho; ta phân loại như sau:</p>
+                    <ul>
+                        <li>&rho; = 0 là Tua bin xung lực thuần tuý.</li>
+                        <li>&rho; = 0,1 – 0,25 là Tua bin xung lực có độ phân lực nhỏ.</li>
+                        <li>&rho; = 0,4 – 0,6 là Tua bin phân lực.</li>
+                    </ul>
+                `
+            },
+            'c4-6': {
+                title: "Câu 6: Hãy trình bày chu trình Các nô trên đồ thị T-S. Nêu rõ các quá trình, viết công thức tính hiệu suất theo nhiệt độ Kenvin. Tại sao chu trình này không được áp dụng trong thực tế?",
+                content: `
+                    <p>Chu trình Cacno gồm 2 quá trình đẳng nhiệt và 2 quá trình đoạn nhiệt xen kẽ nhau. Theo định luật nhiệt động II quá trình truyền nhiệt là quá trình không thuận nghịch vì nhiệt chỉ được truyền khi có hiệu số nhiệt độ giữa 2 vật.</p>
+                    <div class="diagram-box">
+                        <svg viewBox="0 0 300 250" width="250" height="200">
+                            <line x1="50" y1="220" x2="250" y2="220" stroke="#000" stroke-width="1.5" marker-end="url(#arrowIso)"/>
+                            <line x1="50" y1="220" x2="50" y2="20" stroke="#000" stroke-width="1.5" marker-end="url(#arrowIso)"/>
+                            <text x="260" y="225" font-size="14" font-family="Times New Roman">S</text>
+                            <text x="40" y="20" font-size="14" font-family="Times New Roman">T</text>
+                            <polyline points="80,60 200,60 200,160 80,160 80,60" fill="none" stroke="#000" stroke-width="2"/>
+                            <text x="65" y="55" font-size="14" font-family="Times New Roman">A</text>
+                            <text x="210" y="55" font-size="14" font-family="Times New Roman">B</text>
+                            <text x="210" y="175" font-size="14" font-family="Times New Roman">C</text>
+                            <text x="65" y="175" font-size="14" font-family="Times New Roman">D</text>
+                            <text x="30" y="65" font-size="14" font-family="Times New Roman">T<tspan dy="5" font-size="10">1</tspan></text>
+                            <text x="30" y="165" font-size="14" font-family="Times New Roman">T<tspan dy="5" font-size="10">2</tspan></text>
+                        </svg>
+                        <span class="caption">H - Chu trình Cacno trên đồ thị T-S</span>
+                    </div>
+                    <p>- AB là quá trình giãn nở đẳng nhiệt; chất môi giới nhận nguồn nhiệt q<sub>1</sub> từ nguồn nóng ở nhiệt độ T<sub>1</sub>.</p>
+                    <p>- BC là quá trình giãn nở đoạn nhiệt từ T<sub>1</sub> &divide; T<sub>2</sub> (s = const) sinh công l = q<sub>1</sub> - q<sub>2</sub>.</p>
+                    <p>- CD là quá trình nén đẳng nhiệt (ở T<sub>2</sub>) chất môi giới nhả nhiệt lượng q<sub>2</sub> cho nguồn lạnh.</p>
+                    <p>- DA là quá trình nén đoạn nhiệt từ T<sub>2</sub> &divide; T<sub>1</sub>.</p>
+                    <div class="formula">&eta;<sub>t</sub> = (q<sub>1</sub> - q<sub>2</sub>) / q<sub>1</sub> = 1 - (q<sub>2</sub> / q<sub>1</sub>)</div>
+                    <p>vì q<sub>2</sub> lấy giá trị dương trong biểu thức nên |q<sub>2</sub>| = T<sub>2</sub>(S<sub>C</sub> - S<sub>D</sub>) vì S<sub>C</sub> > S<sub>D</sub></p>
+                    <div class="formula">&rArr; &eta;<sub>t</sub> = 1 - (T<sub>2</sub> / T<sub>1</sub>) &nbsp;&nbsp;&nbsp;&nbsp; (*)</div>
+                    <p>Từ công thức (*) cho ta thấy: Hiệu suất nhiệt của chu trình Cacno thuận nghịch chỉ phụ thuộc vào nhiệt độ nguồn nóng và nguồn lạnh mà không phụ thuộc vào tính chất của chất môi giới. Hiệu suất nhiệt của chu trình luôn < 1...</p>
+                    <p><strong>* Chu trình này không được áp dụng trong thực tế vì:</strong></p>
+                    <div class="diagram-box">
+                        <svg viewBox="0 0 300 250" width="250" height="200">
+                            <line x1="50" y1="220" x2="250" y2="220" stroke="#000" stroke-width="1.5" marker-end="url(#arrowIso)"/>
+                            <line x1="50" y1="220" x2="50" y2="20" stroke="#000" stroke-width="1.5" marker-end="url(#arrowIso)"/>
+                            <text x="260" y="225" font-size="14" font-family="Times New Roman">v</text>
+                            <text x="40" y="20" font-size="14" font-family="Times New Roman">p</text>
+                            <path d="M 100 60 Q 150 80 200 120" fill="none" stroke="#000" stroke-width="1.5"/>
+                            <path d="M 200 120 Q 180 170 120 180" fill="none" stroke="#000" stroke-width="1.5"/>
+                            <path d="M 120 180 Q 80 150 60 100" fill="none" stroke="#000" stroke-width="1.5"/>
+                            <path d="M 60 100 Q 80 70 100 60" fill="none" stroke="#000" stroke-width="1.5"/>
+                            <text x="90" y="55" font-size="14" font-family="Times New Roman">A</text>
+                            <text x="210" y="125" font-size="14" font-family="Times New Roman">B</text>
+                            <text x="110" y="195" font-size="14" font-family="Times New Roman">C</text>
+                            <text x="50" y="105" font-size="14" font-family="Times New Roman">D</text>
+                        </svg>
+                        <span class="caption">H - Chu trình Cacno trên đồ thị P-V</span>
+                    </div>
+                    <p>Từ đồ thị p-v ta nhận thấy:</p>
+                    <p>- Trạng thái D (Hình trên) là trạng thái 2 pha chưa được ngưng hoàn toàn nên thể tích tại đó rất lớn, để bơm nén lượng thể tích đó phải dùng loại bơm nén rất lớn do vậy công tiêu tốn cho máy nén vô cùng lớn.</p>
+                    <p>- Để có được loại máy nén cỡ lớn nói trên công việc chế tạo máy là vô cùng khó khăn phức tạp vì thiết bị quá cồng kềnh do vậy chu trình Các nô thực tế không áp dụng. Do đó chu trình Cacno chỉ là tiêu chuẩn để đánh giá mức độ hoàn thiện của các chu trình động cơ nhiệt.</p>
+                `
+            },
+            'c4-7': {
+                title: "Câu 7: Trình bày các tổn thất của tua bin hơi và biện pháp khắc phục?",
+                content: `
+                    <p><strong>1. Tổn thất ở van điều chỉnh:</strong> Tổn thất đầu tiên khi hơi vào tua bin là tổn thất ở 8 supap điều chỉnh dòng hơi khi đi qua các van này đều bị tiết lưu làm giảm áp suất từ P<sub>0</sub> xuống P<sub>0</sub>' và nhiệt giáng sử dụng của tua bin cũng giảm đi một lượng &Delta; là h<sub>1</sub>. Theo tính toán tổn thất hơi qua van điều chỉnh khoảng 5% áp suất so với áp suất ban đầu. <em>- Muốn giảm tổn thất hơi qua van điều chỉnh khi đưa hơi vào tua bin cho các supap mở hết.</em></p>
+                    <p><strong>2. Tổn thất ống phun hay bánh tĩnh:</strong> Tổn thất ống phun thực chất là tổn thất giữa ma sát giữa dòng hơi với vách ống, giữa các lớp hơi với nhau làm cho một phần động năng mất đi làm cho nhiệt hàm tăng lên gây nên tổn thất. (tổn thất ống phun h<sub>c</sub> = 0,07 h<sub>0</sub>). <em>- Muốn giảm tổn thất này thì trong quá trình đại tu ta phải vệ sinh sạch sẽ phần truyền (các cánh tĩnh).</em></p>
+                    <p><strong>3. Tổn thất cánh động trong tua bin:</strong> Dòng hơi khi đưa vào cánh động xảy ra hiện tượng sau:</p>
+                    <ul>
+                        <li>Do độ bền mà các lá cánh phải có chiều dày nhất định làm cho dòng hơi bị va đập vào mép các lá cánh gây tổn thất.</li>
+                        <li>Do sự đổi hướng khi vào cánh động mà xảy ra hiện tượng dòng hơi va vào lưng cánh động, khi vào cánh động dòng hơi bị xoáy cuộn một phần do chiều cao lá cánh lớn hơn chiều cao ống phun.</li>
+                        <li>Do dòng hơi không chứa đầy rãnh lá cánh động nên tạo thành vùng xoáy cuộn hiện tượng này xảy ra nhiều khi độ phun hơi e < 1 và khi điều chỉnh công suất.</li>
+                    </ul>
+                    <p><em>* Muốn giảm tổn thất này thì trong quá trình đại tu ta phải vệ sinh sạch sẽ các cánh động và vận hành tua bin ở chế độ ổn định, công suất phát ở mức kinh tế.</em></p>
+                    <p><strong>4. Tổn thất tốc độ ra:</strong> Hơi sau khi ra khỏi cánh động có một tốc độ nhất định nếu không được sử dụng cho tầng sau thì đó là một tổn thất rất lớn. Đối với tua bin nhiều tầng thì tốc độ ra khỏi tầng trước được tận dụng cho tầng sau và ở tầng cuối cùng thì tổn thất này là rất lớn. <em>- Muốn giảm tổn thất này người ta phải chế tạo tua bin nhiều tầng.</em></p>
+                    <p><strong>5. Tổn thất ma sát:</strong> Bánh động quay trong khoảng chứa đầy hơi nên giữa mặt bánh động và khối lượng hơi ấy có ma sát. Khi bánh động quay còn kéo theo các phần tử hơi ở sát bánh động quay theo gây nên mất năng lượng cho bánh động. Dòng hơi mất một phần năng lượng để thổi hơi tĩnh trong rãnh cánh động. Tất cả những hiện tượng trên gây nên tổn thất.</p>
+                    <p><strong>6. Tổn thất do hơi ẩm:</strong> Trong tua bin hơi nhiều tầng các tầng cuối làm việc trong vùng hơi ẩm, hơi lúc đó xuất hiện các giọt nước nhỏ li ti dưới tác dụng của lực li tâm làm cho giọt nước này văng ra rìa bánh động... gây nên tổn thất. Ngoài hiện tượng trên còn có hiện tượng bào mòn ở mép và đầu cánh động do đó người ta chế tạo ở đầu và mép cánh động bằng vật liệu tốt hơn hoặc phun phủ bề mặt cánh động bằng vật liệu chống mài mòn. <em>- Để giảm tổn thất do hơi ẩm thì trong vận hành phải đảm bảo thông số định mức, thực hiện sấy, xả đúng qui định. ở tua bin công suất lớn người ta cho quá nhiệt trung gian hơi.</em></p>
+                    <p><strong>7. Tổn thất ống thoát:</strong> Hơi ra khỏi tầng cuối cùng trong ống thoát rồi xuống bình ngưng ở những tua bin ngưng hơi tốc độ này tương đối cao từ 100 -120 m/s. ngoài ra dòng hơi đi trong ống thoát do ma sát làm cho nhiệt hàm của dòng hơi trước khi xuống bình ngưng lên tăng. <em>- Để giảm tổn thất này người ta cho trích hơi đi gia nhiệt cho nước ngưng, nước cấp. Mục đích giảm tối thiểu lượng hơi xuống bình ngưng.</em></p>
+                    <p><strong>8. Tổn thất cơ:</strong> Là một tổn thất ngoài nó bao gồm các tổn thất gối đỡ trục, công sinh ra để kéo bơm dầu chính cùng trang bị của bộ điều tốc, vòng bay … đều gây nên tổn thất năng lượng gọi là tổn thất cơ. Tổn thất này không ảnh hưởng đến trạng thái hơi. <em>- Để tổn thất này là nhỏ nhất dầu bôi trơn gối trục phải tốt nằm trong tiêu chuẩn cho phép.</em></p>
+                    <p><strong>9. Tổn thất do toả nhiệt ra môi trường xung quanh:</strong> Hơi trong tua bin tiếp xúc với xi lanh làm cho xi lanh có nhiệt độ cao hơn do đó có hiện tượng trao đổi nhiệt với môi trường bên ngoài mà không ảnh hưởng đến trạng thái hơi trong tua bin nên được xem là một tổn thất ngoài. Tổn thất này nhỏ vì diện tích tiếp xúc của xi lanh với môi trường nhỏ lại có vỏ bảo ôn đầy đủ đồng thời tốc độ hơi đi trong tua bin lại lớn. <em>- Muốn giảm tổn thất này vỏ xi lanh phải được bảo ôn tốt.</em></p>
+                    <p><strong>10. Tổn thất hơi qua khe hở ngoài:</strong> Cổ trục tua bin hai đầu đều có khe hở, phía cao áp hơi có áp suất lớn hơn áp suất khí quyển nên có xu hướng rò hơi từ trong ra ngoài. Phía hạ áp làm việc với áp suất nhỏ hơn áp suất khí quyển nên không khí có xu hướng đi vào. Để giải quyết vấn đề này người ta có lắp các con chèn hai đầu trục và cho một lượng hơi nhỏ đi chèn, lượng hơi này không tham gia quá trình sinh công không ảnh hưởng đến trạng thái hơi trong tua bin nên được xem là một tổn thất ngoài. <em>- Để giảm tổn thất này khi sửa chữa phải đảm bảo các con chèn phải có chất lượng tốt, trong vận hành phải đảm bảo lượng hơi đi chèn.</em></p>
+                `
+            },
+            'c4-8': {
+                title: "Câu 8: Vẽ và giải thích chu trình của hơi nước trong nhà máy nhiệt điện (Chu trình Rankine) trên đồ thị T-S. Viết công thức tính công và hiệu suất của chu trình?",
+                content: `
+                    <p><strong>1. Biểu diễn chu trình Rankine trên đồ thị T-S:</strong></p>
+                    <p>Chu trình Rankine được sử dụng phổ biến trong các nhà máy nhiệt điện, thiết bị thực hiện cho chu trình này thường gồm Lò hơi, Tua bin, bình ngưng, bơm cấp nước. Chu trình Rankine gồm 2 quá trình đẳng áp và 2 quá trình đoạn nhiệt tiến hành xen kẽ nhau.</p>
+                    <div class="diagram-box">
+                        <svg viewBox="0 0 700 300" width="100%" height="250">
+                            <g transform="translate(0, 0)">
+                                <line x1="50" y1="250" x2="250" y2="250" stroke="#000" stroke-width="1.5" marker-end="url(#arrowIso)"/>
+                                <line x1="50" y1="250" x2="50" y2="20" stroke="#000" stroke-width="1.5" marker-end="url(#arrowIso)"/>
+                                <text x="260" y="255" font-size="14" font-family="Times New Roman">S</text>
+                                <text x="40" y="20" font-size="14" font-family="Times New Roman">T</text>
+                                <path d="M 60 200 Q 120 50 180 200" fill="none" stroke="#000" stroke-dasharray="5,5"/>
+                                <line x1="80" y1="200" x2="80" y2="100" stroke="#000" stroke-width="1.5"/>
+                                <line x1="80" y1="100" x2="120" y2="100" stroke="#000" stroke-width="1.5"/>
+                                <line x1="120" y1="100" x2="150" y2="100" stroke="#000" stroke-width="1.5"/>
+                                <line x1="150" y1="100" x2="150" y2="150" stroke="#000" stroke-width="1.5"/>
+                                <line x1="150" y1="150" x2="200" y2="220" stroke="#000" stroke-width="1.5"/>
+                                <line x1="200" y1="220" x2="80" y2="200" stroke="#000" stroke-width="1.5"/>
+                                <text x="65" y="215" font-size="14" font-family="Times New Roman">3</text>
+                                <text x="110" y="95" font-size="14" font-family="Times New Roman">4</text>
+                                <text x="155" y="95" font-size="14" font-family="Times New Roman">5</text>
+                                <text x="160" y="145" font-size="14" font-family="Times New Roman">1</text>
+                                <text x="210" y="225" font-size="14" font-family="Times New Roman">2</text>
+                                <text x="60" y="215" font-size="14" font-family="Times New Roman">2'</text>
+                                <text x="170" y="120" font-size="14" font-family="Times New Roman">p<tspan dy="5" font-size="10">1</tspan></text>
+                                <text x="180" y="240" font-size="14" font-family="Times New Roman">p<tspan dy="5" font-size="10">2</tspan></text>
+                                <text x="100" y="270" font-size="14" font-family="Times New Roman">a</text>
+                                <text x="190" y="270" font-size="14" font-family="Times New Roman">b</text>
+                            </g>
+                            <g transform="translate(350, 0)">
+                                <rect x="50" y="50" width="60" height="60" fill="none" stroke="#000" stroke-width="1.5"/>
+                                <text x="60" y="85" font-size="12" font-family="Times New Roman">Lò hơi</text>
+                                <polygon points="150,60 200,50 200,110 150,100" fill="none" stroke="#000" stroke-width="1.5"/>
+                                <text x="160" y="85" font-size="12" font-family="Times New Roman">Tua bin</text>
+                                <circle cx="230" cy="80" r="15" fill="none" stroke="#000" stroke-width="1.5"/>
+                                <text x="225" y="85" font-size="10" font-family="Times New Roman">MF</text>
+                                <line x1="200" y1="80" x2="215" y2="80" stroke="#000" stroke-dasharray="4,2"/>
+                                <circle cx="150" cy="180" r="20" fill="none" stroke="#000" stroke-width="1.5"/>
+                                <text x="130" y="215" font-size="12" font-family="Times New Roman">Bình ngưng</text>
+                                <circle cx="100" cy="230" r="10" fill="none" stroke="#000" stroke-width="1.5"/>
+                                <polygon points="95,225 105,230 95,235" fill="#000"/>
+                                <text x="70" y="255" font-size="12" font-family="Times New Roman">Bơm NC</text>
+                                <g stroke="#000" stroke-width="1.5" fill="none" marker-end="url(#arrowIso)">
+                                    <path d="M 110 50 L 150 50" />
+                                    <path d="M 200 100 L 150 180" />
+                                    <path d="M 130 180 L 100 220" />
+                                    <path d="M 100 240 L 80 100 L 80 80 L 50 80" />
+                                </g>
+                            </g>
+                        </svg>
+                        <span class="caption">Chu trình Rankine trên đồ thị T-S và Sơ đồ nguyên lý nhà máy</span>
+                    </div>
+                    <p>1-2: Quá trình giãn nở đoạn nhiệt của hơi trong Tua bin áp suất giảm từ p<sub>1</sub> xuống p<sub>2</sub>.</p>
+                    <p>2-2': Quá trình ngưng hơi trong bình ngưng. Hơi nhả nhiệt q<sub>2</sub> ở áp suất không đổi cho nước làm mát.</p>
+                    <p>2'-3: Quá trình nén đoạn nhiệt nước cấp trong bơm nước cấp trở lại lò, áp suất tăng từ p<sub>2</sub> đến p<sub>1</sub>.</p>
+                    <p>3-4-5: Quá trình hoá hơi đẳng áp biến nước thành hơi bão hoà khô được thực hiện trong thiết bị sinh hơi (Lò hơi).</p>
+                    <p>5-1: Quá trình biến hơi bão hoà khô thành hơi quá nhiệt, thực hiện trong bộ quá nhiệt ở áp suất p<sub>1</sub> không đổi.</p>
+
+                    <p><strong>2. Công và hiệu suất của chu trình Rankine:</strong></p>
+                    <div class="formula">&eta;<sub>t</sub> = l / q<sub>1</sub> = (q<sub>1</sub> - |q<sub>2</sub>|) / q<sub>1</sub> &nbsp;&nbsp;&nbsp;&nbsp; (1*)</div>
+                    <p>Trong đó:</p>
+                    <p>q<sub>1</sub> - Nhiệt cấp cho chu trình trong quá trình đẳng áp (3, 4, 5, 1): q<sub>1</sub> = i<sub>1</sub> - i<sub>3</sub> ; bằng diện tích (a 3 4 1 b) &nbsp;&nbsp;&nbsp;&nbsp; (2*)</p>
+                    <p>q<sub>2</sub> - Nhiệt nhả cho nguồn lạnh trong quá trình đẳng áp (2, 2'): q<sub>2</sub> = i<sub>2</sub> - i<sub>2'</sub> ; bằng diện tích (a 2' 2 b)</p>
+                    <p>Công của chu trình:</p>
+                    <div class="formula">l = l<sub>T</sub> - l<sub>B</sub> = l<sub>T</sub> = i<sub>1</sub> - i<sub>2</sub></div>
+                    <p>l<sub>T</sub> = i<sub>1</sub> - i<sub>2</sub> là công của tua bin.</p>
+                    <p>l<sub>B</sub> = i<sub>3</sub> - i<sub>2'</sub> là công của bơm.</p>
+                    <p>Thông thường ở áp suất p<sub>1</sub> không cao lắm, giá trị công bơm rất nhỏ so với công của Tua bin, ta có thể bỏ qua công của bơm ( l<sub>B</sub> = 0 ) có nghĩa là i<sub>3</sub> &asymp; i<sub>2'</sub>.</p>
+                    <p>Sau khi thể (2*), (4*) vào (1*) ta được biểu thức hiệu suất nhiệt của chu trình Rankine thuận nghịch sau:</p>
+                    <div class="formula">&eta;<sub>t</sub> = l<sub>T</sub> / q<sub>1</sub> = (i<sub>1</sub> - i<sub>2</sub>) / (i<sub>1</sub> - i<sub>2'</sub>) &nbsp;&nbsp;&nbsp;&nbsp; (5*)</div>
+                    <p>ở đây:</p>
+                    <p>i<sub>1</sub> - Entanpi của hơi quá nhiệt ở p<sub>1</sub>, t<sub>1</sub>.</p>
+                    <p>i<sub>2</sub> - Entanpi của hơi bão hoà ẩm khi ra khỏi Tua bin ở áp suất p<sub>2</sub>.</p>
+                    <p>i<sub>2'</sub> - Entanpi của nước ngưng ở áp suất p<sub>2</sub>.</p>
+                `
+            },
+            'c4-9': {
+                title: "Câu 9: Vẽ và giải thích một vòng tuần hoàn tự nhiên của môi chất ở lò hơi. Khái niệm về bội số tuần hoàn, ý nghĩa của bội số tuần hoàn?",
+                content: `
+                    <p><strong>1. Vẽ và giải thích 1 vòng tuần hoàn tự nhiên của môi chất lò hơi:</strong></p>
+                    <div class="diagram-box">
+                        <svg viewBox="0 0 300 300" width="250" height="250">
+                            <rect x="100" y="40" width="100" height="50" rx="25" fill="none" stroke="#1a365d" stroke-width="2"/>
+                            <text x="145" y="70" font-size="16" font-family="Times New Roman">1</text>
+                            <line x1="120" y1="90" x2="120" y2="230" stroke="#2b6cb0" stroke-width="2" marker-end="url(#arrowBlue)"/>
+                            <text x="90" y="160" font-size="16" font-family="Times New Roman">2</text>
+                            <rect x="100" y="240" width="100" height="20" fill="none" stroke="#1a365d" stroke-width="2"/>
+                            <text x="145" y="285" font-size="16" font-family="Times New Roman">4</text>
+                            <line x1="120" y1="240" x2="180" y2="240" stroke="#2b6cb0" stroke-width="2"/>
+                            <line x1="180" y1="240" x2="180" y2="90" stroke="#2b6cb0" stroke-width="2" marker-end="url(#arrowBlue)"/>
+                            <text x="190" y="160" font-size="16" font-family="Times New Roman">3</text>
+                        </svg>
+                        <span class="caption">Sơ đồ vòng tuần hoàn tự nhiên (1: Bao hơi; 2: Ống nước xuống; 3: Ống nước lên; 4: Ống góp dưới)</span>
+                    </div>
+                    <p><strong>Giải thích sự tuần hoàn tự nhiên theo sơ đồ:</strong></p>
+                    <p>- Mô tả: Sơ đồ vòng tuần hoàn tự nhiên đơn giản của lò hơi được trình bày theo hình vẽ trên, nó là một hệ thống kín bao gồm phần ống nước xuống không được đốt nóng (2), nước trong ống chuyển động đi xuống, phần ống nước lên (3), nước trong ống được đốt nóng và chuyển động đi lên. Các ống nước lên và xuống được nối với nhau bằng bao hơi (1) và ống góp dưới (4).</p>
+                    <p>- Giải thích nguyên lý làm việc: Trong ống nước lên, nước nhận nhiệt và sinh hơi thành hỗn hợp hơi nước có mặt độ giảm dần và chuyển động lên trên vào khoang hơi của bao hơi. Do có sự chênh lệch mặt độ hay tỷ trọng giữa nước trong ống nước xuống và hỗn hợp hơi nước trong ống nước lên đã gây ra chuyển động tự nhiên trong vòng kín và tạo thành vòng tuần hoàn tự nhiên.</p>
+                    
+                    <p><strong>2. Khái niệm và ý nghĩa của bội số tuần hoàn:</strong></p>
+                    <p>- Khái niệm về bội số tuần hoàn: Bội số tuần hoàn là tỷ số giữa lưu lượng nước trong ống nước xuống và lưu lượng hơi sinh ra khỏi ống nước lên của vòng tuần hoàn tự nhiên</p>
+                    <div class="formula">k = D<sub>th</sub> / D</div>
+                    <p>Trong đó: k là bội số tuần hoàn, D<sub>th</sub> (kg/s) là lưu lượng nước xuống trong ống nước xuống, D (kg/s) là lưu lượng hơi ra khỏi ống nước lên</p>
+                    <p>- Ý nghĩa của bội số tuần hoàn:</p>
+                    <ul>
+                        <li>Bội số tuần hoàn có ý nghĩa quan trọng trong việc đảm bảo sự làm việc an toàn cho các ống sinh hơi (ống nước lên) của mỗi lò hơi</li>
+                        <li>Trong quá trình tính toán thiết kế lò hơi, bội số tuần hoàn được xác định nhằm đảm bảo tránh xảy ra các trường hợp phá hủy tuần hoàn tự nhiên như: Ngừng tuần hoàn, tuần hoàn ngược, chế độ phân lớp và chế độ khô ống.</li>
+                    </ul>
+                `
+            }
+        };
+
+        // ==========================================
+        // LOGIC CHUYỂN ĐỔI VIEW (SPA)
+        // ==========================================
+        const viewList = document.getElementById('view-list');
+        const viewDetail = document.getElementById('view-detail');
+        const detailContentArea = document.getElementById('detail-content-area');
+
+        function showDetail(id) {
+            const item = data[id];
+            if (!item) return;
+
+            detailContentArea.innerHTML = `
+                <div class="detail-question-title">${item.title}</div>
+                <div class="detail-content">
+                    <h3>Trả lời:</h3>
+                    ${item.content}
+                </div>
+            `;
+
+            viewList.style.display = 'none';
+            viewDetail.style.display = 'block';
+            window.scrollTo(0, 0); // Cuộn lên đầu trang
+        }
+
+        function showList() {
+            viewDetail.style.display = 'none';
+            viewList.style.display = 'block';
+            window.scrollTo(0, 0);
+        }
+
+        // ==========================================
+        // LOGIC CHATBOT (TRỢ LÝ ẢO)
+        // ==========================================
+        const chatWindow = document.getElementById('chatWindow');
+        const chatBody = document.getElementById('chatBody');
+        const chatInput = document.getElementById('chatInput');
+
+        function toggleChat() {
+            if (chatWindow.style.display === 'flex') {
+                chatWindow.style.display = 'none';
+            } else {
+                chatWindow.style.display = 'flex';
+                chatInput.focus();
+            }
+        }
+
+        function handleChat(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function sendMessage() {
+            const text = chatInput.value.trim();
+            if (text === '') return;
+
+            // Hiển thị tin nhắn người dùng
+            addMessage(text, 'msg-user');
+            chatInput.value = '';
+
+            // Xử lý phản hồi của Bot sau 0.5s
+            setTimeout(() => {
+                const reply = getBotResponse(text);
+                addMessage(reply, 'msg-bot');
+            }, 500);
+        }
+
+        function addMessage(text, className) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${className}`;
+            msgDiv.innerText = text;
+            chatBody.appendChild(msgDiv);
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        function getBotResponse(input) {
+            const text = input.toLowerCase();
+            
+            if (text.includes('nhiệt độ') || text.includes('kelvin')) {
+                return "Nhiệt độ đặc trưng cho trạng thái nhiệt. Bạn có thể xem chi tiết ở Câu 1.3 nhé!";
+            }
+            if (text.includes('áp suất') || text.includes('bar') || text.includes('pa')) {
+                return "Áp suất là lực tác dụng lên một đơn vị diện tích. Xem Câu 1.4 để biết thêm về các đơn vị đo!";
+            }
+            if (text.includes('lò hơi') || text.includes('nhiên liệu')) {
+                return "Lò hơi có nhiều đặc tính quan trọng. Bạn nên đọc Câu 3.1 và 3.2. Cần tôi tóm tắt phần nào không?";
+            }
+            if (text.includes('tuabin') || text.includes('tuabin hơi')) {
+                return "Tuabin biến nhiệt năng thành cơ năng. Bạn có thể tìm hiểu về Chu trình Rankine (Câu 4.8) hoặc các tổn thất (Câu 4.7).";
+            }
+            if (text.includes('rankine')) {
+                return "Chu trình Rankine là chu trình cơ bản của nhà máy nhiệt điện, gồm 2 quá trình đẳng áp và 2 quá trình đoạn nhiệt. Xem Câu 4.8!";
+            }
+            if (text.includes('cacno') || text.includes('carnot')) {
+                return "Chu trình Cacno có hiệu suất cao nhất nhưng không thể thực hiện trong thực tế. Lý do ở Câu 4.6!";
+            }
+            if (text.includes('chào') || text.includes('hello') || text.includes('hi')) {
+                return "Chào bạn! Tôi có thể giúp gì cho việc ôn thi Kỹ thuật Nhiệt của bạn?";
+            }
+            if (text.includes('cảm ơn') || text.includes('thank')) {
+                return "Không có gì! Chúc bạn ôn tập tốt và đạt điểm cao.";
+            }
+            
+            return "Xin lỗi, tôi chưa hiểu ý bạn. Bạn hãy thử hỏi về các chủ đề như: Nhiệt độ, Áp suất, Lò hơi, Tuabin, hoặc Rankine nhé!";
+        }
+
+    </script>
+
+    <!-- Định nghĩa marker cho SVG dùng chung -->
+    <svg style="display: none;">
+        <defs>
+            <marker id="arrowIso" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                <polygon points="0 0, 10 3.5, 0 7" fill="#000" />
+            </marker>
+            <marker id="arrowIsoStart" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+                <polygon points="10 0, 0 3.5, 10 7" fill="#000" />
+            </marker>
+            <marker id="arrowIsoEnd" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                <polygon points="0 0, 10 3.5, 0 7" fill="#000" />
+            </marker>
+            <marker id="arrowBlue" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                <polygon points="0 0, 10 3.5, 0 7" fill="#2b6cb0" />
+            </marker>
+        </defs>
+    </svg>
+<!-- ==========================================================
+  BẢN HIỆU ĐÍNH & BỔ SUNG (GS. Kỹ thuật Nhiệt)
+  CÁCH DÙNG: dán toàn bộ khối này vào file gốc, ngay TRƯỚC thẻ </body>
+  (sau thẻ <svg style="display:none">...</svg> cuối file).
+=========================================================== -->
+<style>
+    .bosung{margin-top:18px;padding:14px 18px;background:#f0fff4;border-left:4px solid #38a169;border-radius:6px}
+    .bosung h4{color:#276749;margin-bottom:6px}
+    .bosung p,.bosung li{margin-bottom:6px}
+    #searchBox{width:100%;padding:10px 14px;font-size:16px;border:1px solid #cbd5e0;border-radius:8px;margin-bottom:10px}
+    .chat-link{display:inline-block;margin:4px 6px 0 0;color:#2b6cb0;cursor:pointer;text-decoration:underline}
+</style>
+<script>
+(function () {
+    // Marker SVG nằm trong <svg display:none> thường không hiển thị mũi tên -> đưa về kích thước 0
+    const defs = document.querySelector('body > svg');
+    if (defs) defs.setAttribute('style', 'position:absolute;width:0;height:0;overflow:hidden');
+
+    const fix = (id, pairs) => {
+        pairs.forEach(([a, b]) => {
+            if (data[id].content.includes(a)) data[id].content = data[id].content.split(a).join(b);
+            else console.warn('Không tìm thấy đoạn cần sửa ở', id, ':', a);
+        });
+    };
+    const add = (id, html) => {
+        data[id].content += `<div class="bosung"><h4>Bổ sung của giáo sư</h4>${html}</div>`;
+    };
+
+    /* ===== I. SỬA SAI / HIỆU ĐÍNH ===== */
+    fix('c1-3', [['<sup>o</sup>K', ' K'], ['K = - 273 <sup>o</sup>C', 'K = -273,15 <sup>o</sup>C']]);
+    fix('c1-4', [['mmHg<sub>2</sub>O', 'mmH<sub>2</sub>O']]);
+    fix('c2-2', [['chiều dương là chiều giảm nhiệt độ',
+        'chiều dương là chiều tăng nhiệt độ (còn dòng nhiệt truyền theo chiều giảm nhiệt độ, ngược chiều gradient: q = -&lambda;&middot;grad t)']]);
+    fix('c3-6', [['Ăn mòn khí nghi', 'Ăn mòn khi nghỉ (ăn mòn lúc ngừng lò)']]);
+    fix('c3-7', [['hyđrôxyn apatit', 'hydroxyapatit']]);
+    data['c4-6'].title = data['c4-6'].title.replace('Kenvin', 'Kelvin');
+    fix('c4-8', [
+        ['(a 3 4 1 b)', '(a 3 4 5 1 b)'],
+        ['l = l<sub>T</sub> - l<sub>B</sub> = l<sub>T</sub> = i<sub>1</sub> - i<sub>2</sub>',
+         'l = l<sub>T</sub> - l<sub>B</sub> = (i<sub>1</sub> - i<sub>2</sub>) - (i<sub>3</sub> - i<sub>2\'</sub>) &asymp; i<sub>1</sub> - i<sub>2</sub>'],
+        ['Sau khi thể (2*), (4*) vào (1*)', 'Sau khi thế q<sub>1</sub> theo (2*) và l<sub>T</sub> vào (1*)']
+    ]);
+    fix('c4-9', [['mặt độ', 'mật độ']]);
+
+    /* ===== II. BỔ SUNG NỘI DUNG ===== */
+    add('c1-3', `<p>Ngoài ba loại trên còn có <strong>nhiệt kế giãn nở rắn/lưỡng kim</strong>, <strong>nhiệt kế áp suất</strong> và <strong>nhiệt kế bức xạ (hỏa quang kế)</strong> dùng đo nhiệt độ cao, không tiếp xúc (ví dụ nhiệt độ ngọn lửa buồng lửa). Trong vận hành lò hơi, nhiệt độ hơi quá nhiệt, khói thải thường đo bằng cặp nhiệt (K, S), nhiệt độ nước/dầu bằng nhiệt kế điện trở (Pt100).</p>`);
+
+    add('c2-3', `<p><strong>Định luật Fourier</strong> (dẫn nhiệt): q = -&lambda;&middot;grad t, với &lambda; là hệ số dẫn nhiệt [W/mK].</p>
+    <p><strong>Phạm vi thường gặp của &alpha; [W/m<sup>2</sup>K]:</strong> đối lưu tự nhiên của khí 5 – 25; đối lưu cưỡng bức của khí 10 – 200; nước đối lưu cưỡng bức 500 – 10.000; nước sôi 2.000 – 100.000; hơi nước ngưng tụ 5.000 – 15.000 (giá trị mang tính tham khảo). Vì &alpha; phía khói nhỏ nhất nên bề mặt phía khói thường được làm cánh, còn phía nước/hơi ít cần.</p>`);
+
+    add('c3-2', `<p><strong>Lưu huỳnh (S):</strong> một thành phần cháy nhưng có hại: tạo SO<sub>2</sub>, SO<sub>3</sub> gây ăn mòn nhiệt độ thấp ở bộ sấy không khí và bộ hâm nước, đồng thời làm tăng nhiệt độ điểm sương của khói.</p>
+    <p><strong>Nhiệt độ nóng chảy của tro</strong> (t<sub>1</sub> biến dạng, t<sub>2</sub> mềm, t<sub>3</sub> chảy lỏng) quyết định khả năng đóng xỉ, bám bẩn bề mặt đốt.</p>
+    <p><strong>Công thức Mendeleev</strong> tính nhiệt trị thấp làm việc:</p>
+    <div class="formula">Q<sub>t</sub><sup>lv</sup> = 339C<sup>lv</sup> + 1030H<sup>lv</sup> - 109(O<sup>lv</sup> - S<sup>lv</sup>) - 25W<sup>lv</sup> &nbsp; [kJ/kg]</div>
+    <p>(các thành phần tính theo % khối lượng).</p>`);
+
+    add('c3-3', `<p><strong>Hiệu suất lò theo phương pháp cân bằng ngược:</strong></p>
+    <div class="formula">&eta;<sub>lò</sub> = q<sub>1</sub> = 100 - (q<sub>2</sub> + q<sub>3</sub> + q<sub>4</sub> + q<sub>5</sub> + q<sub>6</sub>) &nbsp; [%], &nbsp; q<sub>i</sub> = Q<sub>i</sub>/Q<sub>đv</sub>&middot;100</div>
+    <p>Trong đó q<sub>2</sub> (tổn thất khói thải) thường lớn nhất; nó tăng khi nhiệt độ khói thải và hệ số không khí thừa &alpha; tăng. Q<sub>6</sub> chỉ đáng kể với lò thải xỉ lỏng hoặc nhiên liệu nhiều tro.</p>`);
+
+    add('c4-3', `<p><strong>Phân tích bổ sung về an toàn cơ khí:</strong></p>
+    <ul>
+        <li><strong>p<sub>0</sub> tăng:</strong> ứng suất trong vỏ, van, cánh tầng đầu tăng; với độ mở van điều chỉnh không đổi, lưu lượng hơi tỷ lệ gần đúng với p<sub>0</sub> nên công suất và lực chiều trục tăng, dễ quá tải.</li>
+        <li><strong>t<sub>0</sub> giảm đột ngột:</strong> gây ứng suất nhiệt, chênh lệch giãn nở giữa rô to và vỏ, rung động; nguy hiểm nhất là nước theo hơi vào tua bin (thủy kích), có thể làm cong trục, hỏng cánh, mòn đệm chặn chiều trục.</li>
+        <li><strong>Biện pháp:</strong> điều chỉnh chế độ đốt/phun giảm ôn để đưa thông số về định mức; giảm tải tua bin khi thông số lệch; mở xả đường hơi và thân tua bin; theo dõi độ rung, độ giãn nở tương đối, dịch chuyển trục, nhiệt độ metal; <em>ngừng tua bin khẩn cấp theo quy trình</em> khi thông số vượt giới hạn cho phép của nhà chế tạo.</li>
+    </ul>`);
+
+    add('c4-4', `<p><strong>Giới hạn khi giảm p<sub>k</sub>:</strong> p<sub>k</sub> không thể thấp hơn áp suất bão hòa ứng với nhiệt độ nước làm mát cộng độ chênh nhiệt độ cuối của bình ngưng. Ngoài ra, giảm p<sub>k</sub> quá thấp làm độ ẩm cuối tua bin tăng và tổn thất tốc độ ra tăng (cánh cuối đạt giới hạn giãn nở), nên có <em>áp suất ngưng tụ tối ưu</em> theo mùa. Ngược lại p<sub>k</sub> tăng (mất chân không, nước làm mát nóng) làm nhiệt giáng giảm, hiệu suất giảm, nhiệt độ ống thoát tăng, có thể gây lệch tâm do biến dạng vỏ hạ áp.</p>
+    <p>Quá nhiệt trung gian và hồi nhiệt (gia nhiệt hồi nhiệt) là hai biện pháp làm tăng hiệu suất đồng thời giảm độ ẩm tầng cuối khi tăng p<sub>0</sub>.</p>`);
+
+    add('c4-6', `<p><strong>Các lý do bổ sung:</strong></p>
+    <ul>
+        <li>Quá trình đẳng nhiệt AB trong vùng hơi bão hòa ẩm nên T<sub>1</sub> bị giới hạn dưới nhiệt độ tới hạn của nước (khoảng 374 <sup>o</sup>C), nên hiệu suất lý thuyết không cao; không thể tận dụng vùng hơi quá nhiệt nhiệt độ cao.</li>
+        <li>Hơi giãn nở đoạn nhiệt BC kết thúc ở độ khô thấp (độ ẩm cao), gây xói mòn cánh cuối và giảm hiệu suất tua bin.</li>
+        <li>Muốn thực hiện chu trình thuận nghịch phải truyền nhiệt với độ chênh nhiệt độ vô cùng nhỏ, đòi hỏi diện tích trao đổi nhiệt vô hạn, nên công suất đạt được rất nhỏ.</li>
+        <li>Giải pháp thực tế: chu trình Rankine (ngưng hết hơi thành nước rồi mới bơm nước) và có quá nhiệt.</li>
+    </ul>`);
+
+    add('c4-7', `<p><strong>11. Tổn thất do rò rỉ trong:</strong> Hơi rò qua khe hở giữa đỉnh cánh động và vỏ, giữa bánh tĩnh (màng ngăn) và trục, không tham gia sinh công trong tầng đó nên làm giảm hiệu suất tương đối trong. <em>- Biện pháp:</em> dùng chèn mê cung, chèn có vòng đệm bù, kiểm tra khe hở khi đại tu, tránh va chạm động tĩnh khi khởi động.</p>
+    <p><strong>Tổng hợp:</strong> hiệu suất tương đối trong &eta;<sub>oi</sub> = H<sub>i</sub>/H<sub>0</sub> (kể các tổn thất trong: van, ống phun, cánh động, tốc độ ra, ma sát, hơi ẩm, rò rỉ, ống thoát); hiệu suất tương đối có ích &eta;<sub>oe</sub> = &eta;<sub>oi</sub>&middot;&eta;<sub>cơ</sub>; hiệu suất máy phát thêm &eta;<sub>mf</sub>.</p>`);
+
+    add('c4-8', `<p><strong>Công thức chính xác khi kể công bơm:</strong></p>
+    <div class="formula">&eta;<sub>t</sub> = [(i<sub>1</sub> - i<sub>2</sub>) - (i<sub>3</sub> - i<sub>2'</sub>)] / (i<sub>1</sub> - i<sub>3</sub>)</div>
+    <p>với công bơm l<sub>B</sub> = v'<sub>2</sub>(p<sub>1</sub> - p<sub>2</sub>). Khi tính nhà máy thực, còn kể đến hiệu suất trong của tua bin: i<sub>2</sub> thực = i<sub>1</sub> - &eta;<sub>oi</sub>(i<sub>1</sub> - i<sub>2</sub>).</p>
+    <p><strong>Các biện pháp nâng cao hiệu suất Rankine:</strong> tăng p<sub>1</sub>, t<sub>1</sub>; giảm p<sub>2</sub>; quá nhiệt trung gian; gia nhiệt hồi nhiệt nước cấp bằng hơi trích; chu trình siêu tới hạn.</p>`);
+
+    add('c4-9', `<p><strong>Động lực tuần hoàn:</strong> S<sub>đl</sub> = h&middot;g&middot;(&rho;<sub>xuống</sub> - &rho;<sub>tb lên</sub>) [Pa], trong đó h là chiều cao hữu ích của vòng tuần hoàn; tuần hoàn ổn định khi động lực này cân bằng tổng trở lực của ống xuống và ống lên.</p>
+    <p><strong>Nhận xét về k:</strong> áp suất lò càng cao thì chênh lệch mật độ nước - hơi càng nhỏ nên k càng nhỏ (lò áp suất thấp k lên tới vài chục đến hàng trăm, lò cao áp chỉ khoảng 4 – 10, giá trị tham khảo). Độ khô hỗn hợp ra khỏi ống nước lên x = 1/k. Nếu k quá nhỏ, ống thiếu nước làm mát, dễ cháy ống; k quá lớn thì không kinh tế vì tăng kích thước và trở lực hệ thống.</p>`);
+
+    /* ===== III. TÌM KIẾM CÂU HỎI ===== */
+    const grid = document.querySelector('#view-list');
+    const box = document.createElement('input');
+    box.id = 'searchBox';
+    box.placeholder = 'Tìm câu hỏi theo từ khóa (ví dụ: Rankine, lò hơi, áp suất)...';
+    grid.insertBefore(box, grid.firstChild);
+    const norm = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd');
+    box.addEventListener('input', () => {
+        const k = norm(box.value.trim());
+        document.querySelectorAll('.question-card').forEach(c => {
+            c.style.display = norm(c.textContent).includes(k) ? '' : 'none';
+        });
+    });
+
+    /* ===== IV. TRỢ LÝ: THAY BẰNG BỘ TRẢ LỜI KHÔNG DẤU, KHÔNG NHẦM TỪ ===== */
+    const topics = [
+        [['do phan luc'], 'c4-5', 'Độ phân lực ρ = nhiệt giáng cánh động / nhiệt giáng toàn tầng.'],
+        [['xung luc', 'phan luc'], 'c4-2', 'Tua bin xung lực: giãn nở hoàn toàn ở ống phun. Tua bin phản lực: giãn nở cả ở cánh tĩnh và cánh động.'],
+        [['ton that tua bin', 'ton that cua tua bin'], 'c4-7', 'Tua bin có nhiều loại tổn thất: van điều chỉnh, ống phun, cánh động, tốc độ ra, ma sát, hơi ẩm, cơ...'],
+        [['ton that hoi', 'nuoc ngung'], 'c4-1', 'Tổn thất môi chất gồm tổn thất trong và tổn thất ngoài.'],
+        [['rankine'], 'c4-8', 'Rankine gồm 2 quá trình đẳng áp và 2 quá trình đoạn nhiệt; η = (i1 - i2)/(i1 - i2\').'],
+        [['cacno', 'carnot'], 'c4-6', 'Cacno có hiệu suất 1 - T2/T1 nhưng không thực hiện được vì nén hơi ẩm cần máy nén rất lớn.'],
+        [['tuan hoan', 'boi so'], 'c4-9', 'Bội số tuần hoàn k = Dth/D.'],
+        [['p0', 't0', 'pk', 'thong so hoi'], 'c4-4', 'Thông số p0, t0, pk ảnh hưởng đồng thời đến hiệu suất và độ bền tua bin.'],
+        [['tua bin', 'turbine'], 'c4-7', 'Bạn muốn hỏi về loại, tổn thất hay thông số của tua bin?'],
+        [['phot phat', 'cau', 'xa lo', 'xu ly nuoc'], 'c3-7', 'Phốt phát đưa trực tiếp vào bao hơi để tạo bùn, sau đó xả định kỳ.'],
+        [['an mon', 'phong mon'], 'c3-6', 'Có phòng mòn khô, ướt và khí khi ngừng lò.'],
+        [['than bot', 'do min', 'r90'], 'c3-5', 'Độ mịn kinh tế là độ mịn có tổng chi phí nghiền và tổn thất cháy không hoàn toàn nhỏ nhất.'],
+        [['can bang nhiet', 'ton that nhiet'], 'c3-3', 'Qdv = Q1 + Q2 + Q3 + Q4 + Q5 + Q6.'],
+        [['chay'], 'c3-4', 'Quá trình cháy có 4 giai đoạn: sấy nóng-bốc chất bốc, bắt lửa, cháy, kết thúc.'],
+        [['nhien lieu', 'chat boc', 'do am', 'do tro', 'nhiet tri'], 'c3-2', 'Đặc tính công nghệ: độ ẩm, chất bốc, cốc, tro, nhiệt trị.'],
+        [['lo hoi'], 'c3-1', 'Đặc tính lò hơi: thông số hơi, sản lượng, hiệu suất, nhiệt thể tích buồng lửa.'],
+        [['newton', 'he so toa nhiet'], 'c2-3', 'q = α(tw - tf).'],
+        [['gradient', 'truong nhiet', 'dang nhiet'], 'c2-2', 'Gradient nhiệt độ vuông góc với mặt đẳng nhiệt, hướng về phía nhiệt độ tăng.'],
+        [['dan nhiet', 'doi luu', 'buc xa', 'trao doi nhiet'], 'c2-1', 'Ba phương thức: dẫn nhiệt, đối lưu, bức xạ.'],
+        [['ap suat', 'manomet', 'bar'], 'c1-4', 'Áp suất P = F/S; P = Pkt + Pd hoặc P = Pkt - Pck.'],
+        [['nhiet do', 'kelvin', 'nhiet ke'], 'c1-3', 'T(K) = t(°C) + 273.'],
+        [['bao hoa', 'qua nhiet', 'do kho'], 'c1-1', 'Hơi bão hòa ẩm, bão hòa khô và quá nhiệt khác nhau ở độ khô và nhiệt độ so với nhiệt độ bão hòa.'],
+        [['pha', 'the ran', 'the long'], 'c1-2', 'Vật chất có 3 pha: rắn, lỏng, hơi.']
+    ];
+    function botReply(input) {
+        const t = norm(input), compact = t.replace(/\s+/g, ''), words = t.split(/[^a-z0-9]+/);
+        for (const [keys, id, ans] of topics) {
+            if (keys.some(k => k.length <= 3 ? words.includes(k) : compact.includes(k.replace(/ /g, '')))) return { text: ans, id };
+        }
+        if (['chao', 'hello', 'hi', 'xin'].some(w => words.includes(w))) return { text: 'Chào bạn! Tôi có thể giúp gì cho việc ôn thi Kỹ thuật Nhiệt?' };
+        if (t.includes('cam on') || words.includes('thanks')) return { text: 'Không có gì! Chúc bạn ôn tập tốt.' };
+        return { text: 'Tôi chưa hiểu ý bạn. Hãy thử: nhiệt độ, áp suất, lò hơi, tua bin, Rankine, Cacno...' };
+    }
+    window.sendMessage = function () {
+        const text = chatInput.value.trim();
+        if (!text) return;
+        addMessage(text, 'msg-user');
+        chatInput.value = '';
+        setTimeout(() => {
+            const r = botReply(text);
+            addMessage(r.text, 'msg-bot');
+            if (r.id) {
+                const a = document.createElement('span');
+                a.className = 'chat-link';
+                a.textContent = 'Xem chi tiết: ' + data[r.id].title.split(':')[0] + ' →';
+                a.onclick = () => showDetail(r.id);
+                chatBody.lastChild.appendChild(document.createElement('br'));
+                chatBody.lastChild.appendChild(a);
+            }
+        }, 400);
+    };
+})();
+</script>
+
+</body>
+</html>
