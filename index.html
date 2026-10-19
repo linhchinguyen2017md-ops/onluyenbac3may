@@ -346,6 +346,10 @@
         </div>
         <div class="list-container">
             <a class="file-link" onclick="openDoc('tonghopmaytruong.html')">📌 Tổng hợp toàn bộ đáp án chuyên môn Máy trưởng</a>
+            
+            <!-- ĐÃ THÊM FILE LYTHUYET.HTML VÀO ĐÂY THEO YÊU CẦU -->
+            <a class="file-link" onclick="openDoc('lythuyet.html')">📖 Tài liệu Lý thuyết chung (lythuyet.html)</a>
+            
             <a class="file-link" onclick="openDoc('Ảnhhưởngchânkhôngbìnhngưng.html')">Ảnh hưởng chân không bình ngưng</a>
             <a class="file-link" onclick="openDoc('aplucnhiet.html')">Ảnh hưởng của áp lực, nhiệt độ hơi mới và chân không bình ngưng đến quá trình vận hành và hiệu suất của tuabin</a>
             <a class="file-link" onclick="openDoc('Ảnhhưởngcủanhiệtđộhơichínhtớithiếtbịvàhiệusuấttuabin.html')">Ảnh hưởng của nhiệt độ hơi chính tới thiết bị và hiệu suất tuabin</a>
@@ -362,12 +366,7 @@
             <a class="file-link" onclick="openDoc('Sựcốáplựcdầubôitrơntuabingiảmthấp.html')">Sự cố áp lực dầu bôi trơn tuabin giảm thấp</a>
             <a class="file-link" onclick="openDoc('ThủykíchTuabintáchạinguyênnhânvàxửlý.html')">Thủy kích Tuabin - Khái niệm, tác hại, nguyên nhân và xử lý</a>
             <a class="file-link" onclick="openDoc('Tínhiệucảnhbáobảovệbơmcấpvàxửlýsựcốrungkhitổmáy540MW.html')">Tín hiệu cảnh báo - bảo vệ bơm cấp và xử lý sự cố rung khi tổ máy 540 MW</a>
-            
-            <!-- ================================================================= -->
-            <!-- ĐÃ THÊM FILE RUNBACK.HTML VÀO ĐÂY THEO YÊU CẦU -->
-            <!-- ================================================================= -->
             <a class="file-link" onclick="openDoc('runback.html')">Tài liệu Runback (File runback.html)</a>
-            
         </div>
     </div>
 
@@ -611,11 +610,9 @@
     }
 
     async function getDocTextAsync() {
-        // Cách 1: đọc trực tiếp từ iframe (nhanh, đúng nội dung đang hiển thị)
         let text = getDocTextFromIframe();
         if (text) return text;
 
-        // Cách 2: tải lại file và parse (dự phòng)
         if (currentDocFile) {
             try {
                 const res = await fetch(currentDocFile);
@@ -640,8 +637,7 @@
             .trim();
     }
 
-    /* --- Chia nhỏ văn bản thành các đoạn ~200 ký tự ---
-           (tránh lỗi 1 số trình duyệt tự ngắt khi đọc text quá dài) */
+    /* --- Chia nhỏ văn bản thành các đoạn ~200 ký tự --- */
     function splitIntoChunks(text, maxLen) {
         maxLen = maxLen || 200;
         const marked = text.replace(/([.!?;:])\s+/g, '$1|');
@@ -698,7 +694,7 @@
             btnRead.classList.add('reading');
             btnStop.disabled = false;
             status.textContent = '🔈 Đang đọc...';
-        } else { // paused
+        } else { 
             btnRead.textContent = '▶ TIẾP TỤC';
             btnRead.classList.add('reading');
             btnStop.disabled = false;
@@ -772,7 +768,6 @@
         if (!synth || readState === 'idle') return;
 
         if (readQueue.length === 0) {
-            // Đọc hết
             readState = 'idle';
             updateReadButtons();
             return;
@@ -794,7 +789,6 @@
             if (readState === 'reading') {
                 speakNextChunk();
             }
-            // Nếu đang 'paused' thì đợi người dùng bấm Tiếp tục
         };
 
         utter.onerror = function (e) {
@@ -817,7 +811,7 @@
         readState = 'idle';
         readQueue = [];
         if (synth) {
-            try { synth.cancel(); } catch (e) { /* bỏ qua */ }
+            try { synth.cancel(); } catch (e) { }
         }
         updateReadButtons();
     }
