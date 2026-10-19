@@ -3,20 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ảnh hưởng của nhiệt độ hơi chính tới thiết bị và hiệu suất tuabin</title>
+<title>Ảnh hưởng của áp lực, nhiệt độ hơi mới và chân không bình ngưng đến tuabin hơi</title>
 <style>
   :root{
     --primary: #0b5394;
-    --primary-dark: #073b6b;
     --primary-light: #e8f0fb;
     --accent: #c0392b;
-    --accent-light: #fdecea;
-    --warning: #f39c12;
-    --warning-light: #fff8e1;
-    --success: #27ae60;
-    --success-light: #e8f8ef;
-    --purple: #7d3c98;
-    --purple-light: #f4ecf7;
     --border: #d0d7de;
     --bg: #f7f9fc;
     --text: #1f2328;
@@ -32,54 +24,28 @@
     font-size: 16px;
   }
   .container{
-    max-width: 1120px;
+    max-width: 980px;
     margin: 0 auto;
-    padding: 32px 22px 80px;
+    padding: 40px 24px 80px;
   }
   header{
-    background: linear-gradient(135deg, #b9770e 0%, #f39c12 50%, #f1c40f 100%);
+    background: linear-gradient(135deg, #0b5394 0%, #1a73c9 100%);
     color: #fff;
-    padding: 38px 28px;
+    padding: 40px 24px;
     text-align: center;
     border-radius: 12px;
-    margin-bottom: 28px;
-    box-shadow: 0 6px 24px rgba(243,156,18,0.35);
-    position: relative;
-    overflow: hidden;
-  }
-  header::before{
-    content: "🌡";
-    position: absolute;
-    font-size: 12rem;
-    opacity: 0.1;
-    top: -10px;
-    right: 20px;
-    line-height: 1;
+    margin-bottom: 32px;
+    box-shadow: 0 6px 20px rgba(11,83,148,0.25);
   }
   header h1{
-    margin: 0 0 12px;
-    font-size: 1.6rem;
-    line-height: 1.35;
-    position: relative;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    margin: 0 0 10px;
+    font-size: 1.9rem;
+    line-height: 1.3;
   }
-  header .subtitle{
+  header p{
     margin: 0;
-    opacity: 0.97;
+    opacity: 0.92;
     font-size: 1rem;
-    font-style: italic;
-    position: relative;
-  }
-  header .scope{
-    display: inline-block;
-    margin-top: 14px;
-    background: rgba(0,0,0,0.25);
-    border: 1px solid rgba(255,255,255,0.35);
-    padding: 6px 18px;
-    border-radius: 20px;
-    font-size: 0.88rem;
-    font-weight: 500;
-    position: relative;
   }
   h2{
     color: var(--primary);
@@ -87,39 +53,37 @@
     padding-left: 14px;
     margin-top: 42px;
     margin-bottom: 16px;
-    font-size: 1.35rem;
+    font-size: 1.4rem;
   }
   h3{
-    color: var(--primary-dark);
+    color: #1a4d80;
     margin-top: 24px;
     margin-bottom: 10px;
-    font-size: 1.14rem;
-  }
-  h4{
-    color: #1a4d80;
-    margin-top: 18px;
-    margin-bottom: 8px;
-    font-size: 1.02rem;
+    font-size: 1.12rem;
   }
   p{margin: 10px 0;}
-  ul, ol{margin: 8px 0 12px; padding-left: 24px;}
+  ul{margin: 8px 0 12px; padding-left: 22px;}
   li{margin: 6px 0;}
   code{
     background: #eef2f7;
-    padding: 2px 7px;
+    padding: 2px 6px;
     border-radius: 4px;
     font-family: "Consolas", "Courier New", monospace;
-    font-size: 0.9em;
+    font-size: 0.94em;
     color: #b83280;
-    white-space: nowrap;
   }
-  .section-card{
+  .formula{
     background: #fff;
     border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 20px 24px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    border-left: 4px solid var(--primary);
+    padding: 14px 18px;
+    border-radius: 6px;
+    margin: 16px 0;
+    text-align: center;
+    font-family: "Cambria Math", "Times New Roman", serif;
+    font-size: 1.15rem;
+    color: #0b3d6b;
+    overflow-x: auto;
   }
   .callout{
     background: var(--primary-light);
@@ -129,287 +93,68 @@
     margin: 18px 0;
   }
   .callout.warning{
-    background: var(--warning-light);
-    border-left-color: var(--warning);
-  }
-  .callout.danger{
-    background: var(--accent-light);
+    background: #fdecea;
     border-left-color: var(--accent);
   }
-  .callout.success{
-    background: var(--success-light);
-    border-left-color: var(--success);
+  .callout.note{
+    background: #fff8e1;
+    border-left-color: #f39c12;
   }
-  .callout.purple{
-    background: var(--purple-light);
-    border-left-color: var(--purple);
-  }
-  .callout strong{color: var(--primary-dark);}
-  .callout.danger strong{color: var(--accent);}
-  .callout.warning strong{color: #b9770e;}
-  .callout.success strong{color: #1e8449;}
-  .callout.purple strong{color: var(--purple);}
-
-  .badge{
-    display: inline-block;
-    padding: 3px 10px;
-    border-radius: 12px;
-    font-size: 0.78rem;
-    font-weight: 600;
-    color: #fff;
-  }
-  .badge.blue{background: var(--primary);}
-  .badge.red{background: var(--accent);}
-  .badge.green{background: var(--success);}
-  .badge.orange{background: var(--warning);}
-  .badge.purple{background: var(--purple);}
-  .badge.gray{background: #6b7280;}
-
-  /* Effect cards */
-  .effect-card{
-    background: #fff;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    margin-bottom: 20px;
-    overflow: hidden;
-    box-shadow: 0 3px 12px rgba(0,0,0,0.06);
-  }
-  .effect-header{
-    padding: 15px 22px;
-    color: #fff;
-    font-size: 1.12rem;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .effect-header.up{background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);}
-  .effect-header.down{background: linear-gradient(135deg, #0b5394 0%, #1a73c9 100%);}
-  .effect-header .arrow{
-    background: rgba(255,255,255,0.25);
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    flex-shrink: 0;
-    font-size: 1.3rem;
-  }
-  .effect-body{
-    padding: 18px 24px 10px;
-  }
-  .effect-body h4{
-    color: var(--primary-dark);
-    margin-top: 14px;
-    margin-bottom: 8px;
-    font-size: 1.04rem;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .effect-body h4::before{
-    content: "▸";
-    color: var(--primary);
-    font-size: 1.1rem;
-  }
-  .effect-body .group-label{
-    display: inline-block;
-    background: var(--primary-light);
-    color: var(--primary-dark);
-    padding: 3px 12px;
-    border-radius: 12px;
-    font-size: 0.85rem;
-    font-weight: 700;
-    margin-top: 12px;
-    margin-bottom: 6px;
-  }
-  .effect-body .group-label.eff{
-    background: var(--success-light);
-    color: #1e8449;
-  }
-  .effect-body .group-label.safe{
-    background: var(--accent-light);
-    color: var(--accent);
-  }
-  .effect-body .group-label.eco{
-    background: var(--warning-light);
-    color: #b9770e;
-  }
-
-  /* Cause table */
   table{
     width: 100%;
     border-collapse: collapse;
-    margin: 16px 0;
+    margin: 20px 0;
     background: #fff;
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-    font-size: 0.92rem;
+    font-size: 0.95rem;
   }
   thead{
     background: var(--primary);
     color: #fff;
   }
   th, td{
-    padding: 11px 14px;
+    padding: 12px 14px;
     text-align: left;
     border-bottom: 1px solid var(--border);
     vertical-align: top;
   }
   tbody tr:nth-child(even){background: #f4f7fb;}
   tbody tr:hover{background: #e8f0fb;}
-  th{font-weight: 600; font-size: 0.88rem;}
-  .cause-table th:nth-child(1){width: 30%;}
-  .cause-table th:nth-child(2){width: 70%;}
-
-  /* Step cards */
-  .action-step{
-    background: #f9fbfd;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 16px 20px;
-    margin-bottom: 14px;
-    border-left: 5px solid var(--success);
-    display: flex;
-    gap: 16px;
-  }
-  .action-num{
-    background: var(--success);
-    color: #fff;
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    flex-shrink: 0;
-    font-size: 1rem;
-  }
-  .action-content{flex: 1;}
-  .action-content .title{
-    font-weight: 700;
-    color: #1e8449;
-    margin-bottom: 6px;
-    font-size: 1.05rem;
-  }
-  .action-content ul{margin: 6px 0;}
-
-  .emergency-box{
-    background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
-    color: #fff;
-    padding: 22px 26px;
-    border-radius: 10px;
-    margin: 22px 0;
-    box-shadow: 0 6px 20px rgba(192,57,43,0.3);
-  }
-  .emergency-box h3{
-    color: #fff;
-    margin-top: 0;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 1.15rem;
-  }
-  .emergency-box h3::before{
-    content: "⚠";
-    font-size: 1.5rem;
-  }
-  .emergency-box p{margin: 10px 0;}
-  .emergency-box strong{color: #ffe082;}
-  .emergency-box ul{margin: 10px 0 0; padding-left: 22px;}
-
-  .toc{
+  th{font-weight: 600;}
+  .section-card{
     background: #fff;
     border: 1px solid var(--border);
     border-radius: 10px;
-    padding: 18px 22px;
-    margin-bottom: 24px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.04);
   }
-  .toc h3{
-    margin-top: 0;
-    color: var(--primary);
-    font-size: 1rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  .toc ol{
-    margin: 0;
-    padding-left: 22px;
-  }
-  .toc li{margin: 6px 0;}
-  .toc a{
-    color: var(--primary-dark);
-    text-decoration: none;
-    transition: color .2s;
-  }
-  .toc a:hover{
-    color: var(--accent);
-    text-decoration: underline;
-  }
-
-  .params-grid{
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 14px;
-    margin: 18px 0;
-  }
-  .param-box{
-    background: linear-gradient(135deg, #f4f8fd 0%, #e8f0fb 100%);
-    border: 1px solid #c9dcf0;
-    border-radius: 8px;
-    padding: 14px 16px;
-    border-left: 4px solid var(--primary);
-  }
-  .param-box .label{
-    font-size: 0.82rem;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
+  .badge{
+    display: inline-block;
+    background: var(--primary);
+    color: #fff;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
     font-weight: 600;
-    display: block;
-    margin-bottom: 4px;
+    margin-right: 8px;
   }
-  .param-box .value{
-    font-size: 1.05rem;
-    font-weight: 700;
-    color: var(--primary-dark);
-    font-family: "Consolas", monospace;
-  }
-  .param-box.danger{
-    background: linear-gradient(135deg, #fdf3f2 0%, #fdecea 100%);
-    border-color: #f5c6c0;
-    border-left-color: var(--accent);
-  }
-  .param-box.danger .value{color: var(--accent);}
-  .param-box.warning{
-    background: linear-gradient(135deg, #fffcf0 0%, #fff8e1 100%);
-    border-color: #f5dfa0;
-    border-left-color: var(--warning);
-  }
-  .param-box.warning .value{color: #b9770e;}
-
+  .badge.inc{background: #27ae60;}
+  .badge.dec{background: #c0392b;}
   footer{
     margin-top: 50px;
     padding-top: 20px;
     border-top: 1px solid var(--border);
     text-align: center;
     color: var(--muted);
-    font-size: 0.88rem;
+    font-size: 0.9rem;
   }
-
-  @media(max-width: 720px){
-    header h1{font-size: 1.2rem;}
-    header::before{font-size: 7rem; top: 10px;}
-    h2{font-size: 1.15rem;}
-    .effect-body{padding: 14px 16px 8px;}
-    .action-step{padding: 12px 14px; gap: 12px;}
-    .action-num{width: 32px; height: 32px; font-size: 0.9rem;}
-    table{font-size: 0.82rem;}
+  @media(max-width: 640px){
+    header h1{font-size: 1.4rem;}
+    h2{font-size: 1.2rem;}
+    table{font-size: 0.85rem;}
     th, td{padding: 9px 10px;}
   }
 </style>
@@ -418,208 +163,575 @@
 <div class="container">
 
   <header>
-    <h1>Ảnh hưởng của nhiệt độ hơi chính tới thiết bị và hiệu suất tuabin</h1>
-    <p class="subtitle">Hiện tượng – Nguyên nhân – Biện pháp xử lý sự cố nhiệt độ hơi chính tăng cao</p>
-    <span class="scope">Nhà máy nhiệt điện – Chu trình Rankine</span>
+    <h1>Ảnh hưởng của áp lực, nhiệt độ hơi mới và chân không bình ngưng đến quá trình vận hành và hiệu suất tuabin hơi</h1>
+    <p>Phân tích nhiệt – cơ – hiệu suất cho tuabin hơi theo chu trình Rankine</p>
   </header>
 
-  <!-- TOC -->
-  <div class="toc">
-    <h3>Mục lục</h3>
-    <ol>
-      <li><a href="#s1">Ảnh hưởng của nhiệt độ hơi chính tới thiết bị và hiệu suất tuabin</a></li>
-      <li><a href="#s2">Hiện tượng, nguyên nhân và biện pháp xử lý sự cố nhiệt độ hơi chính tăng cao</a></li>
-    </ol>
-  </div>
+  <!-- 1 -->
+  <section>
+    <h2>1. Khái quát chung</h2>
+    <div class="section-card">
+      <p>Tuabin hơi làm việc theo chu trình Rankine. Công suất và hiệu suất của tuabin phụ thuộc chủ yếu vào entanpi hơi vào, entanpi hơi ra và tổn thất trong quá trình giãn nở:</p>
 
-  <!-- I -->
-  <section id="s1">
-    <h2>1. Ảnh hưởng của nhiệt độ hơi chính tới thiết bị và hiệu suất tuabin</h2>
-
-    <!-- a. Tăng cao -->
-    <div class="effect-card">
-      <div class="effect-header up">
-        <span class="arrow">↑</span>
-        <span>a. Khi nhiệt độ hơi chính tăng cao</span>
+      <div class="formula">
+        P = ṁ · (h₀ − h<sub>k</sub>) · η<sub>td</sub> · η<sub>g</sub>
       </div>
-      <div class="effect-body">
-        <div class="group-label eff">Đối với hiệu suất tuabin</div>
-        <ul>
-          <li>Khi áp lực hơi chính (p₀) và áp suất hơi thoát (p<sub>k</sub>) không đổi, nếu tăng nhiệt độ hơi mới (T₀) thì <strong>nhiệt độ trung bình cấp nhiệt của chu trình tăng lên</strong>, làm tăng nhiệt giáng lý thuyết, từ đó <strong>làm tăng hiệu suất nhiệt của tuabin</strong>.</li>
-          <li>Đồng thời, <strong>độ khô của hơi ở các tầng cánh cuối tuabin hạ áp (LP) tăng</strong>, giảm độ ẩm của hơi thoát.</li>
-        </ul>
-
-        <div class="group-label safe">Đối với an toàn kim loại thiết bị</div>
-        <p>Nhiệt độ hơi vượt ngưỡng định mức làm kim loại các bộ phận chịu nhiệt, chịu áp bị <strong>quá nhiệt</strong>:</p>
-        <ul>
-          <li>Bộ quá nhiệt lò hơi;</li>
-          <li>Đường ống hơi chính;</li>
-          <li>Cụm van Stop MSV, van điều chỉnh CV;</li>
-          <li>Cánh tĩnh/động tuabin cao áp.</li>
-        </ul>
-        <ul>
-          <li>Thúc đẩy quá trình <strong>dão nhiệt (creep)</strong> của kim loại, suy giảm độ bền cơ học và làm giảm tuổi thọ làm việc của tổ máy.</li>
-          <li>Nếu nhiệt độ tăng đột ngột còn gây ra <strong>ứng suất nhiệt và độ chênh giãn nở lớn</strong> giữa rotor và stator.</li>
-        </ul>
+      <div class="formula">
+        η<sub>chu trình</sub> ≈ (h₀ − h<sub>k</sub>) / (h₀ − h'<sub>k</sub>)
       </div>
-    </div>
 
-    <!-- b. Giảm thấp -->
-    <div class="effect-card">
-      <div class="effect-header down">
-        <span class="arrow">↓</span>
-        <span>b. Khi nhiệt độ hơi chính giảm thấp</span>
-      </div>
-      <div class="effect-body">
-        <div class="group-label eco">Đối với tính kinh tế chu trình</div>
-        <ul>
-          <li>Giảm nhiệt độ hơi mới làm <strong>giảm nhiệt giáng lý thuyết</strong> của chu trình Rankine, làm sụt giảm công suất và hiệu suất của tuabin.</li>
-          <li>Muốn duy trì tải tổ máy bắt buộc phải <strong>tăng lưu lượng hơi</strong>, làm gia tăng tổn thất áp lực và <strong>tăng lực dọc trục</strong> lên gối đỡ chặn.</li>
-        </ul>
+      <p>Trong đó:</p>
+      <ul>
+        <li><code>P₀, T₀</code>: áp lực và nhiệt độ hơi mới.</li>
+        <li><code>P_k</code>: áp suất bình ngưng, đặc trưng bởi chân không.</li>
+        <li><code>h₀, h_k</code>: entanpi hơi vào và hơi thải.</li>
+        <li><code>η_td</code>: hiệu suất tuabin.</li>
+      </ul>
 
-        <div class="group-label safe">Nguy cơ xói mòn và thủy kích (Water Hammer)</div>
-        <ul>
-          <li>Hơi sớm bị bão hòa làm <strong>độ ẩm ở các tầng cánh cuối tuabin hạ áp tăng cao</strong>, các hạt nước ngưng li ti va đập với vận tốc lớn gây <strong>rỗ, mòn cánh động</strong>.</li>
-          <li>Đặc biệt, nếu nhiệt độ hơi chính giảm đột ngột (giảm <code>≥ 50 °C trong 15 phút</code> hoặc <code>−65,5 °C trong 15 phút</code>), nguy cơ rất cao dẫn đến <strong>thủy kích tuabin</strong>, làm <strong>cong trục rotor</strong>, <strong>cháy hỏng gối chặn</strong> và buộc phải ngừng máy khẩn cấp có phá hoại chân không.</li>
-        </ul>
+      <div class="callout">
+        Ba thông số này ảnh hưởng đồng thời đến <strong>công suất</strong>, <strong>hiệu suất</strong>, <strong>độ an toàn</strong> và <strong>tuổi thọ thiết bị</strong>.
       </div>
     </div>
   </section>
 
-  <!-- II -->
-  <section id="s2">
-    <h2>2. Hiện tượng, nguyên nhân và biện pháp xử lý sự cố nhiệt độ hơi chính tăng cao</h2>
+  <!-- 2 -->
+  <section>
+    <h2>2. Ảnh hưởng của áp lực hơi mới P₀</h2>
 
-    <!-- 2.1 Dấu hiệu -->
-    <h3>2.1. Dấu hiệu hiện tượng</h3>
     <div class="section-card">
+      <h3>2.1. Đến quá trình vận hành</h3>
       <ul>
-        <li>Hệ thống DCS/TCS phát tín hiệu chuông và cảnh báo hiển thị <strong>nhiệt độ hơi chính (hơi quá nhiệt) cao</strong>.</li>
-        <li>Dải nhiệt độ làm việc trung bình của vùng quá nhiệt trên lò hơi tăng lên.</li>
-        <li>Các van phun nước giảm ôn hơi chính <strong>tự động mở tăng dần độ mở lên 100 %</strong> nhưng nhiệt độ hơi vẫn tiếp tục tăng cao.</li>
+        <li><span class="badge inc">Tăng P₀</span>
+          <ul>
+            <li>Mật độ hơi tăng, lưu lượng qua tuabin tăng nếu độ mở van không đổi.</li>
+            <li>Áp suất các tầng tăng, lực dọc trục tăng, ứng suất thân vỏ và cánh tăng.</li>
+            <li>Dễ gây rung động, quá tải cánh tầng cuối và tăng nguy cơ hư hỏng ổ trục.</li>
+            <li>Nhiệt độ bão hòa tăng, nếu giữ T₀ không đổi thì độ quá nhiệt giảm, hơi cuối ẩm hơn → xói mòn cánh.</li>
+          </ul>
+        </li>
+        <li><span class="badge dec">Giảm P₀</span>
+          <ul>
+            <li>Công suất giảm, phải mở van lớn hơn để giữ tải.</li>
+            <li>Lưu lượng thể tích tăng, có thể quá tải tầng cuối.</li>
+            <li>Hiệu suất giảm do tổn thất tiết lưu và lệch khỏi điểm thiết kế.</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3>2.2. Đến hiệu suất</h3>
+      <ul>
+        <li>Trong giới hạn cho phép, tăng P₀ làm tăng nhiệt độ trung bình cấp nhiệt → <strong>tăng hiệu suất chu trình Rankine</strong>.</li>
+        <li>Nếu tăng quá cao mà không tăng T₀ hoặc không có quá nhiệt trung gian, độ ẩm cuối tăng, tổn thất ẩm tăng → <strong>giảm hiệu suất tuabin</strong> và tăng xói mòn.</li>
+        <li>Vận hành <strong>trượt áp suất</strong> ở tải thấp giúp giảm tổn thất tiết lưu, cải thiện hiệu suất.</li>
       </ul>
     </div>
+  </section>
 
-    <!-- 2.2 Nguyên nhân -->
-    <h3>2.2. Nguyên nhân sự cố</h3>
-    <table class="cause-table">
+  <!-- 3 -->
+  <section>
+    <h2>3. Ảnh hưởng của nhiệt độ hơi mới T₀</h2>
+
+    <div class="section-card">
+      <h3>3.1. Đến quá trình vận hành</h3>
+      <ul>
+        <li><span class="badge inc">Tăng T₀</span>
+          <ul>
+            <li>Entanpi hơi vào tăng, công sinh ra tăng.</li>
+            <li>Nhiệt độ kim loại, độ giãn nở nhiệt và ứng suất nhiệt tăng.</li>
+            <li>Dễ gây creep, oxy hóa, biến dạng và giảm tuổi thọ vật liệu.</li>
+            <li>Cần giới hạn theo vật liệu thân, van, cánh và đường ống.</li>
+          </ul>
+        </li>
+        <li><span class="badge dec">Giảm T₀</span>
+          <ul>
+            <li>Entanpi giảm, công suất giảm.</li>
+            <li>Độ ẩm cuối tăng, gây xói mòn cánh tầng cuối.</li>
+            <li>Có thể phải giảm tải để bảo vệ tuabin.</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3>3.2. Đến hiệu suất</h3>
+      <ul>
+        <li>Tăng T₀ làm tăng độ giáng entanpi lý thuyết, tăng hiệu suất Carnot/Rankine và <strong>giảm độ ẩm cuối</strong>.</li>
+        <li>Giảm T₀ làm giảm hiệu suất, tăng suất tiêu hao nhiên liệu và tăng tổn thất ẩm.</li>
+        <li>T₀ là thông số rất nhạy với an toàn thiết bị, nên thường được giữ ổn định ở giá trị định mức.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <h2>4. Ảnh hưởng của chân không bình ngưng P_k</h2>
+
+    <div class="section-card">
+      <h3>4.1. Đến quá trình vận hành</h3>
+      <ul>
+        <li><span class="badge inc">Chân không tốt (P_k thấp)</span>
+          <ul>
+            <li>Nhiệt độ ngưng tụ giảm, độ giáng entanpi tăng, công suất tăng.</li>
+            <li>Nhưng độ ẩm cuối tăng, thể tích hơi thải lớn, tầng cuối chịu tải nặng, dễ rung và xói mòn.</li>
+            <li>Nhiệt độ hơi thải thấp, cần kiểm soát giãn nở thân tuabin.</li>
+          </ul>
+        </li>
+        <li><span class="badge dec">Chân không xấu (P_k cao)</span>
+          <ul>
+            <li>Công suất giảm, nhiệt độ hơi thải tăng.</li>
+            <li>Thân tuabin nóng, giãn nở không đều, rung động, có thể trip bảo vệ.</li>
+            <li>Không khí lọt vào bình ngưng làm tăng P_k, giảm truyền nhiệt, tăng oxy hòa tan gây ăn mòn.</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3>4.2. Đến hiệu suất</h3>
+      <ul>
+        <li>Chân không sâu trong giới hạn làm giảm nhiệt độ ngưng tụ, <strong>tăng hiệu suất chu trình</strong>, giảm nhiệt tiêu hao.</li>
+        <li>Cải thiện chân không quá mức cần tăng công bơm nước tuần hoàn, ejector, quạt gió → có thể không kinh tế.</li>
+        <li>Tồn tại <strong>chân không tối ưu kinh tế</strong>, phụ thuộc nhiệt độ nước làm mát, lưu lượng và tình trạng thiết bị.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <h2>5. Bảng tóm tắt ảnh hưởng</h2>
+    <table>
       <thead>
         <tr>
-          <th>Nhóm nguyên nhân</th>
-          <th>Chi tiết</th>
+          <th>Thông số</th>
+          <th>Tăng</th>
+          <th>Giảm</th>
+          <th>Ảnh hưởng hiệu suất</th>
+          <th>Giới hạn chính</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td><span class="badge red">1</span> <strong>Hệ thống phun giảm ôn bị lỗi</strong></td>
-          <td>Áp lực nước cấp bị tụt; van điều chỉnh phun giảm ôn kẹt đóng/lỗi bộ định vị; tắc rọ lọc van phun làm lưu lượng nước phun giảm ôn không đủ.</td>
+          <td><strong>Áp lực hơi mới P₀</strong></td>
+          <td>Tăng công, tăng áp suất tầng, tăng lực dọc trục</td>
+          <td>Giảm công, tăng tổn thất tiết lưu</td>
+          <td>Tăng trong giới hạn, nhưng tăng độ ẩm cuối</td>
+          <td>Ứng suất, rung, xói mòn</td>
         </tr>
         <tr>
-          <td><span class="badge red">2</span> <strong>Chế độ cháy lò hơi mất cân đối</strong></td>
-          <td>Điều chỉnh tỉ lệ than – gió không hợp lý; trung tâm ngọn lửa bị đẩy lên cao về phía các cyclone; nhiệt độ vùng thu hồi nhiệt HRA tăng cao.</td>
+          <td><strong>Nhiệt độ hơi mới T₀</strong></td>
+          <td>Tăng entanpi, giảm độ ẩm cuối</td>
+          <td>Giảm công, tăng độ ẩm</td>
+          <td>Tăng hiệu suất</td>
+          <td>Creep, oxy hóa, giãn nở</td>
         </tr>
         <tr>
-          <td><span class="badge red">3</span> <strong>Biến động thông số</strong></td>
-          <td>Áp lực hơi chính tăng nhanh hoặc nhiệt độ nước cấp đầu vào lò bị giảm.</td>
-        </tr>
-        <tr>
-          <td><span class="badge red">4</span> <strong>Cháy lại đuôi lò</strong></td>
-          <td>Cháy lại ở phần đuôi lò đối lưu làm nhiệt độ khói tăng vọt.</td>
-        </tr>
-        <tr>
-          <td><span class="badge red">5</span> <strong>Lỗi tín hiệu C&amp;I</strong></td>
-          <td>Cảm biến nhiệt độ (can nhiệt) hiển thị sai giá trị cao hoặc gửi tín hiệu giả làm vòng lặp điều khiển tự động đóng nhầm van phun giảm ôn.</td>
+          <td><strong>Chân không bình ngưng P_k</strong></td>
+          <td>Giảm công, nóng thân tuabin</td>
+          <td>Tăng công, tăng hiệu suất</td>
+          <td>Chân không sâu tăng hiệu suất</td>
+          <td>Độ ẩm cuối, tải tầng cuối, chi phí phụ trợ</td>
         </tr>
       </tbody>
     </table>
+  </section>
 
-    <!-- 2.3 Xử lý -->
-    <h3>2.3. Quy trình biện pháp xử lý sự cố trong ca vận hành</h3>
-
-    <div class="action-step">
-      <div class="action-num">1</div>
-      <div class="action-content">
-        <div class="title">Báo cáo &amp; Xác minh điểm đo</div>
-        <p>Kịp thời báo cáo <strong>Trưởng ca, Trưởng kíp lò máy</strong>; liên hệ nhân viên C&amp;I kiểm tra đối chiếu các điểm đo để loại trừ nguyên nhân <strong>tín hiệu đo bị lỗi ảo</strong>.</p>
-      </div>
-    </div>
-
-    <div class="action-step">
-      <div class="action-num">2</div>
-      <div class="action-content">
-        <div class="title">Xử lý hệ thống giảm ôn &amp; Nước cấp</div>
-        <ul>
-          <li>Chuyển các van phun giảm ôn hơi chính từ <strong>AUTO sang MANUAL</strong> trên DCS để mở lớn tối đa lưu lượng nước giảm ôn.</li>
-          <li>Nếu do thiếu áp lực nước cấp, can thiệp điều chỉnh <strong>khớp nối thủy lực bơm cấp sang MAN</strong> để tăng áp lực hoặc chủ động <strong>khởi động thêm tổ bơm cấp dự phòng</strong> để đảm bảo đủ nước phun.</li>
-          <li>Nếu tắc rọ lọc van phun, <strong>tăng chênh áp giữa ống góp nước cấp và bao hơi</strong> để tăng cường lưu lượng.</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="action-step">
-      <div class="action-num">3</div>
-      <div class="action-content">
-        <div class="title">Phối hợp điều chỉnh quá trình cháy lò hơi</div>
-        <ul>
-          <li>Liên hệ <strong>Lò trưởng</strong> điều chỉnh lại quá trình cháy của lò hơi: giảm bớt lượng than cấp (giảm máy cấp than), điều chỉnh lại tỉ lệ phân phối gió sơ cấp – thứ cấp để <strong>hạ thấp trung tâm ngọn lửa buồng đốt</strong>.</li>
-          <li>Nếu áp lực hơi chính tăng quá cao, phối hợp đưa áp lực hơi về <strong>giá trị vận hành định mức</strong>.</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="action-step">
-      <div class="action-num">4</div>
-      <div class="action-content">
-        <div class="title">Tương tác phía Tuabin</div>
-        <p>Chuyển <strong>Tuabin Master sang điều khiển bằng tay (MAN)</strong> và tăng phụ tải/tăng lưu lượng hơi qua bộ quá nhiệt để <strong>giải nhiệt hỗ trợ hạ nhiệt độ hơi chính</strong>.</p>
-      </div>
-    </div>
-
-    <div class="action-step">
-      <div class="action-num">5</div>
-      <div class="action-content">
-        <div class="title">Bảo vệ ngừng máy khẩn cấp</div>
-        <ul>
-          <li>Giám sát chặt chẽ <strong>nhiệt độ kim loại các ống vách lò</strong> và <strong>đường ống hơi chính</strong>.</li>
-          <li>Khi nhiệt độ hơi chính tăng lên đến <strong>565 °C</strong> mà không thể điều chỉnh khống chế được, sau <strong>15 phút</strong> hệ thống bảo vệ sẽ tác động <strong>TRIP Tuabin</strong>.</li>
-          <li>Nếu bảo vệ không tự động tác động, người vận hành phải <strong>ấn nút dừng khẩn cấp tuabin bằng tay</strong> và báo cáo Trưởng ca xin lệnh <strong>ngừng lò khẩn cấp (MFT)</strong>.</li>
-          <li><strong>Tuyệt đối không khởi động lại tổ máy</strong> khi chưa xác định và loại trừ triệt để nguyên nhân gây quá nhiệt.</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="emergency-box">
-      <h3>LƯU Ý AN TOÀN</h3>
+  <!-- 6 -->
+  <section>
+    <h2>6. Tương tác và vận hành tối ưu</h2>
+    <div class="section-card">
+      <p>Ba thông số này không độc lập mà tác động qua lại:</p>
       <ul>
-        <li>Khi nhiệt độ hơi chính tăng đến <strong>565 °C</strong> không điều chỉnh được trong <strong>15 phút</strong> → <strong>TRIP Tuabin</strong>.</li>
-        <li>Nếu bảo vệ không tác động → <strong>dừng tuabin bằng tay</strong> và <strong>xin lệnh MFT</strong>.</li>
-        <li><strong>Không khởi động lại tổ máy</strong> khi chưa loại trừ triệt để nguyên nhân quá nhiệt.</li>
+        <li>Tăng P₀ và T₀ có thể nâng cao hiệu suất nhưng phải kiểm soát độ ẩm cuối.</li>
+        <li>Chân không càng sâu càng làm độ ẩm cuối tăng, nên cần phối hợp với nhiệt độ hơi mới.</li>
+        <li>Cần theo dõi: nhiệt độ hơi thải, độ ẩm, rung, lực dọc trục, độ giãn nở, áp suất tầng, nhiệt độ kim loại.</li>
+        <li>Vận hành tối ưu là giữ T₀ định mức, điều chỉnh P₀ theo chế độ trượt áp suất, và duy trì P_k ở giá trị tối ưu kinh tế.</li>
       </ul>
-    </div>
 
-    <div class="params-grid">
-      <div class="param-box danger">
-        <span class="label">Ngưỡng Trip Tuabin</span>
-        <span class="value">565 °C / 15 phút</span>
-      </div>
-      <div class="param-box warning">
-        <span class="label">Giảm nhiệt độ đột ngột (nguy cơ thủy kích)</span>
-        <span class="value">≥ 50 °C / 15 phút</span>
-      </div>
-      <div class="param-box warning">
-        <span class="label">Ngưỡng nguy hiểm khác</span>
-        <span class="value">−65,5 °C / 15 phút</span>
+      <div class="callout note">
+        <strong>Lưu ý:</strong> Điểm vận hành tối ưu không phải là điểm có hiệu suất tuabin cao nhất, mà là điểm cân bằng giữa hiệu suất, an toàn thiết bị và chi phí phụ trợ.
       </div>
     </div>
+  </section>
 
-    <div class="callout success">
-      <strong>Nguyên tắc chung:</strong> Nhiệt độ hơi chính ảnh hưởng trực tiếp đến <strong>hiệu suất chu trình, tuổi thọ kim loại và an toàn thiết bị</strong>. Khi nhiệt độ tăng cao, phải hành động theo đúng trình tự: <strong>xác minh điểm đo → xử lý giảm ôn → phối hợp lò hơi → điều chỉnh tuabin → sẵn sàng Trip/MFT</strong>. Ưu tiên tuyệt đối bảo vệ tuabin và đường ống hơi chính khỏi quá nhiệt.
+  <!-- 7 -->
+  <section>
+    <h2>7. Kết luận</h2>
+    <div class="section-card">
+      <ul>
+        <li><strong>Áp lực hơi mới</strong> và <strong>nhiệt độ hơi mới</strong> tăng trong giới hạn sẽ nâng cao hiệu suất chu trình, nhưng bị giới hạn bởi vật liệu, độ ẩm cuối và an toàn tuabin.</li>
+        <li><strong>Chân không bình ngưng</strong> tốt giúp tăng công suất và hiệu suất, nhưng phải cân bằng với tải tầng cuối, chi phí phụ trợ và điều kiện nước làm mát.</li>
+        <li>Vận hành tuabin hiệu quả và an toàn đòi hỏi phối hợp hài hòa cả ba thông số trong dải thiết kế, đồng thời giám sát chặt chẽ các thông số nhiệt – cơ – rung động.</li>
+      </ul>
     </div>
   </section>
 
   <footer>
-    Tài liệu vận hành – Ảnh hưởng nhiệt độ hơi chính tới thiết bị và hiệu suất tuabin<br>
-    Quy trình xử lý sự cố nhiệt độ hơi chính tăng cao
+    Tài liệu tham khảo nội bộ – Phân tích vận hành và hiệu suất tuabin hơi.
+  </footer>
+
+</div>
+</body>
+</html><!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ảnh hưởng của áp lực, nhiệt độ hơi mới và chân không bình ngưng đến tuabin hơi</title>
+<style>
+  :root{
+    --primary: #0b5394;
+    --primary-light: #e8f0fb;
+    --accent: #c0392b;
+    --border: #d0d7de;
+    --bg: #f7f9fc;
+    --text: #1f2328;
+    --muted: #57606a;
+  }
+  *{box-sizing: border-box;}
+  body{
+    margin: 0;
+    font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    font-size: 16px;
+  }
+  .container{
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+  header{
+    background: linear-gradient(135deg, #0b5394 0%, #1a73c9 100%);
+    color: #fff;
+    padding: 40px 24px;
+    text-align: center;
+    border-radius: 12px;
+    margin-bottom: 32px;
+    box-shadow: 0 6px 20px rgba(11,83,148,0.25);
+  }
+  header h1{
+    margin: 0 0 10px;
+    font-size: 1.9rem;
+    line-height: 1.3;
+  }
+  header p{
+    margin: 0;
+    opacity: 0.92;
+    font-size: 1rem;
+  }
+  h2{
+    color: var(--primary);
+    border-left: 5px solid var(--primary);
+    padding-left: 14px;
+    margin-top: 42px;
+    margin-bottom: 16px;
+    font-size: 1.4rem;
+  }
+  h3{
+    color: #1a4d80;
+    margin-top: 24px;
+    margin-bottom: 10px;
+    font-size: 1.12rem;
+  }
+  p{margin: 10px 0;}
+  ul{margin: 8px 0 12px; padding-left: 22px;}
+  li{margin: 6px 0;}
+  code{
+    background: #eef2f7;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 0.94em;
+    color: #b83280;
+  }
+  .formula{
+    background: #fff;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--primary);
+    padding: 14px 18px;
+    border-radius: 6px;
+    margin: 16px 0;
+    text-align: center;
+    font-family: "Cambria Math", "Times New Roman", serif;
+    font-size: 1.15rem;
+    color: #0b3d6b;
+    overflow-x: auto;
+  }
+  .callout{
+    background: var(--primary-light);
+    border-left: 4px solid var(--primary);
+    padding: 14px 18px;
+    border-radius: 6px;
+    margin: 18px 0;
+  }
+  .callout.warning{
+    background: #fdecea;
+    border-left-color: var(--accent);
+  }
+  .callout.note{
+    background: #fff8e1;
+    border-left-color: #f39c12;
+  }
+  table{
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    font-size: 0.95rem;
+  }
+  thead{
+    background: var(--primary);
+    color: #fff;
+  }
+  th, td{
+    padding: 12px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tbody tr:nth-child(even){background: #f4f7fb;}
+  tbody tr:hover{background: #e8f0fb;}
+  th{font-weight: 600;}
+  .section-card{
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .badge{
+    display: inline-block;
+    background: var(--primary);
+    color: #fff;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-right: 8px;
+  }
+  .badge.inc{background: #27ae60;}
+  .badge.dec{background: #c0392b;}
+  footer{
+    margin-top: 50px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+  @media(max-width: 640px){
+    header h1{font-size: 1.4rem;}
+    h2{font-size: 1.2rem;}
+    table{font-size: 0.85rem;}
+    th, td{padding: 9px 10px;}
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <h1>Ảnh hưởng của áp lực, nhiệt độ hơi mới và chân không bình ngưng đến quá trình vận hành và hiệu suất tuabin hơi</h1>
+    <p>Phân tích nhiệt – cơ – hiệu suất cho tuabin hơi theo chu trình Rankine</p>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <h2>1. Khái quát chung</h2>
+    <div class="section-card">
+      <p>Tuabin hơi làm việc theo chu trình Rankine. Công suất và hiệu suất của tuabin phụ thuộc chủ yếu vào entanpi hơi vào, entanpi hơi ra và tổn thất trong quá trình giãn nở:</p>
+
+      <div class="formula">
+        P = ṁ · (h₀ − h<sub>k</sub>) · η<sub>td</sub> · η<sub>g</sub>
+      </div>
+      <div class="formula">
+        η<sub>chu trình</sub> ≈ (h₀ − h<sub>k</sub>) / (h₀ − h'<sub>k</sub>)
+      </div>
+
+      <p>Trong đó:</p>
+      <ul>
+        <li><code>P₀, T₀</code>: áp lực và nhiệt độ hơi mới.</li>
+        <li><code>P_k</code>: áp suất bình ngưng, đặc trưng bởi chân không.</li>
+        <li><code>h₀, h_k</code>: entanpi hơi vào và hơi thải.</li>
+        <li><code>η_td</code>: hiệu suất tuabin.</li>
+      </ul>
+
+      <div class="callout">
+        Ba thông số này ảnh hưởng đồng thời đến <strong>công suất</strong>, <strong>hiệu suất</strong>, <strong>độ an toàn</strong> và <strong>tuổi thọ thiết bị</strong>.
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <h2>2. Ảnh hưởng của áp lực hơi mới P₀</h2>
+
+    <div class="section-card">
+      <h3>2.1. Đến quá trình vận hành</h3>
+      <ul>
+        <li><span class="badge inc">Tăng P₀</span>
+          <ul>
+            <li>Mật độ hơi tăng, lưu lượng qua tuabin tăng nếu độ mở van không đổi.</li>
+            <li>Áp suất các tầng tăng, lực dọc trục tăng, ứng suất thân vỏ và cánh tăng.</li>
+            <li>Dễ gây rung động, quá tải cánh tầng cuối và tăng nguy cơ hư hỏng ổ trục.</li>
+            <li>Nhiệt độ bão hòa tăng, nếu giữ T₀ không đổi thì độ quá nhiệt giảm, hơi cuối ẩm hơn → xói mòn cánh.</li>
+          </ul>
+        </li>
+        <li><span class="badge dec">Giảm P₀</span>
+          <ul>
+            <li>Công suất giảm, phải mở van lớn hơn để giữ tải.</li>
+            <li>Lưu lượng thể tích tăng, có thể quá tải tầng cuối.</li>
+            <li>Hiệu suất giảm do tổn thất tiết lưu và lệch khỏi điểm thiết kế.</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3>2.2. Đến hiệu suất</h3>
+      <ul>
+        <li>Trong giới hạn cho phép, tăng P₀ làm tăng nhiệt độ trung bình cấp nhiệt → <strong>tăng hiệu suất chu trình Rankine</strong>.</li>
+        <li>Nếu tăng quá cao mà không tăng T₀ hoặc không có quá nhiệt trung gian, độ ẩm cuối tăng, tổn thất ẩm tăng → <strong>giảm hiệu suất tuabin</strong> và tăng xói mòn.</li>
+        <li>Vận hành <strong>trượt áp suất</strong> ở tải thấp giúp giảm tổn thất tiết lưu, cải thiện hiệu suất.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <h2>3. Ảnh hưởng của nhiệt độ hơi mới T₀</h2>
+
+    <div class="section-card">
+      <h3>3.1. Đến quá trình vận hành</h3>
+      <ul>
+        <li><span class="badge inc">Tăng T₀</span>
+          <ul>
+            <li>Entanpi hơi vào tăng, công sinh ra tăng.</li>
+            <li>Nhiệt độ kim loại, độ giãn nở nhiệt và ứng suất nhiệt tăng.</li>
+            <li>Dễ gây creep, oxy hóa, biến dạng và giảm tuổi thọ vật liệu.</li>
+            <li>Cần giới hạn theo vật liệu thân, van, cánh và đường ống.</li>
+          </ul>
+        </li>
+        <li><span class="badge dec">Giảm T₀</span>
+          <ul>
+            <li>Entanpi giảm, công suất giảm.</li>
+            <li>Độ ẩm cuối tăng, gây xói mòn cánh tầng cuối.</li>
+            <li>Có thể phải giảm tải để bảo vệ tuabin.</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3>3.2. Đến hiệu suất</h3>
+      <ul>
+        <li>Tăng T₀ làm tăng độ giáng entanpi lý thuyết, tăng hiệu suất Carnot/Rankine và <strong>giảm độ ẩm cuối</strong>.</li>
+        <li>Giảm T₀ làm giảm hiệu suất, tăng suất tiêu hao nhiên liệu và tăng tổn thất ẩm.</li>
+        <li>T₀ là thông số rất nhạy với an toàn thiết bị, nên thường được giữ ổn định ở giá trị định mức.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <h2>4. Ảnh hưởng của chân không bình ngưng P_k</h2>
+
+    <div class="section-card">
+      <h3>4.1. Đến quá trình vận hành</h3>
+      <ul>
+        <li><span class="badge inc">Chân không tốt (P_k thấp)</span>
+          <ul>
+            <li>Nhiệt độ ngưng tụ giảm, độ giáng entanpi tăng, công suất tăng.</li>
+            <li>Nhưng độ ẩm cuối tăng, thể tích hơi thải lớn, tầng cuối chịu tải nặng, dễ rung và xói mòn.</li>
+            <li>Nhiệt độ hơi thải thấp, cần kiểm soát giãn nở thân tuabin.</li>
+          </ul>
+        </li>
+        <li><span class="badge dec">Chân không xấu (P_k cao)</span>
+          <ul>
+            <li>Công suất giảm, nhiệt độ hơi thải tăng.</li>
+            <li>Thân tuabin nóng, giãn nở không đều, rung động, có thể trip bảo vệ.</li>
+            <li>Không khí lọt vào bình ngưng làm tăng P_k, giảm truyền nhiệt, tăng oxy hòa tan gây ăn mòn.</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3>4.2. Đến hiệu suất</h3>
+      <ul>
+        <li>Chân không sâu trong giới hạn làm giảm nhiệt độ ngưng tụ, <strong>tăng hiệu suất chu trình</strong>, giảm nhiệt tiêu hao.</li>
+        <li>Cải thiện chân không quá mức cần tăng công bơm nước tuần hoàn, ejector, quạt gió → có thể không kinh tế.</li>
+        <li>Tồn tại <strong>chân không tối ưu kinh tế</strong>, phụ thuộc nhiệt độ nước làm mát, lưu lượng và tình trạng thiết bị.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <h2>5. Bảng tóm tắt ảnh hưởng</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Thông số</th>
+          <th>Tăng</th>
+          <th>Giảm</th>
+          <th>Ảnh hưởng hiệu suất</th>
+          <th>Giới hạn chính</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Áp lực hơi mới P₀</strong></td>
+          <td>Tăng công, tăng áp suất tầng, tăng lực dọc trục</td>
+          <td>Giảm công, tăng tổn thất tiết lưu</td>
+          <td>Tăng trong giới hạn, nhưng tăng độ ẩm cuối</td>
+          <td>Ứng suất, rung, xói mòn</td>
+        </tr>
+        <tr>
+          <td><strong>Nhiệt độ hơi mới T₀</strong></td>
+          <td>Tăng entanpi, giảm độ ẩm cuối</td>
+          <td>Giảm công, tăng độ ẩm</td>
+          <td>Tăng hiệu suất</td>
+          <td>Creep, oxy hóa, giãn nở</td>
+        </tr>
+        <tr>
+          <td><strong>Chân không bình ngưng P_k</strong></td>
+          <td>Giảm công, nóng thân tuabin</td>
+          <td>Tăng công, tăng hiệu suất</td>
+          <td>Chân không sâu tăng hiệu suất</td>
+          <td>Độ ẩm cuối, tải tầng cuối, chi phí phụ trợ</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <h2>6. Tương tác và vận hành tối ưu</h2>
+    <div class="section-card">
+      <p>Ba thông số này không độc lập mà tác động qua lại:</p>
+      <ul>
+        <li>Tăng P₀ và T₀ có thể nâng cao hiệu suất nhưng phải kiểm soát độ ẩm cuối.</li>
+        <li>Chân không càng sâu càng làm độ ẩm cuối tăng, nên cần phối hợp với nhiệt độ hơi mới.</li>
+        <li>Cần theo dõi: nhiệt độ hơi thải, độ ẩm, rung, lực dọc trục, độ giãn nở, áp suất tầng, nhiệt độ kim loại.</li>
+        <li>Vận hành tối ưu là giữ T₀ định mức, điều chỉnh P₀ theo chế độ trượt áp suất, và duy trì P_k ở giá trị tối ưu kinh tế.</li>
+      </ul>
+
+      <div class="callout note">
+        <strong>Lưu ý:</strong> Điểm vận hành tối ưu không phải là điểm có hiệu suất tuabin cao nhất, mà là điểm cân bằng giữa hiệu suất, an toàn thiết bị và chi phí phụ trợ.
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <h2>7. Kết luận</h2>
+    <div class="section-card">
+      <ul>
+        <li><strong>Áp lực hơi mới</strong> và <strong>nhiệt độ hơi mới</strong> tăng trong giới hạn sẽ nâng cao hiệu suất chu trình, nhưng bị giới hạn bởi vật liệu, độ ẩm cuối và an toàn tuabin.</li>
+        <li><strong>Chân không bình ngưng</strong> tốt giúp tăng công suất và hiệu suất, nhưng phải cân bằng với tải tầng cuối, chi phí phụ trợ và điều kiện nước làm mát.</li>
+        <li>Vận hành tuabin hiệu quả và an toàn đòi hỏi phối hợp hài hòa cả ba thông số trong dải thiết kế, đồng thời giám sát chặt chẽ các thông số nhiệt – cơ – rung động.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    Tài liệu tham khảo nội bộ – Phân tích vận hành và hiệu suất tuabin hơi.
   </footer>
 
 </div>
