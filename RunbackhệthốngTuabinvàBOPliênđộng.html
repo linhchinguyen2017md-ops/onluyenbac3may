@@ -2,572 +2,544 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Các trường hợp Runback của hệ thống Tuabin và BOP – Tín hiệu liên động</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Báo cáo kỹ thuật – Chức năng Runback Tuabin và BOP</title>
 <style>
-  :root{
-    --primary: #0b5394;
-    --primary-dark: #073b6b;
-    --primary-light: #e8f0fb;
-    --accent: #c0392b;
-    --accent-light: #fdecea;
-    --warning: #f39c12;
-    --warning-light: #fff8e1;
-    --success: #27ae60;
-    --success-light: #e8f8ef;
-    --purple: #7d3c98;
-    --purple-light: #f4ecf7;
-    --cyan: #0e7490;
-    --cyan-light: #e0f7fa;
-    --border: #d0d7de;
-    --bg: #f7f9fc;
-    --text: #1f2328;
-    --muted: #57606a;
-  }
-  *{box-sizing: border-box;}
-  body{
-    margin: 0;
-    font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    line-height: 1.65;
-    font-size: 16px;
-  }
-  .container{
-    max-width: 1180px;
-    margin: 0 auto;
-    padding: 32px 22px 80px;
-  }
-  header{
-    background: linear-gradient(135deg, #7d3c98 0%, #9b59b6 50%, #bb8fce 100%);
-    color: #fff;
-    padding: 38px 28px;
-    text-align: center;
-    border-radius: 12px;
-    margin-bottom: 28px;
-    box-shadow: 0 6px 24px rgba(125,60,152,0.35);
-    position: relative;
-    overflow: hidden;
-  }
-  header::before{
-    content: "⚡";
-    position: absolute;
-    font-size: 13rem;
-    opacity: 0.1;
-    top: -20px;
-    right: 20px;
-    line-height: 1;
-  }
-  header h1{
-    margin: 0 0 12px;
-    font-size: 1.65rem;
-    line-height: 1.35;
-    position: relative;
-  }
-  header .subtitle{
-    margin: 0;
-    opacity: 0.96;
-    font-size: 1rem;
-    font-style: italic;
-    position: relative;
-  }
-  header .scope{
-    display: inline-block;
-    margin-top: 14px;
-    background: rgba(0,0,0,0.25);
-    border: 1px solid rgba(255,255,255,0.35);
-    padding: 6px 18px;
-    border-radius: 20px;
-    font-size: 0.88rem;
-    font-weight: 500;
-    position: relative;
-  }
-  h2{
-    color: var(--primary);
-    border-left: 5px solid var(--primary);
-    padding-left: 14px;
-    margin-top: 42px;
-    margin-bottom: 16px;
-    font-size: 1.35rem;
-  }
-  h3{
-    color: var(--primary-dark);
-    margin-top: 24px;
-    margin-bottom: 10px;
-    font-size: 1.14rem;
-  }
-  p{margin: 10px 0;}
-  ul, ol{margin: 8px 0 12px; padding-left: 24px;}
-  li{margin: 6px 0;}
-  code{
-    background: #eef2f7;
-    padding: 2px 7px;
-    border-radius: 4px;
-    font-family: "Consolas", "Courier New", monospace;
-    font-size: 0.9em;
-    color: #b83280;
-    white-space: nowrap;
-  }
-  .section-card{
-    background: #fff;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 20px 24px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  }
-  .callout{
-    background: var(--primary-light);
-    border-left: 4px solid var(--primary);
-    padding: 14px 18px;
-    border-radius: 6px;
-    margin: 18px 0;
-  }
-  .callout.warning{
-    background: var(--warning-light);
-    border-left-color: var(--warning);
-  }
-  .callout.danger{
-    background: var(--accent-light);
-    border-left-color: var(--accent);
-  }
-  .callout.success{
-    background: var(--success-light);
-    border-left-color: var(--success);
-  }
-  .callout.purple{
-    background: var(--purple-light);
-    border-left-color: var(--purple);
-  }
-  .callout.cyan{
-    background: var(--cyan-light);
-    border-left-color: var(--cyan);
-  }
-  .callout strong{color: var(--primary-dark);}
-  .callout.danger strong{color: var(--accent);}
-  .callout.warning strong{color: #b9770e;}
-  .callout.success strong{color: #1e8449;}
-  .callout.purple strong{color: var(--purple);}
-  .callout.cyan strong{color: var(--cyan);}
-
-  /* CONCEPT BOX */
-  .concept-box{
-    background: linear-gradient(135deg, #f4ecf7 0%, #e8d5f0 100%);
-    border: 1px solid #d5b8e0;
-    border-left: 6px solid var(--purple);
-    border-radius: 10px;
-    padding: 20px 24px;
-    margin: 20px 0;
-    box-shadow: 0 3px 10px rgba(125,60,152,0.1);
-  }
-  .concept-box .title{
-    color: var(--purple);
-    font-size: 1.12rem;
-    font-weight: 700;
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .concept-box .title::before{
-    content: "📖";
-    font-size: 1.3rem;
-  }
-
-  /* TABLE */
-  table{
-    width: 100%;
-    border-collapse: collapse;
-    margin: 16px 0;
-    background: #fff;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-    font-size: 0.9rem;
-  }
-  thead{
-    background: var(--primary);
-    color: #fff;
-  }
-  th, td{
-    padding: 11px 12px;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
-    vertical-align: top;
-  }
-  tbody tr:nth-child(even){background: #f4f7fb;}
-  tbody tr:hover{background: #e8f0fb;}
-  th{font-weight: 600; font-size: 0.85rem;}
-  .rb-table th:nth-child(1){width: 6%;text-align:center;}
-  .rb-table th:nth-child(2){width: 30%;}
-  .rb-table th:nth-child(3){width: 20%;}
-  .rb-table th:nth-child(4){width: 44%;}
-
-  .rb-num{
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 30px;
-    height: 30px;
-    background: linear-gradient(135deg, #7d3c98 0%, #9b59b6 100%);
-    color: #fff;
-    border-radius: 50%;
-    font-weight: 700;
-    font-size: 0.9rem;
-  }
-  .rb-load{
-    display: inline-block;
-    background: linear-gradient(135deg, #b9770e 0%, #f39c12 100%);
-    color: #fff;
-    padding: 5px 12px;
-    border-radius: 14px;
-    font-weight: 700;
-    font-family: "Consolas", monospace;
-    font-size: 0.85rem;
-    white-space: nowrap;
-  }
-  .rb-load.var{
-    background: linear-gradient(135deg, #0b5394 0%, #1a73c9 100%);
-    white-space: normal;
-    text-align: center;
-  }
-
-  /* CONDITION CHECKLIST */
-  .cond-list{
-    counter-reset: cond;
-    list-style: none;
-    padding-left: 0;
-  }
-  .cond-list li{
-    counter-increment: cond;
-    position: relative;
-    padding: 14px 20px 14px 64px;
-    background: #fff;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    margin-bottom: 12px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-    border-left: 5px solid var(--purple);
-  }
-  .cond-list li::before{
-    content: counter(cond);
-    position: absolute;
-    left: 18px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 34px;
-    height: 34px;
-    background: linear-gradient(135deg, #7d3c98 0%, #9b59b6 100%);
-    color: #fff;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 0.92rem;
-  }
-
-  /* INTERLOCK CARDS */
-  .interlock-group{
-    background: #fff;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    margin-bottom: 18px;
-    overflow: hidden;
-    box-shadow: 0 3px 12px rgba(0,0,0,0.06);
-  }
-  .interlock-header{
-    padding: 14px 22px;
-    color: #fff;
-    font-size: 1.05rem;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .interlock-header .letter{
-    background: rgba(255,255,255,0.25);
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 800;
-    flex-shrink: 0;
-    font-size: 1rem;
-  }
-  .interlock-header.ig-a{background: linear-gradient(135deg, #0b5394 0%, #1a73c9 100%);}
-  .interlock-header.ig-b{background: linear-gradient(135deg, #7b0d0d 0%, #c0392b 100%);}
-  .interlock-header.ig-c{background: linear-gradient(135deg, #0e7490 0%, #0891b2 100%);}
-  .interlock-header.ig-d{background: linear-gradient(135deg, #b9770e 0%, #f39c12 100%);}
-  .interlock-header.ig-e{background: linear-gradient(135deg, #1e8449 0%, #27ae60 100%);}
-  .interlock-body{
-    padding: 4px 20px 12px;
-  }
-  .interlock-body ul{margin: 6px 0;}
-
-  .badge{
-    display: inline-block;
-    padding: 3px 10px;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: #fff;
-  }
-  .badge.blue{background: var(--primary);}
-  .badge.red{background: var(--accent);}
-  .badge.green{background: var(--success);}
-  .badge.orange{background: var(--warning);}
-  .badge.purple{background: var(--purple);}
-
-  .toc{
-    background: #fff;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 18px 22px;
-    margin-bottom: 24px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  }
-  .toc h3{
-    margin-top: 0;
-    color: var(--primary);
-    font-size: 1rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  .toc ol{
-    margin: 0;
-    padding-left: 22px;
-    columns: 2;
-    column-gap: 30px;
-  }
-  .toc li{margin: 6px 0;break-inside: avoid;}
-  .toc a{
-    color: var(--primary-dark);
-    text-decoration: none;
-    transition: color .2s;
-  }
-  .toc a:hover{
-    color: var(--accent);
-    text-decoration: underline;
-  }
-
-  footer{
-    margin-top: 50px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border);
-    text-align: center;
-    color: var(--muted);
-    font-size: 0.88rem;
-  }
-
-  @media(max-width: 720px){
-    header h1{font-size: 1.18rem;}
-    header::before{font-size: 7rem; top: 10px;}
-    h2{font-size: 1.15rem;}
-    .toc ol{columns: 1;}
-    table{font-size: 0.78rem;}
-    th, td{padding: 8px 8px;}
-    .rb-table th:nth-child(1){width: 10%;}
-    .cond-list li{padding: 12px 14px 12px 58px;}
-    .cond-list li::before{width: 30px; height: 30px; font-size: 0.85rem; left: 14px;}
-  }
+:root{--bg:#f3f5f8;--paper:#fff;--ink:#1a2333;--muted:#5a6b80;--line:#c9d3df;--primary:#14508c;--soft:#e8f1fb;--code:#eef2f7}
+@media (prefers-color-scheme:dark){:root{--bg:#12161c;--paper:#1a2029;--ink:#e6ebf2;--muted:#9aa8bb;--line:#33404f;--primary:#6fb1f2;--soft:#1f2c3d;--code:#252e3a}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15.5px/1.7 "Segoe UI",Roboto,system-ui,sans-serif}
+main{max-width:1050px;margin:0 auto;padding:28px 18px 80px}
+.cover{background:var(--paper);border:1px solid var(--line);border-top:6px solid var(--primary);border-radius:10px;padding:40px 36px;margin-bottom:22px}
+.cover .tag{font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.cover h1{margin:10px 0 6px;font-size:1.9rem;line-height:1.3;color:var(--primary)}
+.cover p{margin:0;color:var(--muted)}
+.ctl{margin-top:22px}
+article{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:30px 36px}
+h2{margin:38px 0 12px;font-size:1.28rem;color:var(--primary);border-bottom:2px solid var(--primary);padding-bottom:4px}
+h2:first-child{margin-top:0}
+h3{margin:24px 0 8px;font-size:1.06rem}
+p,li{margin:7px 0} ul,ol{padding-left:24px}
+code{background:var(--code);padding:1px 6px;border-radius:4px;font-size:.9em}
+.tw{overflow-x:auto;margin:10px 0 18px}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:.92rem}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--soft);color:var(--primary)}
+em{color:var(--muted)}
+@media print{body{background:#fff}article,.cover{border:0}}
 </style>
 </head>
-<body>
-<div class="container">
-
-  <header>
-    <h1>Các trường hợp Runback của hệ thống Tuabin và BOP</h1>
-    <p class="subtitle">Điều kiện tác động – Mức tải sau Runback – Tín hiệu liên động tự động</p>
-    <span class="scope">Vận hành nhà máy nhiệt điện – TCS Mark VIe &amp; DCS Ovation</span>
-  </header>
-
-  <!-- TOC -->
-  <div class="toc">
-    <h3>Mục lục</h3>
-    <ol>
-      <li><a href="#s1">Khái niệm và các trường hợp Runback</a></li>
-      <li><a href="#s2">Điều kiện tiên quyết để Runback tác động</a></li>
-      <li><a href="#s3">Các tín hiệu liên động sau Runback</a></li>
-    </ol>
-  </div>
-
-  <!-- I -->
-  <section id="s1">
-    <h2>1. Khái niệm và các trường hợp Runback của Tuabin &amp; BOP</h2>
-
-    <div class="concept-box">
-      <div class="title">Khái niệm Runback</div>
-      <p>Trong vận hành nhiệt điện, <strong>Runback</strong> là chức năng <strong>tự động giảm nhanh phụ tải tổ máy</strong> (Tuabin – Lò hơi) về một ngưỡng tải an toàn tương ứng với khả năng đáp ứng của các thiết bị phụ trợ (BOP) còn lại khi xảy ra sự cố thiết bị chính, nhằm <strong>bảo vệ tổ máy không bị nhảy hoàn toàn</strong> (tránh Trip Tuabin hoặc MFT Lò).</p>
-    </div>
-
-    <h3>Các trường hợp sự cố kích hoạt Runback</h3>
-
-    <table class="rb-table">
-      <thead>
-        <tr>
-          <th>TT</th>
-          <th>Trường hợp sự cố kích hoạt</th>
-          <th>Mức tải sau Runback</th>
-          <th>Mục đích kỹ thuật trong vận hành</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><span class="rb-num">1</span></td>
-          <td><strong>Chỉ có 01 Bơm nước tuần hoàn (CWP) làm việc</strong></td>
-          <td><span class="rb-load">60% tải (~ 324 MW)</span></td>
-          <td>Lưu lượng nước làm mát giảm 50%. Giảm tải về 60% nhằm giảm lượng nhiệt thải xuống bình ngưng, tránh sụt giảm độ chân không bình ngưng (ngăn ngừa chạm ngưỡng trip chân không thấp ≥ 0,254 bar) và khống chế nhiệt độ hơi thoát hạ áp không tăng cao.</td>
-        </tr>
-        <tr>
-          <td><span class="rb-num">2</span></td>
-          <td><strong>Chỉ có 01 Bơm nước ngưng (CEP) làm việc</strong></td>
-          <td><span class="rb-load">60% tải (~ 324 MW)</span></td>
-          <td>01 bơm ngưng không đủ lưu lượng đẩy nước về bình khử khí ở 100% tải. Giảm tải về 60% để cân bằng chu trình nước ngưng, tránh tụt mức nước bình khử khí và chống dâng ngập mức nước bình ngưng.</td>
-        </tr>
-        <tr>
-          <td><span class="rb-num">3</span></td>
-          <td><strong>Chỉ có 01 Bơm cấp nước lò hơi (BFP) làm việc</strong></td>
-          <td><span class="rb-load">60% tải (~ 324 MW)</span></td>
-          <td>01 bơm cấp chỉ đáp ứng tối đa khoảng 60% lưu lượng nước cấp định mức cho 2 lò. Runback về 60% để tránh quá dòng bơm cấp (runout), tránh tụt mức nước bao hơi tới mức bảo vệ cạn nước (LL &lt; −279 mm) gây MFT lò hơi.</td>
-        </tr>
-        <tr>
-          <td><span class="rb-num">4</span></td>
-          <td><strong>Sự cố nước làm mát Stator máy phát (SWC Runback)</strong></td>
-          <td><span class="rb-load var">Giảm dòng điện &amp; tải theo logic bảo vệ</span></td>
-          <td>Khi lưu lượng nước làm mát Stator thấp (&lt; 56 m³/h), nhiệt độ Stator tăng cao (&gt; 78,2 °C ÷ 83,2 °C) hoặc áp lực nước làm mát suy giảm. Cắt giảm tải để giảm dòng điện stator, bảo vệ cách điện cuộn dây stator máy phát khỏi quá nhiệt phá hủy.</td>
-        </tr>
-        <tr>
-          <td><span class="rb-num">5</span></td>
-          <td><strong>Trip 01 Quạt khói (ID Fan) / Quạt gió (SA/PA Fan)</strong></td>
-          <td><span class="rb-load var">Giảm theo năng lực quạt còn lại</span></td>
-          <td>Mất 1 quạt khói hoặc quạt gió lò hơi CFB. Hệ thống tự động giảm tải buồng đốt và lưu lượng hơi tương ứng để giữ cân bằng áp lực âm buồng đốt và tỷ lệ than/gió, tránh tăng áp buồng đốt gây MFT.</td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
-
-  <!-- II -->
-  <section id="s2">
-    <h2>2. Điều kiện tiên quyết để chức năng Runback tác động</h2>
-
-    <div class="callout purple">
-      <strong>Nguyên tắc:</strong> Để chức năng Runback tự động kích hoạt và thực thi giảm tải nhịp nhàng trên hệ thống điều khiển tổ máy, các điều kiện sau <strong>bắt buộc phải được thỏa mãn</strong>.
-    </div>
-
-    <ol class="cond-list">
-      <li><strong>Tuabin Master</strong> đang ở chế độ <span class="badge purple">Auto</span>.</li>
-      <li><strong>Fuel Master (Coal Master)</strong> đang ở chế độ <span class="badge purple">Auto</span>.</li>
-      <li><strong>Biến tần (VFD)</strong> của quạt khói (ID Fan) A hoặc B đang ở chế độ <span class="badge purple">Auto</span>.</li>
-      <li><strong>Boiler Master</strong> (của lò hơi có thiết bị liên quan bị trip) đạt mức tải quy định: <span class="badge orange">≥ 48%</span>.</li>
-    </ol>
-
-    <div class="callout warning">
-      <strong>Ghi chú quan trọng:</strong> Nếu một trong các vòng điều khiển Master nêu trên đang ở chế độ <strong>Manual (bằng tay)</strong>, chức năng tự động Runback sẽ <strong>không thể thực thi tự động</strong>. Khi đó, người vận hành (Máy trưởng/Trưởng kíp) phải <strong>chủ động can thiệp giảm tải khẩn cấp bằng tay</strong> để tránh sự cố nhảy toàn bộ tổ máy.
-    </div>
-  </section>
-
-  <!-- III -->
-  <section id="s3">
-    <h2>3. Các tín hiệu liên động sau khi Runback</h2>
-
-    <div class="callout">
-      <strong>Nguyên tắc phối hợp:</strong> Sau khi tín hiệu Runback kích hoạt, hệ thống điều khiển tự động phối hợp (<strong>TCS Mark VIe</strong> và <strong>DCS Ovation</strong>) cùng các thiết bị phụ trợ (BOP) đồng thời thực hiện chuỗi liên động sau.
-    </div>
-
-    <!-- a -->
-    <div class="interlock-group">
-      <div class="interlock-header ig-a">
-        <span class="letter">a</span>
-        <span>Liên động Tuabin và Hệ thống van hơi</span>
-      </div>
-      <div class="interlock-body">
-        <ul>
-          <li>Hệ thống điều khiển tuabin tự động chuyển sang <strong>tốc độ giảm tải khẩn cấp</strong> (Ramp Rate cao hơn bình thường) có tích hợp chức năng khống chế ứng suất nhiệt của rôto (<em>Thermal Stress Control</em>).</li>
-          <li>Tự động điều chỉnh <strong>khép bớt góc mở</strong> của các van điều chỉnh hơi chính (<strong>CV</strong>) và van điều chỉnh hơi tái nhiệt (<strong>IV</strong>) tương ứng với mốc phụ tải đích 60% (~ 324 MW).</li>
-          <li>Các van thông hơi (<strong>BVV</strong>), van dòng ngược (<strong>RFV</strong>) luôn ở trạng thái giám sát và sẵn sàng liên động theo chế độ dòng của chu trình.</li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- b -->
-    <div class="interlock-group">
-      <div class="interlock-header ig-b">
-        <span class="letter">b</span>
-        <span>Liên động Hệ thống Lò hơi (Nhiên liệu &amp; Gió)</span>
-      </div>
-      <div class="interlock-body">
-        <ul>
-          <li><strong>Fuel Master:</strong> Tự động giảm lưu lượng than cấp vào buồng đốt (giảm tốc độ quay hoặc dừng bớt máy cấp than đang làm việc) nhằm kéo giảm nhiệt lượng cấp tức thời.</li>
-          <li><strong>Hệ thống Gió &amp; Khói:</strong> Tự động điều chỉnh giảm lưu lượng gió sơ cấp (<strong>PA</strong>) và gió thứ cấp (<strong>SA</strong>) theo đường đặc tính tải mới để duy trì ổn định tỷ lệ than/gió và khống chế nhiệt độ tầng sôi lò CFB; điều chỉnh biến tần quạt khói (<strong>ID Fan</strong>) duy trì ổn định áp suất âm buồng đốt.</li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- c -->
-    <div class="interlock-group">
-      <div class="interlock-header ig-c">
-        <span class="letter">c</span>
-        <span>Liên động Hệ thống Nước cấp và Nước ngưng</span>
-      </div>
-      <div class="interlock-body">
-        <ul>
-          <li><strong>Điều khiển nước cấp bao hơi:</strong> Tự động điều chỉnh khép bớt van nước cấp bao hơi theo sản lượng hơi giảm, ổn định mức nước bao hơi, ngăn ngừa hiện tượng sôi bồng hoặc cạn nước bao hơi gây tác động bảo vệ MFT lò.</li>
-          <li><strong>Bảo vệ chống quá tải bơm cấp (Runout protection):</strong> Nếu Runback do trip 1 bơm cấp, hệ thống tự động khống chế độ mở van điều khiển dòng không cho bơm cấp còn lại chạy vượt quá dải lưu lượng an toàn.</li>
-          <li><strong>Liên động phun làm mát cổ thoát hạ áp:</strong> Tự động mở van nước ngưng phun làm mát cổ thoát hơi hạ áp (<strong>LP Hood Spray</strong>) khi nhiệt độ hơi thoát tăng cao (≥ 79 °C hoặc 57,2 °C tùy chế độ) để bảo vệ các tầng cánh cuối.</li>
-          <li><strong>Liên động van tái tuần hoàn nước ngưng:</strong> Mở lớn thêm van tái tuần hoàn nước ngưng về bình ngưng nếu lưu lượng qua bình ngưng hơi chèn bị giảm thấp để đảm bảo làm mát bình ngưng hơi chèn và bảo vệ bơm ngưng.</li>
-          <li><strong>Liên động van xả nước ngưng về bể dự trữ:</strong> Tự động mở van xả về bể chứa dự trữ nước ngưng khi mức nước bình ngưng dâng cao (≥ 950 mm hoặc &gt; 1200 mm) để chống ngập dàn ống trao đổi nhiệt.</li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- d -->
-    <div class="interlock-group">
-      <div class="interlock-header ig-d">
-        <span class="letter">d</span>
-        <span>Liên động Hệ thống Hơi trích, Bình gia nhiệt &amp; Xả đọng</span>
-      </div>
-      <div class="interlock-body">
-        <ul>
-          <li>Áp lực các cửa trích hơi <strong>tự động suy giảm tự nhiên</strong> theo áp suất hơi trong các xi lanh tuabin.</li>
-          <li>Các van tự động điều chỉnh <strong>mức nước đọng bình gia nhiệt cao áp và hạ áp</strong> tự động tăng độ mở xả về bình khử khí hoặc bình ngưng để duy trì mức nước bình thường, ngăn ngừa trào ngược nước vào thân tuabin.</li>
-          <li>Các cụm van xả đọng đường ống hơi chính, hơi tái và thân tuabin (nhóm xả <strong>A, B, C</strong>) chuyển sang trạng thái sẵn sàng mở tự động theo logic nhiệt độ/áp suất nếu phát hiện hơi có nguy cơ ngưng tụ.</li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- e -->
-    <div class="interlock-group">
-      <div class="interlock-header ig-e">
-        <span class="letter">e</span>
-        <span>Kích hoạt Bộ đếm thời gian bảo vệ dự phòng</span>
-      </div>
-      <div class="interlock-body">
-        <ul>
-          <li>Trường hợp Runback do hệ thống <strong>nước làm mát Stator (SWC)</strong>, các bộ định thời gian bảo vệ sẽ đếm lùi:
-            <ul>
-              <li><span class="badge blue">T1 = 120 s</span></li>
-              <li><span class="badge blue">T2 = 210 s</span></li>
-              <li><span class="badge blue">T3 = 600 s</span> (hoặc 60 phút)</li>
-            </ul>
-          </li>
-          <li>Nếu sau thời gian quy định mà các thông số làm mát Stator hoặc dòng điện máy phát <strong>không trở về dải an toàn</strong>, hệ thống sẽ tự động phát lệnh <strong>Trip Tuabin</strong> để cô lập tổ máy.</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="callout success">
-      <strong>Kết luận:</strong> Chức năng Runback là <strong>lá chắn bảo vệ quan trọng</strong> giúp tổ máy tránh nhảy hoàn toàn khi mất thiết bị phụ trợ. Tuy nhiên, Runback chỉ hoạt động khi các vòng điều khiển Master đều ở chế độ Auto. Khi có bất kỳ vòng nào ở Manual, vận hành viên phải <strong>chủ động giảm tải bằng tay</strong> để bảo vệ tổ máy.
-    </div>
-  </section>
-
-  <footer>
-    Tài liệu vận hành – Chức năng Runback hệ thống Tuabin &amp; BOP<br>
-    Điều kiện tác động – Mức tải – Chuỗi liên động tự động
-  </footer>
-
-</div>
-</body>
-</html>
+<body><main>
+<section class="cover">
+<div class="tag">Báo cáo kỹ thuật</div>
+<h1>Chức năng Runback của hệ thống Tuabin và BOP</h1>
+<p>Điều kiện tác động, mức tải, tốc độ giảm tải và chuỗi liên động tự động</p>
+<div class="tw ctl"><table>
+<tr><th>Hệ thống</th><td>Tuabin – Lò hơi (2A, 2B) – Máy phát; TCS Mark VIe và DCS Ovation</td></tr>
+<tr><th>Phiên bản</th><td>1.0</td></tr>
+<tr><th>Ngày lập</th><td>19/10/2026</td></tr>
+</table></div>
+</section>
+<article>
+<h2>1. Mục đích và phạm vi</h2>
+<h3>1.1. Mục đích</h3>
+<p>Báo cáo này mô tả chi tiết chức năng Runback của hệ thống Tuabin và các hệ thống phụ trợ (BOP), gồm: phân loại trạng thái khởi động Tuabin, tốc độ tăng giảm tải, điều kiện tác động của Runback theo từng loại bơm, điều kiện chuyển chế độ Manual của Tuabin, logic bypass hạ áp, các trường hợp Runback bổ sung và chuỗi liên động sau Runback.</p>
+<h3>1.2. Phạm vi</h3>
+<p>Báo cáo áp dụng cho tổ máy Tuabin – Lò hơi (hai lò 2A, 2B) – Máy phát, điều khiển bằng TCS Mark VIe và DCS Ovation. Các thông số dùng đơn vị °C, bar, MW, %/s, giây (s).</p>
+<h2>2. Thuật ngữ và chữ viết tắt</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Thuật ngữ</th>
+<th>Ý nghĩa</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Runback</td>
+<td>Chức năng tự động giảm nhanh tải tổ máy về mức phù hợp với khả năng của thiết bị phụ trợ còn lại</td>
+</tr>
+<tr>
+<td>BOP</td>
+<td>Balance of Plant – hệ thống thiết bị phụ trợ của nhà máy</td>
+</tr>
+<tr>
+<td>BM</td>
+<td>Boiler Master – vòng điều khiển chính của lò hơi</td>
+</tr>
+<tr>
+<td>BM tổng</td>
+<td>Master tổng của tổ máy</td>
+</tr>
+<tr>
+<td>Tuabin Master</td>
+<td>Vòng điều khiển tải của Tuabin</td>
+</tr>
+<tr>
+<td>Fuel Master</td>
+<td>Vòng điều khiển nhiên liệu (than)</td>
+</tr>
+<tr>
+<td>CWP</td>
+<td>Bơm nước tuần hoàn</td>
+</tr>
+<tr>
+<td>CEP</td>
+<td>Bơm nước ngưng</td>
+</tr>
+<tr>
+<td>BFP</td>
+<td>Bơm cấp nước lò hơi</td>
+</tr>
+<tr>
+<td>SWC</td>
+<td>Hệ thống nước làm mát Stator máy phát</td>
+</tr>
+<tr>
+<td>ID Fan, SA/PA Fan</td>
+<td>Quạt khói; quạt gió thứ cấp, sơ cấp</td>
+</tr>
+<tr>
+<td>PLU</td>
+<td>Điều kiện kích hoạt Runback Tuabin</td>
+</tr>
+<tr>
+<td>UMC</td>
+<td>Chế độ vận hành của Tuabin</td>
+</tr>
+<tr>
+<td>MFT</td>
+<td>Master Fuel Trip – ngắt nhiên liệu lò hơi</td>
+</tr>
+<tr>
+<td>CV, IV</td>
+<td>Van điều chỉnh hơi chính; van điều chỉnh hơi tái nhiệt</td>
+</tr>
+<tr>
+<td>BVV, RFV</td>
+<td>Van thông hơi; van dòng ngược</td>
+</tr>
+<tr>
+<td>LP Hood Spray</td>
+<td>Phun làm mát cổ thoát hơi hạ áp</td>
+</tr>
+</tbody>
+</table></div>
+<h2>3. Khái niệm và nguyên tắc chung của Runback</h2>
+<p>Runback là chức năng tự động giảm nhanh phụ tải tổ máy về một ngưỡng tải an toàn, tương ứng với khả năng đáp ứng của thiết bị phụ trợ còn lại khi xảy ra sự cố thiết bị chính. Mục tiêu là bảo vệ tổ máy không bị nhảy hoàn toàn (tránh trip Tuabin hoặc MFT lò).</p>
+<p>Runback chỉ tự động thực hiện khi các vòng Master liên quan ở chế độ Auto; yêu cầu Auto cụ thể cho từng loại Runback bơm được nêu ở mục 6. Khi có vòng điều khiển ở chế độ Manual, Runback không thể thực hiện tự động và vận hành viên phải chủ động giảm tải bằng tay để tránh sự cố nhảy toàn bộ tổ máy.</p>
+<h2>4. Phân loại trạng thái khởi động Tuabin</h2>
+<h3>4.1. Tiêu chí phân loại</h3>
+<p>Trạng thái khởi động của Tuabin được phân loại theo nhiệt độ Roto cao áp (HP Rotor) tại thời điểm khởi động. Trạng thái khởi động quyết định biểu đồ gia nhiệt, tốc độ tăng tải và giới hạn ứng suất nhiệt cho phép trên Roto và thân Tuabin. Nhiệt độ Roto càng cao thì việc gia nhiệt và tăng tải càng phải thận trọng.</p>
+<h3>4.2. Các trạng thái</h3>
+<p><em>Bảng 1. Phân loại trạng thái khởi động theo nhiệt độ Roto cao áp</em></p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Trạng thái</th>
+<th>Nhiệt độ Roto cao áp</th>
+<th>Yêu cầu vận hành</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Lạnh</td>
+<td>T &lt; 150 °C</td>
+<td>Cần gia nhiệt ban đầu trước khi tăng tải; kiểm soát chặt tốc độ gia nhiệt</td>
+</tr>
+<tr>
+<td>Ấm</td>
+<td>150 °C &lt; T &lt; 217 °C</td>
+<td>Thời gian gia nhiệt rút ngắn; theo dõi giãn nở nhiệt của Roto</td>
+</tr>
+<tr>
+<td>Nóng</td>
+<td>217 °C &lt; T &lt; 417 °C</td>
+<td>Kiểm soát làm mát để tránh sốc nhiệt; giới hạn tốc độ tăng tải</td>
+</tr>
+<tr>
+<td>Cực nóng</td>
+<td>T &gt; 417 °C</td>
+<td>Yêu cầu quy trình đặc biệt; nguy cơ ứng suất nhiệt rất cao</td>
+</tr>
+</tbody>
+</table></div>
+<p>Chưa quy định giá trị biên đúng bằng 150, 217 và 417 °C thuộc trạng thái nào.</p>
+<h2>5. Tốc độ tăng giảm tải</h2>
+<p><em>Bảng 2. Tốc độ tăng giảm tải</em></p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Chế độ</th>
+<th>Tốc độ</th>
+<th>Điều kiện</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tuabin Master – bình thường</td>
+<td>0,167 %/s</td>
+<td>Tăng/giảm tải theo biểu đồ vận hành tiêu chuẩn</td>
+</tr>
+<tr>
+<td>Tuabin Master – Runback Tuabin</td>
+<td>10 %/s</td>
+<td>Máy cắt đầu cực không đóng, PLU, Tuabin trip, tách lưới giữ điện tự dùng</td>
+</tr>
+<tr>
+<td>Runback bơm (tuần hoàn, ngưng, cấp)</td>
+<td>9 MW/s</td>
+<td>Theo logic từng bơm, xem mục 6</td>
+</tr>
+</tbody>
+</table></div>
+<p>Tốc độ giảm tải khi Runback Tuabin nhanh gấp khoảng 60 lần chế độ bình thường (10 / 0,167). Đây là biện pháp bảo vệ khẩn cấp nhằm tránh hư hỏng Tuabin và các hệ thống phụ trợ. Khi Runback, hệ thống điều khiển Tuabin chuyển sang tốc độ giảm tải cao hơn bình thường, có tích hợp chức năng khống chế ứng suất nhiệt Roto (Thermal Stress Control).</p>
+<h2>6. Điều kiện tác động của Runback bơm</h2>
+<h3>6.1. Runback bơm tuần hoàn (CWP)</h3>
+<p>Runback bơm tuần hoàn tác động sau <strong>5 s</strong> khi thỏa mãn đồng thời các điều kiện sau.</p>
+<ul>
+<li>Điều kiện Auto: BM lò 2A; BM lò 2B; biến tần quạt khói A hoặc B của lò 2A; biến tần quạt khói A hoặc B của lò 2B; BM tổng; Tuabin Master (tất cả ở Auto).</li>
+<li>Điều kiện tải: tải tổ máy &gt; 315 MW.</li>
+<li>Hành động: giảm tải với tốc độ 9 MW/s, mục tiêu giảm về 216 MW.</li>
+<li>Reset: khi tải tổ máy giảm xuống dưới 310 MW, tín hiệu Runback được reset và tải giữ ở 310 MW.</li>
+</ul>
+<p>Mục đích kỹ thuật: khi chỉ còn một bơm tuần hoàn, lưu lượng nước làm mát giảm 50%. Giảm tải nhằm giảm nhiệt thải xuống bình ngưng, tránh suy giảm chân không bình ngưng và khống chế nhiệt độ hơi thoát hạ áp không tăng cao.</p>
+<h3>6.2. Runback bơm ngưng (CEP)</h3>
+<p>Runback bơm ngưng tác động sau <strong>8 s</strong> khi thỏa mãn đồng thời các điều kiện sau.</p>
+<ul>
+<li>Điều kiện Auto: BM lò 2A; BM lò 2B; biến tần quạt khói A hoặc B của lò 2A; biến tần quạt khói A hoặc B của lò 2B; BM tổng (tất cả ở Auto).</li>
+<li>Điều kiện tải: tải tổ máy &gt; 320 MW.</li>
+<li>Hành động: giảm tải với tốc độ 9 MW/s, mục tiêu giảm về 216 MW.</li>
+<li>Reset: khi tải tổ máy giảm xuống dưới 310 MW, tín hiệu Runback được reset và tải giữ ở 310 MW.</li>
+</ul>
+<p>Mục đích kỹ thuật: một bơm ngưng không đủ lưu lượng đẩy nước về bình khử khí khi tải cao. Giảm tải để cân bằng chu trình nước ngưng, tránh tụt mức bình khử khí và dâng ngập mức nước bình ngưng.</p>
+<h3>6.3. Runback bơm cấp (BFP)</h3>
+<p>Logic Runback bơm cấp có hai nhánh tùy theo dải tải tổ máy.</p>
+<p><strong>Trường hợp 1: tải tổ máy 270 MW &lt; X &lt; 385 MW.</strong> Runback tác động sau <strong>8 s</strong> khi thỏa mãn đồng thời:</p>
+<ul>
+<li>Điều kiện Auto: BM lò 2A; BM lò 2B; biến tần quạt khói A hoặc B của lò 2A; biến tần quạt khói A hoặc B của lò 2B; BM tổng (tất cả ở Auto).</li>
+<li>Điều kiện tải: tải tổ máy &gt; 320 MW.</li>
+<li>Hành động: giảm tải với tốc độ 9 MW/s, mục tiêu giảm về 216 MW.</li>
+<li>Reset: khi tải tổ máy giảm xuống dưới 310 MW, tín hiệu Runback được reset và tải giữ ở 310 MW.</li>
+</ul>
+<p><strong>Trường hợp 2: tải tổ máy &gt; 385 MW.</strong> Runback tác động sau <strong>8 s</strong> khi thỏa mãn đồng thời:</p>
+<ul>
+<li>Điều kiện Auto: biến tần quạt khói A hoặc B của lò 2A; biến tần quạt khói A hoặc B của lò 2B; Fuel Master; Tuabin Master (tất cả ở Auto).</li>
+<li>Điều kiện tải: BM lò 2A hoặc 2B &gt; 70%.</li>
+<li>Hành động: MFT lò hơi nào có lưu lượng hơi chính thấp hơn; BM lò còn lại giảm về 68%; trip quạt gió sơ cấp của lò đó sau 5 s.</li>
+<li>Reset: chỉ reset tín hiệu Runback bơm cấp khi BM lò &lt; 68,1%.</li>
+</ul>
+<p>Mục đích kỹ thuật: một bơm cấp chỉ đáp ứng khoảng 60% lưu lượng nước cấp định mức cho hai lò. Runback nhằm tránh quá dòng bơm cấp (runout) và tụt mức nước bao hơi tới mức bảo vệ cạn nước (LL &lt; −279 mm) gây MFT lò hơi.</p>
+<h3>6.4. Tổng hợp điều kiện Runback bơm</h3>
+<p><em>Bảng 3. Tổng hợp điều kiện Runback bơm</em></p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Hạng mục</th>
+<th>Bơm tuần hoàn</th>
+<th>Bơm ngưng</th>
+<th>Bơm cấp – TH1 (270 &lt; X &lt; 385 MW)</th>
+<th>Bơm cấp – TH2 (X &gt; 385 MW)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Thời gian trễ</td>
+<td>5 s</td>
+<td>8 s</td>
+<td>8 s</td>
+<td>8 s</td>
+</tr>
+<tr>
+<td>Tải kích hoạt</td>
+<td>&gt; 315 MW</td>
+<td>&gt; 320 MW</td>
+<td>&gt; 320 MW</td>
+<td>BM lò 2A hoặc 2B &gt; 70%</td>
+</tr>
+<tr>
+<td>BM lò 2A, 2B</td>
+<td>Auto</td>
+<td>Auto</td>
+<td>Auto</td>
+<td>Không nêu</td>
+</tr>
+<tr>
+<td>Biến tần quạt khói A hoặc B (lò 2A, lò 2B)</td>
+<td>Auto</td>
+<td>Auto</td>
+<td>Auto</td>
+<td>Auto</td>
+</tr>
+<tr>
+<td>BM tổng</td>
+<td>Auto</td>
+<td>Auto</td>
+<td>Auto</td>
+<td>Không nêu</td>
+</tr>
+<tr>
+<td>Tuabin Master</td>
+<td>Auto</td>
+<td>Không nêu</td>
+<td>Không nêu</td>
+<td>Auto</td>
+</tr>
+<tr>
+<td>Fuel Master</td>
+<td>Không nêu</td>
+<td>Không nêu</td>
+<td>Không nêu</td>
+<td>Auto</td>
+</tr>
+<tr>
+<td>Tốc độ giảm tải</td>
+<td>9 MW/s</td>
+<td>9 MW/s</td>
+<td>9 MW/s</td>
+<td>Không áp dụng</td>
+</tr>
+<tr>
+<td>Mục tiêu</td>
+<td>Giảm về 216 MW</td>
+<td>Giảm về 216 MW</td>
+<td>Giảm về 216 MW</td>
+<td>BM lò giảm về 68%</td>
+</tr>
+<tr>
+<td>Reset</td>
+<td>Tải &lt; 310 MW, giữ ở 310 MW</td>
+<td>Tải &lt; 310 MW, giữ ở 310 MW</td>
+<td>Tải &lt; 310 MW, giữ ở 310 MW</td>
+<td>BM lò &lt; 68,1%</td>
+</tr>
+</tbody>
+</table></div>
+<h2>7. Điều kiện Tuabin chuyển sang chế độ Manual</h2>
+<p>Tuabin chuyển sang Manual khi xuất hiện một trong các điều kiện sau:</p>
+<ol>
+<li>Tải thực tế tổ máy lỗi sau 2 s và BM nhà máy ở Auto.</li>
+<li>Áp lực thực tế hơi chính lỗi sau 2 s.</li>
+<li>Tải tham chiếu của Tuabin lỗi sau 2 s.</li>
+<li>Chênh lệch tải đặt và tải tham chiếu &gt; 2% trong 60 s, và Tuabin cùng các hệ thống phụ (nước cấp, nước ngưng, tuần hoàn) không runback.</li>
+<li>Hệ thống nước làm mát stator Runback.</li>
+<li>Tuabin Runback: máy cắt đầu cực không đóng, PLU, Tuabin trip, tách lưới giữ điện tự dùng.</li>
+<li>Tuabin không ở chế độ UMC.</li>
+<li>Trong Runback Tuabin, các hệ thống phụ (nước cấp, nước ngưng, tuần hoàn) và tải đặt Tuabin lớn hơn tải tham chiếu &gt; 10%.</li>
+</ol>
+<p>Việc chuyển Man cho phép vận hành viên can thiệp trực tiếp vào tải Tuabin khi hệ thống tự động không còn đáng tin cậy.</p>
+<h2>8. Bypass hạ áp: Quick Open và Quick Close</h2>
+<h3>8.1. Quick Open</h3>
+<p>Quick Open tác động lên van điều chỉnh áp lực và van phun giảm ôn khi thỏa mãn một trong hai điều kiện:</p>
+<ul>
+<li>Áp lực hơi chính &gt; 184 bar, giữ 3 s.</li>
+<li>Runback Tuabin (máy cắt đầu cực không đóng, PLU, Tuabin trip, tách lưới giữ điện tự dùng) giữ 3 s, kết hợp áp lực hơi chính &gt; 120 bar giữ 3 s.</li>
+</ul>
+<h3>8.2. Quick Close</h3>
+<p>Quick Close tác động lên van điều chỉnh áp lực, van phun giảm ôn bypass và van đóng ngắt nhanh bypass hạ áp, sau <strong>5 s</strong> khi thỏa mãn một trong các điều kiện:</p>
+<ul>
+<li>Van phun giảm ôn bypass hạ áp mở &gt; 2% và nhiệt độ hơi thoát bypass hạ áp &gt; 250 °C sau 10 s.</li>
+<li>Chân không bình ngưng cao cao &gt; 0,254 bar sau 10 s.</li>
+<li>Van đóng ngắt nhanh phun giảm ôn bypass hạ áp không đóng và áp lực nước phun giảm ôn thấp thấp &lt; 8 bar sau 10 s.</li>
+<li>Không có bơm tuần hoàn nào làm việc sau 5 s.</li>
+</ul>
+<p><em>Bảng 4. Ngưỡng tác động bypass hạ áp</em></p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Thông số</th>
+<th>Ngưỡng tác động</th>
+<th>Thời gian trễ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Áp lực hơi chính (Quick Open)</td>
+<td>&gt; 184 bar</td>
+<td>3 s</td>
+</tr>
+<tr>
+<td>Áp lực hơi chính kết hợp Runback (Quick Open)</td>
+<td>&gt; 120 bar</td>
+<td>3 s</td>
+</tr>
+<tr>
+<td>Nhiệt độ hơi thoát bypass hạ áp</td>
+<td>&gt; 250 °C</td>
+<td>10 s</td>
+</tr>
+<tr>
+<td>Chân không bình ngưng cao cao</td>
+<td>&gt; 0,254 bar</td>
+<td>10 s</td>
+</tr>
+<tr>
+<td>Áp lực nước phun giảm ôn thấp thấp</td>
+<td>&lt; 8 bar</td>
+<td>10 s</td>
+</tr>
+</tbody>
+</table></div>
+<h2>9. Các trường hợp Runback bổ sung</h2>
+<p>Ngoài Runback bơm ở mục 6, hệ thống còn hai trường hợp Runback sau.</p>
+<h3>9.1. Runback do sự cố nước làm mát Stator máy phát (SWC)</h3>
+<ul>
+<li>Điều kiện kích hoạt: lưu lượng nước làm mát Stator thấp (&lt; 56 m³/h), nhiệt độ Stator tăng cao (&gt; 78,2 °C đến 83,2 °C) hoặc áp lực nước làm mát suy giảm.</li>
+<li>Hành động: cắt giảm tải để giảm dòng điện stator, theo logic bảo vệ.</li>
+<li>Mục đích: bảo vệ cách điện cuộn dây stator máy phát khỏi quá nhiệt phá hủy.</li>
+<li>Bảo vệ dự phòng: xem mục 10.2.</li>
+</ul>
+<h3>9.2. Runback do trip một quạt khói hoặc quạt gió</h3>
+<ul>
+<li>Điều kiện kích hoạt: trip một quạt khói (ID Fan) hoặc quạt gió (SA/PA Fan) của lò hơi CFB.</li>
+<li>Hành động: tự động giảm tải buồng đốt và lưu lượng hơi tương ứng theo năng lực quạt còn lại.</li>
+<li>Mục đích: giữ cân bằng áp lực âm buồng đốt và tỷ lệ than/gió, tránh tăng áp buồng đốt gây MFT.</li>
+</ul>
+<h2>10. Chuỗi liên động sau Runback</h2>
+<h3>10.1. Liên động theo hệ thống</h3>
+<p>Sau khi tín hiệu Runback kích hoạt, TCS Mark VIe và DCS Ovation phối hợp với các thiết bị BOP để thực hiện chuỗi liên động sau.</p>
+<p><em>Bảng 5. Liên động sau Runback</em></p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Hệ thống</th>
+<th>Liên động</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tuabin và van hơi</td>
+<td>Chuyển sang tốc độ giảm tải khẩn cấp, có khống chế ứng suất nhiệt Roto; khép bớt van điều chỉnh hơi chính (CV) và van điều chỉnh hơi tái nhiệt (IV) theo mức tải đích; các van BVV, RFV luôn giám sát và sẵn sàng liên động theo chế độ dòng của chu trình</td>
+</tr>
+<tr>
+<td>Lò hơi – nhiên liệu</td>
+<td>Fuel Master giảm lưu lượng than cấp (giảm tốc độ quay hoặc dừng bớt máy cấp than) để kéo giảm nhiệt lượng cấp tức thời</td>
+</tr>
+<tr>
+<td>Lò hơi – gió và khói</td>
+<td>Giảm lưu lượng gió sơ cấp (PA) và thứ cấp (SA) theo đặc tính tải mới để giữ tỷ lệ than/gió và nhiệt độ tầng sôi lò CFB; biến tần quạt khói (ID Fan) giữ ổn định áp suất âm buồng đốt</td>
+</tr>
+<tr>
+<td>Nước cấp bao hơi</td>
+<td>Khép bớt van nước cấp bao hơi theo sản lượng hơi giảm, ổn định mức nước bao hơi, ngăn sôi bồng hoặc cạn nước bao hơi gây MFT</td>
+</tr>
+<tr>
+<td>Bảo vệ bơm cấp</td>
+<td>Khi Runback do trip một bơm cấp, tự động khống chế độ mở van điều khiển dòng để bơm cấp còn lại không chạy vượt dải lưu lượng an toàn (runout protection)</td>
+</tr>
+<tr>
+<td>Cổ thoát hạ áp</td>
+<td>Tự động mở van nước ngưng phun làm mát cổ thoát hạ áp (LP Hood Spray) khi nhiệt độ hơi thoát tăng cao (≥ 79 °C hoặc 57,2 °C tùy chế độ), bảo vệ các tầng cánh cuối</td>
+</tr>
+<tr>
+<td>Nước ngưng</td>
+<td>Mở thêm van tái tuần hoàn nước ngưng về bình ngưng khi lưu lượng qua bình ngưng hơi chèn thấp; mở van xả về bể dự trữ khi mức nước bình ngưng dâng cao (≥ 950 mm hoặc &gt; 1200 mm)</td>
+</tr>
+<tr>
+<td>Hơi trích và gia nhiệt</td>
+<td>Áp lực các cửa trích hơi giảm theo áp suất trong xi lanh Tuabin; van mức nước đọng bình gia nhiệt cao áp và hạ áp tăng độ mở xả về bình khử khí hoặc bình ngưng, ngăn nước trào ngược vào thân Tuabin</td>
+</tr>
+<tr>
+<td>Xả đọng</td>
+<td>Các cụm van xả đọng đường ống hơi chính, hơi tái và thân Tuabin (nhóm A, B, C) sẵn sàng mở tự động theo logic nhiệt độ/áp suất</td>
+</tr>
+</tbody>
+</table></div>
+<h3>10.2. Bộ đếm thời gian bảo vệ dự phòng khi Runback SWC</h3>
+<p>Trong trường hợp Runback do SWC, các bộ định thời bảo vệ đếm lùi: <strong>T1 = 120 s, T2 = 210 s, T3 = 600 s</strong>. Nếu sau thời gian quy định mà thông số làm mát Stator hoặc dòng điện máy phát không trở về dải an toàn, hệ thống tự động phát lệnh Trip Tuabin để cô lập tổ máy.</p>
+<h2>11. Kết luận</h2>
+<p>Chức năng Runback là lớp bảo vệ giúp tổ máy tránh nhảy hoàn toàn khi mất thiết bị phụ trợ. Runback tự động chỉ hoạt động khi các vòng Master liên quan ở chế độ Auto; khi có vòng ở Manual, vận hành viên phải chủ động giảm tải bằng tay. Các ngưỡng tác động, thời gian trễ, tốc độ và mức tải của Runback bơm phải áp dụng theo mục 6 và Bảng 3 của báo cáo này.</p>
+<h2>Phụ lục A. Bảng tổng hợp thông số chính</h2>
+<p><em>Bảng A1. Tổng hợp thông số chính</em></p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Nhóm</th>
+<th>Thông số</th>
+<th>Giá trị</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Khởi động</td>
+<td>Roto cao áp: lạnh / ấm / nóng / cực nóng</td>
+<td>&lt; 150 / 150–217 / 217–417 / &gt; 417 °C</td>
+</tr>
+<tr>
+<td>Tốc độ</td>
+<td>Bình thường / Runback Tuabin / Runback bơm</td>
+<td>0,167 %/s / 10 %/s / 9 MW/s</td>
+</tr>
+<tr>
+<td>Runback bơm</td>
+<td>Mục tiêu giảm tải / mức giữ khi reset</td>
+<td>216 MW / 310 MW</td>
+</tr>
+<tr>
+<td>Runback CWP</td>
+<td>Ngưỡng tải / trễ</td>
+<td>&gt; 315 MW / 5 s</td>
+</tr>
+<tr>
+<td>Runback CEP</td>
+<td>Ngưỡng tải / trễ</td>
+<td>&gt; 320 MW / 8 s</td>
+</tr>
+<tr>
+<td>Runback BFP TH1</td>
+<td>Dải tải / ngưỡng / trễ</td>
+<td>270–385 MW / &gt; 320 MW / 8 s</td>
+</tr>
+<tr>
+<td>Runback BFP TH2</td>
+<td>Tải / ngưỡng BM / BM mục tiêu / reset</td>
+<td>&gt; 385 MW / &gt; 70% / 68% / &lt; 68,1%</td>
+</tr>
+<tr>
+<td>Chuyển Man</td>
+<td>Độ trễ lỗi tín hiệu / lệch tải</td>
+<td>2 s / &gt; 2% trong 60 s</td>
+</tr>
+<tr>
+<td>Chuyển Man</td>
+<td>Tải đặt lớn hơn tải tham chiếu khi Runback</td>
+<td>&gt; 10%</td>
+</tr>
+<tr>
+<td>Bypass</td>
+<td>Quick Open</td>
+<td>&gt; 184 bar (3 s); &gt; 120 bar kết hợp Runback (3 s)</td>
+</tr>
+<tr>
+<td>Bypass</td>
+<td>Quick Close</td>
+<td>&gt; 250 °C; &gt; 0,254 bar; &lt; 8 bar (10 s); không có CWP (5 s)</td>
+</tr>
+<tr>
+<td>SWC</td>
+<td>Lưu lượng / nhiệt độ Stator</td>
+<td>&lt; 56 m³/h / &gt; 78,2 đến 83,2 °C</td>
+</tr>
+<tr>
+<td>SWC</td>
+<td>Bộ đếm bảo vệ</td>
+<td>T1 = 120 s, T2 = 210 s, T3 = 600 s</td>
+</tr>
+<tr>
+<td>Cổ thoát hạ áp</td>
+<td>Nhiệt độ hơi thoát mở LP Hood Spray</td>
+<td>≥ 79 °C hoặc 57,2 °C tùy chế độ</td>
+</tr>
+<tr>
+<td>Bình ngưng</td>
+<td>Mức mở van xả về bể dự trữ</td>
+<td>≥ 950 mm hoặc &gt; 1200 mm</td>
+</tr>
+<tr>
+<td>Bao hơi</td>
+<td>Mức bảo vệ cạn nước</td>
+<td>LL &lt; −279 mm</td>
+</tr>
+</tbody>
+</table></div>
+</article></main></body></html>
