@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="vi"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mô phỏng van điều khiển – Weir MD1-0-V-650-10-00001</title>
+<style>
+:root{--bg:#f4f6f9;--fg:#1c2430;--card:#fff;--mut:#5d6b7c;--acc:#1d6fd8;--bd:#d5dce5;--c1:#dfe6ee;--c2:#f8fafc;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1720;--fg:#e6ebf2;--card:#17212d;--mut:#9aa8b8;--acc:#5aa2ff;--bd:#2b3847;--c1:#1b2633;--c2:#0f1720;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1720;--fg:#e6ebf2;--card:#17212d;--mut:#9aa8b8;--acc:#5aa2ff;--bd:#2b3847;--c1:#1b2633;--c2:#0f1720;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:"Be Vietnam Pro",system-ui,sans-serif}
+body{display:flex;flex-direction:column;overflow:hidden}
+header{padding:6px 14px;background:var(--card);border-bottom:1px solid var(--bd);text-align:center}
+h1{font-size:14px;margin:0}header p{margin:2px 0 0;font-size:10.5px;color:var(--mut)}
+#cv{flex:1;min-height:300px;position:relative;touch-action:none;background:linear-gradient(180deg,var(--c1),var(--c2))}
+#cv canvas{display:block;width:100%;height:100%}
+#panel{background:var(--card);border-top:1px solid var(--bd);padding:6px 12px;max-height:34%;overflow-y:auto}
+details{margin:2px 0 4px;font-size:12px;color:var(--mut)}summary{cursor:pointer;text-align:center;padding:2px}
+.row{display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap;font-size:12.5px;justify-content:center}
+.row label{min-width:50px;color:var(--mut);font-size:11.5px;text-align:right}
+input[type=range]{flex:1;max-width:300px;min-width:120px;accent-color:var(--acc)}
+select{font:inherit;font-size:12px;padding:5px;border:1px solid var(--bd);background:var(--card);color:var(--fg);border-radius:6px;max-width:100%}
+.row b{min-width:60px;color:var(--acc)}
+.row.ly label{min-width:0;display:flex;gap:3px;align-items:center;font-size:11.5px;color:var(--fg);text-align:left}
+button{font:inherit;font-size:12px;font-weight:600;border:1px solid var(--bd);background:var(--card);color:var(--fg);padding:6px 11px;border-radius:6px;cursor:pointer}
+button.danger.on{background:#ef4444;border-color:#ef4444;color:#fff}
+#st{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:6px}
+.bx{background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:6px;font-size:11px;color:var(--mut);line-height:1.5}
+.bx h3{margin:0;font-size:11.5px;color:var(--acc)}.bx small{display:block;margin-bottom:3px}
+.bx span{color:var(--fg);font-weight:700}
+#lg{font-size:10.5px;color:var(--mut);text-align:center;margin-top:5px}
+#err{position:absolute;top:8px;left:8px;right:8px;background:#ef4444;color:#fff;padding:8px;font-size:12px;border-radius:6px;display:none;z-index:5}
+</style></head><body>
+<div id="cv"><div id="err"></div></div>
+<div id="panel">
+<div class="row"><select id="vs"></select><select id="tm"><option value="glass" selected>Trong suốt thực tế</option><option value="xray">X-ray</option><option value="solid">Đặc</option></select><button id="loss" class="danger">Mất khí cấp</button></div>
+<div class="row"><label>Tín hiệu</label><input id="p" type="range" min="0" max="100" value="70"><b id="pv"></b></div>
+<div class="row"><label>Mất khí</label><input id="t" type="range" min="0" max="240" value="0" disabled><b id="tv">0 phút</b></div>
+<details><summary>Mặt cắt &amp; lớp</summary>
+<div class="row"><select id="sa"><option value="n">Không cắt</option><option value="z">Cắt dọc (trước–sau)</option><option value="x">Cắt dọc (trái–phải)</option><option value="y">Cắt ngang (theo lớp)</option></select><input id="sp" type="range" min="-150" max="200" value="0"><b id="spv"></b><button id="fl">Đảo</button></div>
+<div class="row ly"><label><input type="checkbox" id="L_B" checked>Thân &amp; ống</label><label><input type="checkbox" id="L_T" checked>Trim &amp; ty</label><label><input type="checkbox" id="L_A" checked>Chấp hành</label><label><input type="checkbox" id="L_X" checked>Phụ kiện</label><label><input type="checkbox" id="L_F" checked>Dòng chảy</label></div>
+</details>
+<div id="st"></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+'use strict';
+var $=function(i){return document.getElementById(i)};
+if(typeof THREE==='undefined'){$('err').style.display='block';$('err').textContent='Không tải được Three.js';return}
+var T=THREE,PI=Math.PI,box=$('cv'),LITE=false,cuts=[];
+var scene=new T.Scene(),cam=new T.PerspectiveCamera(36,1,.1,1200),rd=new T.WebGLRenderer({antialias:true,alpha:true});
+rd.setPixelRatio(Math.min(devicePixelRatio||1,2));box.appendChild(rd.domElement);rd.localClippingEnabled=true;
+scene.add(new T.HemisphereLight(0xffffff,0x6b7280,.5));
+var s1=new T.DirectionalLight(0xffffff,.7);s1.position.set(10,20,15);scene.add(s1);
+var s2=new T.DirectionalLight(0xffffff,.3);s2.position.set(-12,6,-14);scene.add(s2);
+try{var ec=document.createElement('canvas');ec.width=256;ec.height=128;var ex=ec.getContext('2d'),eg=ex.createLinearGradient(0,0,0,128);
+ eg.addColorStop(0,'#cfe3ff');eg.addColorStop(.5,'#ffffff');eg.addColorStop(.56,'#8b95a3');eg.addColorStop(1,'#2b3340');ex.fillStyle=eg;ex.fillRect(0,0,256,128);
+ ex.fillStyle='rgba(255,255,255,.95)';ex.fillRect(40,18,50,14);ex.fillRect(170,26,40,10);
+ var et=new T.CanvasTexture(ec);et.mapping=T.EquirectangularReflectionMapping;var pm=new T.PMREMGenerator(rd);scene.environment=pm.fromEquirectangular(et).texture;pm.dispose()}catch(e){}
+
+// ================= DỮ LIỆU 43 SHEET (đọc từ bản vẽ) =================
+// n|tag|model|DN|rating|body|trim|stem/plug|guide/seat|packing|travel mm|Cv|A in²|actuator|fail|spring lo|hi|air bar|kg|qty|g/a|end|L (face-face; angle: horiz)|below flange (angle: tâm ống vào)|top (casing / cylinder)|yoke (piston: đỉnh ty)|acc B=booster L=lock-up S=solenoid+LS+JB W=water seal D=diffuser|char e/l
+var ROWS=[
+'1|13LBG38AA101|BV500|300|300LB BW|A216-WCB|EQ% S.S MULTI-FLOW|316/CA40|CA15/CA40|GRAFOIL|89|1200|147|A51|CLOSE|2.5|3.5|5.6|980|2|g|BW|775|755|1350|1650|B|e',
+'2|13LCH10AA471|BV992|150|900LB BW|A217-WC6|LINEAR S.S MULTI-FLOW|316/420|410/420|GRAFOIL|57|52|225|A60|OPEN|1.2|3.0|4|520|2|a|BW|337|360|960|480|BW|l',
+'3|13LCH10AA101|BV990|150|900LB BW|A217-WC6|LINEAR CASCADE 2|316/420|410/420|GRAFOIL|57|48|225|A61|CLOSE|2.5|3.0|4|520|2|g|BW|610|370|960|480|BSD|l',
+'4|13LCH20AA471|BV501|200|600LB BW|A217-WC6|LINEAR CASCADE 2|316/CA40|CA15/CA40|GRAFOIL|57|112|225|A60|OPEN|0.2|1.0|4|560|2|a|BW|305|450|960|480|BW|l',
+'5|13LCH20AA101|BV500|200|600LB BW|A217-WC6|LINEAR CASCADE 2|316/CA40|CA15/CA40|GRAFOIL|57|112|147|A61|CLOSE|1.2|3.0|4|520|2|g|BW|610|335|920|480|SD|l',
+'6|13LCH30AA471|BV501|250|300LB BW|A217-WC6|LINEAR MULTI-FLOW|316/CA40|CA15/CA40|PTFE|89|260|225|A60|OPEN|0.2|1.0|4|770|2|a|BW|381|380|1085|605|BW|l',
+'7|13LCH30AA101|BV500|250|300LB BW|A217-WC6|LINEAR MULTI-FLOW|316/CA40|CA15/CA40|PTFE|89|260|147|A61|CLOSE|1.2|3.0|4|730|2|g|BW|762|475|1050|605|SD|l',
+'8|13LCJ10AA471|BV501|100|150LB BW|A216-WCB|LINEAR S.S MULTI-FLOW|316/420|410/420|PTFE|38|104|85|A60|OPEN|0.8|2.1|4|150|2|a|BW|197|165|790|0|W|l',
+'9|13LCJ10AA101|BV500|100|150LB BW|A216-WCB|LINEAR S.S MULTI-FLOW|316/420|410/420|PTFE|38|86|85|A61|CLOSE|0.8|2.1|4|150|2|g|BW|394|195|790|0|SD|l',
+'10|13LCJ20AA471|BV501|150|150LB BW|A216-WCB|LINEAR MULTI-FLOW|316/420|410/420|PTFE|57|243|147|A60|OPEN|0.2|1.0|4|320|2|a|BW|254|215|860|450|BW|l',
+'11|13LCJ20AA101|BV500|150|150LB BW|A216-WCB|LINEAR MULTI-FLOW|316/420|410/420|PTFE|57|243|147|A61|CLOSE|1.2|3.0|4|320|2|g|BW|508|255|860|450|SDW|l',
+'12|13LCJ30AA471|BV500|250|150LB BW|A216-WCB|LINEAR MULTI-FLOW|316/CA40|CA15/CA40|PTFE|89|1200|225|A60|OPEN|0.2|1.0|4|770|2|g|BW|762|475|1085|605|BDW|l',
+'13|13LCJ31AA101|BV500|200|150LB BW|A216-WCB|LINEAR MULTI-FLOW|316/CA40|CA15/CA40|PTFE|89|445|147|A61|CLOSE|1.2|3.0|4|520|2|g|BW|610|335|920|480|SDW|l',
+'14|13LCJ41AA471|BV500|250|150LB BW|A216-WCB|LINEAR MULTI-FLOW|316/CA40|CA15/CA40|PTFE|89|1050|225|A60|OPEN|0.8|2.0|4|770|2|g|BW|762|475|1085|605|BDW|l',
+'15|13LCJ41AA101|BV500|250|150LB BW|A216-WCB|LINEAR MULTI-FLOW|316/CA40|CA15/CA40|PTFE|89|1050|225|A60|OPEN|1.2|3.0|4|770|2|g|BW|762|475|1085|605|BDW|l',
+'16|13LCJ32AA101|BV500|200|150LB BW|A216-WCB|LINEAR MULTI-FLOW|316/CA40|CA15/CA40|PTFE|89|445|225|A61|CLOSE|1.2|3.0|4|550|2|g|BW|610|335|960|480|SDW|l',
+'17|13LCJ42AA101|BV500|250|150LB BW|A216-WCB|LINEAR MULTI-FLOW|316/CA40|CA15/CA40|PTFE|89|1050|225|A60|OPEN|0.8|2.0|4|770|2|g|BW|762|475|1085|605|BDW|l',
+'18|13LCJ42AA101|=17',
+'19|13LCA21AA101|BV500|150|300LB BW|A216-WCB|MOD.EQ% CASCADE 2|316/420|410/420|PTFE|89|112|147|A61|CLOSE|1.2|3.0|4|320|2|g|BW|508|340|920|480|.|e',
+'20|13LCA21AA102|BV500|200|300LB BW|A216-WCB|LINEAR X-STREAM|316/CA15|420/CA15|PTFE|152|148|147|A50|OPEN|1.0|1.4|5.6|500|2|g|BW|610|340|1490|1815|W|l',
+'21|13LCA25AA101|BV500|300|300LB BW|A216-WCB|EQ% CASCADE 2|316/CA40|CA15/CA40|PTFE|152|660|147|A51|STAY PUT (TEND TO CLOSE)|2.5|3.5|5.6|980|2|g|BW|775|755|1490|1815|BL|e',
+'22|13LCP10AA101|BV500|200|150LB RF|A351-CF8M|EQ% CASCADE 3|316/CF8M-STE.F|CH8M/CF8M-STE.F|PTFE|89|191|225|A61|STAY PUT (TEND TO CLOSE)|1.2|3.0|4|500|2|g|RF|568|450|1165|645|BLW|e',
+'23|13LAB21AA101|BV990|200|2500LB BW|A216-WCC|LINEAR X-STREAM|316/316|420/CA15|PTFE|89|54|147|A50|OPEN|1.0|1.4|5.6|2100|2|g|BW|1150|650|1180|1420|B|l',
+'24|13LAB22AA101|=23','25|13LAB23AA101|=23',
+'26|13LCP51AA101|BV500|50|600LB SW|A105|EQ% MULTI-FLOW|316/420|410/420|PTFE|25|12|50|A61|STAY PUT (TEND TO CLOSE)|0.8|2.1|4|80|2|g|SW|203|220|675|0|L|e',
+'27|13PGB31AA101|BV500|250|150LB RF|A216-WCB|LINEAR MULTI-FLOW|316/CA15|CA15/CA40|PTFE|89|1200|225|A60|OPEN|1.2|3.0|4|500|2|g|RF|718|475|1090|605|B|l',
+'28|14EGD11AA101|BV500|80|300LB BW|A216-WCB|EQ% CASCADE 2|316/420|410/420|PTFE|38|27|85|A60|STAY PUT (TEND TO OPEN)|0.8|2.1|4|130|2|g|BW|337|230|715|0|L|e',
+'29|14LBG21AA111|BV500|50|600LB SW|A105|MOD.EQ% MULTI-FLOW|316/420|410/420|PTFE|28.5|53|85|A61|STAY PUT (TEND TO CLOSE)|0.8|2.1|4|80|2|g|SW|203|220|715|0|L|e',
+'30|14LBG21AA121|=29','31|14LBG21AA131|=29','32|14LBG21AA141|=29',
+'33|14LBG31AA101|BV502|25|600LB SW|A105|MOD.EQ% MULTI-FLOW|316/420|410/420|PTFE|25|3.2|50|A61|STAY PUT (TEND TO CLOSE)|0.8|2.1|4|70|2|g|SW|152|165|675|0|L|e',
+'34|14EGD81AA101|BV502|25|600LB SW|A105|MOD.EQ% 25 SPLINE|316/420|410/420|PTFE|19|0.63|50|A61|STAY PUT (TEND TO CLOSE)|0.8|2.1|4|70|2|g|SW|152|165|675|0|L|e',
+'35|11HLC80AA101|BV500|80|300LB BW|A216-WCB|EQ% MULTI-FLOW|316/420|410/420|PTFE|38|21|147|A61|CLOSE|1.2|3.0|4|210|2|g|BW|337|185|785|440|DW|e',
+'36|12HLC80AA101|=35',
+'37|03QEA22AA101|BV500|150|150LB RF|A351-CF8M|MULTI-FLOW|316/316+STE.F|316/316+STE.F|PTFE|57|385|147|A61|CLOSE|1.2|3.0|4|350|1|g|RF|473|255|860|450|.|l',
+'38|13PGB47AA101|BV500|100|150LB RF|A216-WCB|MULTI-FLOW|316/420|410/420|PTFE|38|200|147|A60|OPEN|0.8|2.0|4|230|1|g|RF|368|195|785|440|.|l',
+'39|13PGB47AA102|=38','40|13PGB47AA103|=38',
+'41|13LCA20AA101|BV500|80|300LB BW|A216-WCB|EQ% MULTI-FLOW|316/420|410/420|PTFE|38|55|147|A61|CLOSE|0.8|2.1|4|200|2|g|BW|337|185|785|440|.|e',
+'42|13LCW10AA101|PRV BV|50|600LB SW|A216-WCB|FULL PORT|316/BUNA-N|-/316|-|0|7.7|0|-|DIRECT|0|1|-|70|2|p|SW|190.5|100|425|0|.|l',
+'43|13PGB34AA101|BV500|250|150LB RF|A216-WCB|MULTI-FLOW|316/CA15|CA40/CA40|PTFE|89|1135|225|A60|OPEN|1.2|3.0|5.2|500|1|g|RF|718|475|1090|605|B|l'];
+var DB=[];
+ROWS.forEach(function(l){var f=l.split('|'),o;
+ if(f[2][0]=='='){var s=DB.filter(function(d){return d.n==+f[2].slice(1)})[0];o=Object.assign({},s);o.n=+f[0];o.tag=f[1];o.dup=1}
+ else o={n:+f[0],tag:f[1],mdl:f[2],dn:+f[3],rate:f[4],mat:f[5],trim:f[6],sp:f[7],gs:f[8],pack:f[9],trv:+f[10],cv:+f[11],A:+f[12],code:f[13],fail:f[14],lo:+f[15],hi:+f[16],air:f[17],wt:f[18],qty:f[19],kind:f[20],end:f[21],L:+f[22],yb:+f[23],top:+f[24],yk:+f[25],acc:f[26],ch:f[27]};
+ DB.push(o)});
+function mk(r,ov){var S=Object.assign({},r,ov||{});
+ S.t2=S.tag.charAt(0)=='1'?'2'+S.tag.slice(1):'';S.dir=S.code[2]=='1'?1:-1;S.lock=S.fail.indexOf('STAY')==0?1:0;S.tau=600;S.chc=S.ch=='e'?'eq':'lin';
+ S.prv=S.kind=='p'?1:0;S.piston=S.code[1]=='5';
+ S.lab=(S.kind=='a'?'Góc ':'')+'DN'+S.dn+' '+S.rate.split(' ')[0];return S}
+function byN(n){return mk(DB.filter(function(d){return d.n==n})[0])}
+function pipeOf(dn,rate){var a={300:[323.8,303],250:[273,254.5],200:[219.1,rate.indexOf('2500')==0?165.2:203],150:[168.3,rate.indexOf('900')==0?146.5:154],100:[114.3,102],80:[88.9,78],50:[60.3,51.7],25:[34.3,25]};return a[dn]}
+var FT={200:[345,270,29,8,298.5],250:[405,324,30.6,12,362],150:[280,216,25.9,8,241.3],100:[230,157,24.3,8,190.5]};
+// ================= VẬT LIỆU & HÀM DỰNG =================
+function mat(c,r,m){return new T.MeshStandardMaterial({color:c,roughness:r,metalness:m,side:T.DoubleSide})}
+function ghost(c){var m=new T.MeshPhysicalMaterial({color:c,roughness:.08,metalness:0,transparent:true,opacity:.2,clearcoat:1,clearcoatRoughness:.1,side:T.DoubleSide,depthWrite:false});cuts.push(m);return m}
+function airMat(){return new T.MeshStandardMaterial({color:0x3b82f6,transparent:true,opacity:.3,depthWrite:false})}
+var M={steel:mat(0xaab4c0,.3,.9),chrome:mat(0xe8ecf0,.12,1),iron:mat(0x6b7685,.6,.5),fl:mat(0x56616f,.5,.6),bolt:mat(0x2f3844,.4,.8),
+ptfe:mat(0xf5f5f0,.6,0),seal:mat(0xef4444,.6,.1),dia:mat(0x1f2937,.9,.1),spr:mat(0x10b981,.4,.8),tube:mat(0xcfd5dc,.2,.9),
+blk:mat(0x1e293b,.7,.2),wht:mat(0xf1f5f9,.4,.2),lock:mat(0xf59e0b,.5,.4),cage:mat(0x8a96a5,.3,.9),plug:mat(0xd5dce5,.25,.95)};
+var EM=new T.LineBasicMaterial({color:0x111827,transparent:true,opacity:.5});
+function edg(o,th){if(!LITE&&o.geometry)o.add(new T.LineSegments(new T.EdgesGeometry(o.geometry,th||35),EM));return o}
+function C(a,b,h,o){return new T.CylinderGeometry(a,b,h,LITE?14:40,1,!!o)}
+function hx(r,h){return new T.CylinderGeometry(r,r,h,6)}
+function ann(Ro,Ri,h,bv){var s=new T.Shape();s.absarc(0,0,Ro,0,6.2832,false);var p=new T.Path();p.absarc(0,0,Ri,0,6.2832,true);s.holes.push(p);
+ var o={depth:h,bevelEnabled:false,curveSegments:LITE?14:40};if(bv&&!LITE){var b=Math.min(.04,h*.2);o.bevelEnabled=true;o.bevelThickness=b;o.bevelSize=b;o.bevelSegments=1;o.depth=h-2*b}
+ var g=new T.ExtrudeGeometry(s,o);g.translate(0,0,-o.depth/2);g.rotateX(PI/2);return g}
+function M3(g,m,x,y,z,p,rz){var o=new T.Mesh(g,m);o.position.set(x||0,y||0,z||0);if(rz)o.rotation.z=rz;p.add(o);return o}
+function tube(pts,r,m,p){if(LITE)return;p.add(new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3(pts.map(function(q){return new T.Vector3(q[0],q[1],q[2])})),40,r,8,false),m))}
+function coil(R,w,n,p){var a=[],k=n*(LITE?6:16);for(var j=0;j<=k;j++){var t=j/k;a.push(new T.Vector3(R*Math.cos(t*n*2*PI),t,R*Math.sin(t*n*2*PI)))}var o=new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3(a),k,w,6,false),M.spr);p.add(o);return o}
+function around(n,R,fn){if(LITE)n=Math.max(4,Math.ceil(n/3));for(var i=0;i<n;i++){var a=i*2*PI/n;fn(Math.cos(a)*R,Math.sin(a)*R,a)}}
+function txtTex(a,b,w,h,bg){var c=document.createElement('canvas');c.width=w;c.height=h;var x=c.getContext('2d');x.fillStyle=bg;x.fillRect(0,0,w,h);x.fillStyle='#1c2430';x.font='bold '+(h*.36|0)+'px sans-serif';x.fillText(a,10,h*.45);x.font=(h*.22|0)+'px sans-serif';x.fillText(b,10,h*.82);return new T.CanvasTexture(c)}
+function dish(R,h,sg,m,y,p){var k=h/.85,pts=[[R,0],[R*.8,.45],[R*.5,.75],[.5,.85]].map(function(q){return new T.Vector2(q[0],q[1]*k)});var o=new T.Mesh(new T.LatheGeometry(pts,LITE?16:40),m);o.scale.y=sg;o.position.y=y;p.add(o)}
+
+// ----- từ số liệu sheet → kích thước dựng (đơn vị 100 mm) -----
+function cfOf(r){
+ var po=pipeOf(r.dn,r.rate),RO=po[0]/200,RI=po[1]/200,ang=r.kind=='a',TRV=r.trv/100,k0=.72*RO;
+ var c={RO:RO,RI:RI,ang:ang,TRV:TRV,nR:RO*1.03+.02,pR:k0,sb:.79*k0,k:k0/1.2,piston:r.piston,dir:r.dir};
+ c.sR=c.nR+.45+RO*.1;c.R={225:2.75,147:2.25,85:1.8,50:1.4}[r.A]||2.25;
+ c.bH=r.piston?Math.min(4,r.top/100-7.5-1.5):Math.min(2.6,(r.yk>0?r.yk/100:r.top/100-1.7*c.R)-1.2);
+ if(!ang){c.yb=-r.yb/100;c.AX=c.yb+c.nR;c.yS=c.AX+c.nR+.3;c.L=r.L/100}else{c.AX=-r.yb/100;c.Li=r.L/100;c.yS=c.AX-c.nR-.05}
+ c.pH=Math.max(.35,Math.min(1.2*Math.max(.55,c.k),c.bH-1.4-c.yS-TRV));c.cH=Math.min(TRV+c.pH+.2,c.bH-1.4-c.yS);c.bR=c.pR*1.333+.05;return c}
+
+function build(S,x,y,lite){
+ LITE=lite;var c=cfOf(S),G=new T.Group();G.position.set(x,y||0,0);scene.add(G);
+ var B=new T.Group(),A=new T.Group(),X=new T.Group(),Tm=new T.Group(),F=new T.Group(),mvT=new T.Group(),mvA=new T.Group();
+ G.add(B);G.add(A);G.add(X);G.add(Tm);G.add(F);Tm.add(mvT);A.add(mvA);G.userData={B:B,A:A,X:X,T:Tm,F:F};
+ var TRV=c.TRV,RO=c.RO,RI=c.RI,nR=c.nR,sR=c.sR,pR=c.pR,sb=c.sb,k=c.k,yS=c.yS,AX=c.AX,bH=c.bH,bR=c.bR,PL=4,ang=c.ang,dia=!c.piston,R=c.R;
+ var col=dia?(c.dir>0?0x2563eb:0x6f82d6):(c.dir>0?0x1e40af:0x0ea5e9);
+ var ac=mat(col,.35,.7),acG=ghost(col),shell=ghost(0x7a8798),pipeM=ghost(0xa0aab5);
+ var water=new T.MeshStandardMaterial({color:0x38bdf8,transparent:true,opacity:.2,depthWrite:false,side:T.DoubleSide});
+ var yp=yS+.3+(TRV-.05)/2,pk=/GRAFOIL/.test(S.pack)?mat(0x374151,.8,.1):M.ptfe,rp=RI*.89,PA,PR,iu,idn,acc=S.acc;
+ var hasL=acc.indexOf('L')>=0,hasB=acc.indexOf('B')>=0,hasS=acc.indexOf('S')>=0,hasW=acc.indexOf('W')>=0,hasD=acc.indexOf('D')>=0;
+ // đầu nối: BW (đầu hàn + vát), SW (ống lồng), RF (bích ANSI + bu lông + đai ốc lục giác)
+ function wend(px,py,dx,dy){var rz=dy?0:PI/2,off=0;
+  if(S.end=='RF'){var f=FT[S.dn],t=f[2]/100,Rf=f[0]/200;
+   M3(ann(Rf,RI,t,1),M.fl,px-dx*t/2,py,0,B,rz);edg(B.children[B.children.length-1]);
+   M3(ann(f[1]/200,RI,.08),M.steel,px+dx*.04,py,0,B,rz);
+   M3(ann(Rf,RI,t,1),M.fl,px+dx*(t/2+.14),py,0,B,rz);M3(ann(f[1]/200,RI,.1),M.blk,px+dx*.07,py,0,B,rz);
+   around(f[3],f[4]/200,function(a,b){M3(C(.09,.09,2*t+.4),M.bolt,px+dx*(.07),py+a,b,B,PI/2);M3(hx(.15,.14),M.bolt,px-dx*(t-.0)-dx*.02,py+a,b,B,PI/2);M3(hx(.15,.14),M.bolt,px+dx*(t+.2),py+a,b,B,PI/2)});
+   off=t+.14}
+  else{if(S.end=='SW')M3(ann(RO+.22,RO+.02,.7),M.steel,px-dx*.35,py,0,B,rz);else M3(ann(RO,RO-.206,.9),M.steel,px-dx*.45,py,0,B,rz);
+   var wd=M3(new T.TorusGeometry(RO,.1,8,LITE?16:40),M.bolt,px,py,0,B);if(dy)wd.rotation.x=PI/2;else wd.rotation.y=PI/2}
+  M3(ann(RO,RI,PL),pipeM,px+dx*(off+PL/2),py+dy*(PL/2),0,B,rz);M3(C(RI,RI,PL,true),water,px+dx*(off+PL/2),py+dy*(PL/2),0,F,rz)}
+ if(!ang){                                   // ===== thân globe thẳng =====
+  var L=c.L,ch=-(c.yb+sR),tr=pR*.729,wx=sR*.63;
+  edg(M3(C(sR,sR,ch,true),shell,0,-ch/2,0,B));M3(new T.SphereGeometry(sR,LITE?14:32,LITE?6:12,0,2*PI,PI/2,PI/2),shell,0,c.yb+sR,0,B);
+  M3(C(nR,nR,L-2*tr,true),shell,0,AX,0,B,PI/2);
+  [-1,1].forEach(function(s){M3(C(nR,RO,tr,true),shell,s*(L/2-tr/2),AX,0,B,s>0?PI/2:-PI/2);wend(s*L/2,AX,s,0)});
+  M3(new T.ConeGeometry(.3,.8,12),M.lock,-L*.31,AX,nR+.05,X,-PI/2);
+  var sh=new T.Shape(),a0=Math.acos(wx/sR);sh.absarc(0,0,sR,a0,2*PI-a0,false);
+  var hp=new T.Path();hp.absarc(0,0,sb+.05,0,2*PI,true);sh.holes.push(hp);
+  var pg=new T.ExtrudeGeometry(sh,{depth:.25,bevelEnabled:false,curveSegments:LITE?14:40});pg.translate(0,0,-.125);pg.rotateX(PI/2);
+  M3(pg,M.iron,0,yS-.125,0,B);
+  var hw=yS-.25-(c.yb+.8);M3(new T.BoxGeometry(.25,hw,2*Math.sqrt(sR*sR-wx*wx)),M.iron,wx,yS-.25-hw/2,0,B);
+  var xp=(wx+sR)/2,yq=AX+(yS-AX)*.4,xe=L/2+PL-.2;
+  PA=[[-xe,AX],[-L/2,AX],[-wx*.7,AX],[0,yS-1.3*k],[0,yS-.3*k],[0,yp],[wx,yp],[xp,yp],[xp,yq],[xp,AX],[L/2,AX],[xe,AX]];
+  PR=[rp,rp,1.1*k,.8*k,.55*k,.5*k,.3*k,.28*k,.28*k,.45*k,rp,rp];iu=3;idn=8;
+ } else {                                    // ===== thân góc: vào ngang, ra xuống =====
+  var Li=c.Li,yf=yS-.3,yo=AX-Li;
+  edg(M3(C(sR,sR,-yf,true),shell,0,yf/2,0,B));M3(C(sR,nR,.9,true),shell,0,yf-.45,0,B);M3(C(nR,nR,yf-.9-yo,true),shell,0,(yf-.9+yo)/2,0,B);
+  wend(0,yo,0,-1);M3(C(nR,nR,Li-sR,true),shell,-(Li+sR)/2,AX,0,B,PI/2);wend(-Li,AX,-1,0);
+  M3(new T.ConeGeometry(.3,.8,12),M.lock,-Li*.7,AX,nR+.05,X,-PI/2);M3(ann(sR,sb+.05,.25),M.iron,0,yS-.125,0,B);
+  PA=[[-(Li+PL-.2),AX],[-Li,AX],[-sR*.75,AX],[-pR*1.2,yp],[0,yp],[0,yS-.2],[0,yo],[0,yo-PL+.2]];
+  PR=[rp,rp,.6,.25,.4,.4,rp,rp];iu=2;idn=5;
+ }
+ // ===== trim: ghế, lồng (MF / CASCADE / X-STREAM), lá van plug cân bằng =====
+ var rc=pR*1.333,ts=/X-STREAM/.test(S.trim)?'xs':(/CASCADE/.test(S.trim)?'cs':'mf'),ph=TRV-.05;
+ edg(M3(ann(sb+.5,sb,.25,1),M.steel,0,yS-.125,0,Tm));edg(M3(ann(rc,pR+.05,c.cH),M.cage,0,yS+c.cH/2,0,Tm));
+ if(ts=='mf')for(var i=0;i<12;i++){var a=i*PI/6+PI/12,rm=(rc+pR+.05)/2;M3(new T.BoxGeometry(rc-pR,ph,.22*Math.max(.5,k)),M.blk,Math.cos(a)*rm,yp,Math.sin(a)*rm,Tm).rotation.y=-a}
+ else if(ts=='cs'){for(var j=0;j<3;j++)for(var i2=0;i2<(LITE?8:16);i2++){var a2=i2*PI/(LITE?4:8),rm2=(rc+pR+.05)/2;M3(new T.BoxGeometry(rc-pR,ph/4,.12*Math.max(.5,k)),M.blk,Math.cos(a2)*rm2,yp+(j-1)*ph/3,Math.sin(a2)*rm2,Tm).rotation.y=-a2}}
+ else{var nd=LITE?5:12;for(var j2=0;j2<nd;j2++)M3(ann(rc+.02,pR+.08,ph/nd*.7),j2%2?M.steel:M.blk,0,yp-ph/2+(j2+.5)*ph/nd,0,Tm)}
+ if(hasD)M3(ann(pR,pR*.65,.5),M.cage,0,yS-.6,0,Tm);
+ var pl=new T.Mesh(new T.LatheGeometry([[0,-.3],[sb-.05,-.3],[sb,0],[pR,.25],[pR,c.pH-.15],[.3,c.pH],[0,c.pH]].map(function(q){return new T.Vector2(q[0],q[1])}),LITE?16:40),M.plug);mvT.add(pl);edg(pl,30);
+ M3(new T.TorusGeometry(pR,.06,8,LITE?16:32),M.seal,0,c.pH-.3,0,mvT).rotation.x=PI/2;
+ var stR=Math.max(.12,pR*.15),top0,topRel;
+ // ===== bích nắp, nắp van, bộ chèn =====
+ edg(M3(ann(sR,bR,.35,1),M.fl,0,-.175,0,B));around(8,sR*.83,function(p,q){M3(C(.09,.09,.9),M.bolt,p,0,q,B);M3(hx(.16,.14),M.bolt,p,.5,q,B)});
+ M3(C(bR,bR,bH,true),shell,0,bH/2,0,B);
+ [bH-1.2,bH-.95,bH-.7].forEach(function(yy){M3(ann(stR+.28,stR+.02,.22),pk,0,yy,0,B)});
+ M3(ann(bR*1.1,stR+.02,.3,1),M.steel,0,bH-.3,0,B);M3(new T.BoxGeometry(pR*1.5,.2,.8),M.steel,0,bH,0,B);
+ if(hasW)tube([[bR,1.9,0],[bR+.8,1.9,0],[bR+.8,2.7,0]],.05,M.tube,X);
+ var tg=new T.Mesh(new T.PlaneGeometry(2.2,.9),new T.MeshBasicMaterial({map:txtTex(S.tag,S.t2||S.mdl,256,100,'#e5e7eb')}));tg.position.set(0,-1.2,sR+.02);X.add(tg);
+ var a1=airMat(),aE,spr,upd,pxX,pxY;
+ if(dia){                                    // ===== màng khí: Ø550/450/360/280 =====
+  var ct=S.top/100,yk=S.yk>0?S.yk/100:ct-1.7*R,Hc=ct-yk,YC=yk+Hc/2,dh=Hc/2-.1,PY0=YC-.15*Hc,ry=PY0-yS,ra=c.dir>0,yR=.64*R,pr=.73*R,cy=bH+(yk-bH)*.45;
+  top0=ct+2.0-TRV;topRel=top0-yS;pxX=-(yR+1.3);pxY=cy+.3;
+  edg(M3(C(yR,yR,yk-bH,true),acG,0,(yk+bH)/2,0,A));M3(ann(yR+.15,bR,.25,1),ac,0,bH+.125,0,A);
+  dish(R,dh,1,acG,YC,A);dish(R,dh,-1,acG,YC,A);edg(M3(ann(R+.3,R-.5,.25,1),ac,0,YC,0,A));
+  around(16,R+.1,function(p,q){M3(C(.08,.08,.6),M.bolt,p,YC,q,A);M3(hx(.13,.14),M.bolt,p,YC+.35,q,A)});
+  M3(C(.3,.3,2.1,true),acG,0,ct+1.0,0,A);
+  M3(C(pr,pr,.2),M.steel,0,ry,0,mvA);M3(C(.3,.3,.3),M.steel,0,ry+.25,0,mvA);M3(C(.55,.55,.5),M.steel,0,ry-.35,0,mvA);
+  var dp=new T.Mesh(C(pr,R,1,true),M.dia);A.add(dp);spr=coil(R*.5,.07,7,A);aE=new T.Mesh(C(R-.2,R-.2,1),a1);A.add(aE);
+  if(S.A>=147){var hy=yk*.79;M3(new T.BoxGeometry(.9,.8,.8),M.iron,yR+.45,hy,0,A);M3(C(.2,.2,2.91-yR),M.steel,(yR+2.91)/2,hy,0,A,PI/2);
+   M3(new T.TorusGeometry(1.75,.12,8,LITE?20:40),ac,2.91,hy,0,A).rotation.y=PI/2;M3(new T.BoxGeometry(.08,3.4,.08),ac,2.91,hy,0,A);M3(new T.BoxGeometry(.08,.08,3.4),ac,2.91,hy,0,A)}
+  else{var wy=ct+1.5;M3(new T.TorusGeometry(R*.75,.1,8,LITE?20:32),ac,0,wy,0,A).rotation.x=PI/2;M3(new T.BoxGeometry(R*1.5,.07,.07),ac,0,wy,0,A);M3(new T.BoxGeometry(.07,.07,R*1.5),ac,0,wy,0,A);M3(C(.15,.15,.6),M.steel,0,wy,0,A)}
+  M3(new T.BoxGeometry(.8,.5,.8),M.steel,0,cy-yS,0,mvA);M3(new T.BoxGeometry(.6,.06,.2),M.lock,yR-.3,cy-yS,0,mvA);M3(new T.BoxGeometry(yR+.8,.08,.2),M.steel,-(yR+.8)/2,cy-yS,0,mvA);
+  tube(ra?[[pxX,pxY,.2],[pxX-.3,pxY+.8,.3],[-R*.5,YC-dh+.2,0]]:[[pxX,pxY,.2],[pxX-.6,YC+1,.3],[pxX,ct+.8,.2],[-R*.4,ct-.4,0]],.07,M.tube,X);
+  upd=function(u){var py=PY0+u*TRV,yy=yS+u*TRV;mvT.position.y=yy;mvA.position.y=yy;dp.position.y=(py+YC)/2;dp.scale.y=py-YC||.001;
+   if(ra){spr.position.y=py+.15;spr.scale.y=Math.max(.1,YC+dh-.4-(py+.15));var Lw=Math.max(.02,py-.1-(YC-dh+.4));aE.scale.y=Lw;aE.position.y=YC-dh+.4+Lw/2}
+   else{spr.position.y=YC-dh+.4;spr.scale.y=Math.max(.1,py-.1-(YC-dh+.4));var Lu=Math.max(.02,YC+dh-.4-(py+.1));aE.scale.y=Lu;aE.position.y=YC+dh-.4-Lu/2}};
+ } else {                                    // ===== piston 147 in²: Ø420, đỉnh xi lanh & đỉnh ty theo bản vẽ =====
+  var CT=S.top/100,ST=S.yk/100,YB=CT-7.5,PY1=YB+.9,rq=PY1-yS,dn=c.dir<0,mid=(bH+YB)/2;
+  top0=ST-TRV;topRel=top0-yS;pxX=-3;pxY=mid;
+  [-1.6,1.6].forEach(function(xx){M3(C(.22,.22,YB-bH),ac,xx,mid,0,A)});
+  edg(M3(C(2.1,2.1,CT-YB,true),acG,0,(CT+YB)/2,0,A));M3(ann(2.3,.3,.35,1),ac,0,YB+.175,0,A);M3(C(2.3,2.3,.35),ac,0,CT-.175,0,A);
+  around(18,2.2,function(p,q){M3(C(.08,.08,CT-YB-.6),M.steel,p,(CT+YB)/2,q,A)});
+  M3(C(.35,.35,ST-CT,true),acG,0,(CT+ST)/2,0,A);var wy2=ST-1.75;M3(new T.BoxGeometry(1.2,1.6,1.2),M.iron,.8,wy2,0,A);M3(C(.2,.2,2.6),M.steel,2.1,wy2,0,A,PI/2);
+  M3(new T.TorusGeometry(1.75,.12,8,LITE?20:40),ac,3.4,wy2,0,A).rotation.y=PI/2;M3(new T.BoxGeometry(.08,3.4,.08),ac,3.4,wy2,0,A);M3(new T.BoxGeometry(.08,.08,3.4),ac,3.4,wy2,0,A);
+  M3(C(2.05,2.05,.4),M.steel,0,rq,0,mvA);M3(C(.55,.55,.4),M.steel,0,rq-.35,0,mvA);
+  [.15,-.15].forEach(function(d){M3(new T.TorusGeometry(2.05,.07,8,LITE?16:40),M.seal,0,rq+d,0,mvA).rotation.x=PI/2});
+  M3(new T.BoxGeometry(.8,.5,.8),M.steel,0,mid-yS,0,mvA);M3(new T.BoxGeometry(.6,.06,.2),M.lock,1.4,mid-yS,0,mvA);M3(new T.BoxGeometry(2.45,.08,.2),M.steel,-1.55,mid-yS,0,mvA);
+  aE=new T.Mesh(C(2.0,2.0,1),a1);A.add(aE);spr=new T.Group();A.add(spr);around(3,1.0,function(p,q){coil(.38,.07,12,spr).position.set(p,0,q)});
+  tube(dn?[[-3.7,YB+.2,.2],[-3.1,CT-2,.3],[-2.4,CT-.6,0]]:[[-3.7,YB+.2,.2],[-3.1,YB+.4,.3],[-2.4,YB+.6,0]],.07,M.tube,X);
+  upd=function(u){var py=PY1+u*TRV,yy=yS+u*TRV;mvT.position.y=yy;mvA.position.y=yy;
+   if(!dn){var Lq=py-.2-(YB+.15);aE.scale.y=Lq;aE.position.y=YB+.15+Lq/2;spr.position.y=py+.2;spr.scale.y=CT-.1-(py+.2)}
+   else{var Lu=Math.max(.02,CT-.1-(py+.2));aE.scale.y=Lu;aE.position.y=py+.2+Lu/2;spr.position.y=YB+.2;spr.scale.y=Math.max(.1,py-.2-(YB+.2))}};
+ }
+ M3(C(stR,stR,topRel-.3,false),M.chrome,0,(.3+topRel)/2,0,mvT);
+ // ===== phụ kiện: ABB TZID-C, lọc-giảm áp WVC-200, booster WVC-300, lock-up WVC-400, van từ + LS + JB =====
+ M3(new T.BoxGeometry(1.2,1.4,1),M.wht,pxX,pxY,0,X);M3(C(.25,.25,.7),M.blk,pxX-1.1,pxY-1.2,0,X);
+ if(hasB)M3(new T.BoxGeometry(.8,1.0,.8),M.blk,pxX-.8,pxY+1.4,.5,X);
+ if(hasL)M3(C(.5,.5,1.0),M.lock,pxX-.8,pxY+.5,.6,X);
+ if(hasS){M3(new T.BoxGeometry(.7,.6,.6),M.blk,pxX-.2,pxY+1.9,-.5,X);M3(new T.BoxGeometry(.6,.5,.5),M.lock,0,bH+.5,(dia?yR:2.3)+.1,X);M3(new T.BoxGeometry(1.2,.9,.5),M.steel,pxX-1.2,pxY,-.7,X)}
+ var fx=pxX-1.1,fy=pxY-1.2,bx=pxX-.8,by=pxY+1.4,lx=pxX-.8,ly=pxY+.5;   // mạch khí: cấp → lọc-giảm áp → bộ định vị → booster → lock-up → xi lanh
+ tube([[fx,fy+.4,0],[fx+.3,pxY-.5,.2],[pxX-.3,pxY-.5,.2]],.05,M.tube,X);
+ if(hasB)tube([[pxX,pxY+.7,.2],[pxX-.4,by-.3,.4],[bx,by-.5,.5]],.05,M.tube,X);
+ if(hasL&&hasB)tube([[bx,by-.5,.5],[bx-.3,ly+.6,.6]],.05,M.tube,X);
+ // ===== dòng môi chất =====
+ var cum=[0];for(var kk=1;kk<PA.length;kk++)cum.push(cum[kk-1]+Math.hypot(PA[kk][0]-PA[kk-1][0],PA[kk][1]-PA[kk-1][1]));
+ var TL=cum[cum.length-1],N=LITE?0:200,pos=new Float32Array(N*3),cl=new Float32Array(N*3),ps=[];
+ function rnd(p){var r=Math.sqrt(Math.random()),w=Math.random()*2*PI;p.a=r*Math.cos(w);p.b=r*Math.sin(w)}
+ var cu=new T.Color(0x2563eb),cm=new T.Color(0x67e8f9),cd=new T.Color(0x93c5fd);
+ function plc(p,i){var j=1;while(j<cum.length-1&&cum[j]<p.s)j++;
+  var t=(p.s-cum[j-1])/(cum[j]-cum[j-1]),A0=PA[j-1],B0=PA[j],dx=B0[0]-A0[0],dy=B0[1]-A0[1],d=Math.hypot(dx,dy),r=PR[j-1]+(PR[j]-PR[j-1])*t;
+  pos[i*3]=A0[0]+dx*t-dy/d*p.a*r;pos[i*3+1]=A0[1]+dy*t+dx/d*p.a*r;pos[i*3+2]=p.b*r*.7;
+  var q=j<=iu?cu:(j<=idn?cm:cd);cl[i*3]=q.r;cl[i*3+1]=q.g;cl[i*3+2]=q.b;p.r=r}
+ for(var n=0;n<N;n++){var p0={s:Math.random()*TL};rnd(p0);plc(p0,n);ps.push(p0)}
+ var v={type:S.n,s:S,u:0,tu:0,held:0,P:0,Ph:0,air:[a1],upd:upd,G:G,top:Math.max(dia?S.top/100+2:S.yk/100,0),bot:ang?AX-c.Li-PL:c.yb};
+ if(N){var bg=new T.BufferGeometry();bg.setAttribute('position',new T.BufferAttribute(pos,3));bg.setAttribute('color',new T.BufferAttribute(cl,3));
+  var pts=new T.Points(bg,new T.PointsMaterial({size:.2,vertexColors:true,transparent:true,opacity:.95,depthWrite:false}));pts.frustumCulled=false;F.add(pts);
+  v.step=function(dt,f){if(f<.002)return;
+   for(var i=0;i<N;i++){var p=ps[i];p.s+=dt*3*f*Math.min(6,Math.pow(rp/(p.r||rp),2));if(p.s>=TL){p.s-=TL;rnd(p)}plc(p,i)}
+   bg.attributes.position.needsUpdate=true;bg.attributes.color.needsUpdate=true}}
+ return v;
+}
+// ===== van giảm áp (sheet 42): thân DN50 SW, nắp chuông màng Jorlon, trục chỉnh lò xo =====
+function buildPRV(S,x,y,lite){
+ LITE=lite;var G=new T.Group();G.position.set(x,y||0,0);scene.add(G);
+ var B=new T.Group(),A=new T.Group(),X=new T.Group(),Tm=new T.Group(),F=new T.Group();G.add(B);G.add(A);G.add(X);G.add(Tm);G.add(F);G.userData={B:B,A:A,X:X,T:Tm,F:F};
+ var shell=ghost(0x7a8798),pipeM=ghost(0xa0aab5),water=new T.MeshStandardMaterial({color:0x38bdf8,transparent:true,opacity:.2,depthWrite:false,side:T.DoubleSide});
+ var RO=.3015,RI=.2585,L=1.905;
+ edg(M3(C(.62,.62,L,true),shell,0,0,0,B,PI/2));M3(new T.BoxGeometry(1.0,1.0,1.1),shell,0,-.3,0,B);M3(hx(.5,.5),M.steel,0,-.75,0,B);
+ [-1,1].forEach(function(s){M3(ann(RO+.22,RO+.02,.7),M.steel,s*(L/2-.35),0,0,B,PI/2);M3(ann(RO,RI,4),pipeM,s*(L/2+2),0,0,B,PI/2);M3(C(RI,RI,4,true),water,s*(L/2+2),0,0,F,PI/2)});
+ M3(ann(1.25,.3,.25,1),M.fl,0,.9,0,B);var lp=new T.Mesh(new T.LatheGeometry([[1.19,0],[1.19,.3],[1.0,.7],[.7,1.6],[.55,2.4],[.5,3.25]].map(function(q){return new T.Vector2(q[0],q[1])}),LITE?16:40),ghost(0x6f82d6));lp.position.y=1.0;A.add(lp);edg(lp,30);
+ M3(C(.1,.1,1.4),M.chrome,0,3.6,0,A);M3(hx(.3,.25),M.steel,0,3.5,0,A);M3(hx(.3,.25),M.steel,0,3.9,0,A);
+ var dp=new T.Mesh(C(1.19,1.19,.05,true),M.dia);dp.position.y=1.0;A.add(dp);M3(new T.TorusGeometry(.3,.05,8,24),M.seal,0,.5,0,Tm).rotation.x=PI/2;
+ around(8,1.05,function(p,q){M3(hx(.12,.14),M.bolt,p,1.0,q,B)});
+ var tg=new T.Mesh(new T.PlaneGeometry(1.6,.7),new T.MeshBasicMaterial({map:txtTex(S.tag,'P.R.V DN50 600LB SW',256,100,'#e5e7eb')}));tg.position.set(0,-.3,.57);X.add(tg);
+ var pts=null,N=LITE?0:90,pos=new Float32Array(N*3),ps=[];for(var i=0;i<N;i++)ps.push(Math.random()*8);
+ var v={type:S.n,s:S,u:0,tu:1,held:0,P:0,Ph:0,air:[airMat()],upd:function(){},G:G,top:4.3,bot:-1.2};
+ if(N){var bg=new T.BufferGeometry();bg.setAttribute('position',new T.BufferAttribute(pos,3));pts=new T.Points(bg,new T.PointsMaterial({size:.14,color:0x67e8f9,transparent:true,opacity:.95,depthWrite:false}));pts.frustumCulled=false;F.add(pts);
+  v.step=function(dt){for(var i=0;i<N;i++){ps[i]=(ps[i]+dt*1.2)%8;var s=ps[i]-4,r=Math.abs(s)<1?.12:.2,a=i*2.4;pos[i*3]=s;pos[i*3+1]=Math.sin(a)*r;pos[i*3+2]=Math.cos(a*1.7)*r}bg.attributes.position.needsUpdate=true}}
+ return v;
+}
+// ================= LOGIC MÔ PHỎNG =================
+var V=[],built=[],mode='cmp5',airOn=true,sig=.7,simT=0,tmode='glass';
+function uOf(s,P){var f=Math.max(0,Math.min(1,(P-s.lo)/(s.hi-s.lo)));return s.dir>0?f:1-f}
+function flowOf(s,u){if(s.chc=='lin')return Math.max(0,u);var R=50;return Math.max(0,(Math.pow(R,u-1)-1/R)/(1-1/R))}
+function targets(){V.forEach(function(v){var s=v.s;if(s.prv){v.P=0;v.tu=1;return}
+ if(airOn)v.P=s.lo+sig*(s.hi-s.lo);else v.P=s.lock?v.Ph*Math.exp(-simT/s.tau):0;v.tu=uOf(s,v.P)})}
+function f1(n){return n.toFixed(1)}
+function specHTML(S){var ac=S.acc,l=[];l.push('ABB TZID-C (4–20 mA, single acting)');l.push('lọc-giảm áp Rotork YT-200BN210 (0–8,4 bar)');if(ac.indexOf('B')>=0)l.push('booster Young Tech NYT-300');if(ac.indexOf('L')>=0)l.push('lock-up Weir WVC-400');if(ac.indexOf('S')>=0)l.push('van từ + LS + JB');if(ac.indexOf('W')>=0)l.push('water seal DN8');if(ac.indexOf('D')>=0)l.push('diffuser');
+ if(S.prv)return '<h3>'+S.tag+' / '+S.t2+'</h3><small>Van giảm áp P.R.V · DN50 600LB SW · A216-WCB</small>Trim: FULL PORT · 316/Buna-N<br>Cv 7,7 · góc 90° · màng Jorlon tác động trực tiếp<br>Kích thước: 190,5 × 238 × 425 (trên) / 100 (dưới) · '+S.wt+' kg × '+S.qty+'<br>';
+ return '<h3>'+S.tag+(S.t2?' / '+S.t2:'')+(S.hyp?' (giả định)':'')+'</h3><small>Sheet '+S.n+' · '+S.mdl+' · DN'+S.dn+' · '+S.rate+' · '+S.mat+(S.dup?' · (trùng mã trên bản vẽ)':'')+'</small>'+
+ 'Trim: <span>'+S.trim+'</span> · Ty/Plug '+S.sp+' · Guide/Seat '+S.gs+'<br>Packing '+S.pack+' · '+(S.kind=='a'?'thân góc':'thân globe')+' · '+S.end+'<br>'+
+ 'Chấp hành: <span>'+S.code+' '+S.A+' in² '+(S.piston?'piston đơn':'màng '+(S.dir>0?'R/A':'D/A'))+'</span> · khí '+S.air+' bar · lò xo '+S.lo+'–'+S.hi+'<br>'+
+ 'Fail: <span>'+S.fail+'</span> · '+S.wt+' kg × '+S.qty+(l.length?'<br>Phụ kiện: '+l.join(', '):'')+'<br>'}
+function ui(){
+ $('loss').className='danger'+(airOn?'':' on');$('loss').textContent=airOn?'Mất khí cấp':'Cấp lại khí';
+ $('p').disabled=!airOn;$('t').disabled=airOn;$('pv').textContent=f1(4+16*sig)+' mA';
+ V.forEach(function(v,i){var s=v.s,e=$('b'+i);if(!e)return;
+  if(s.prv){e.innerHTML='Lưu lượng: <span>chảy liên tục</span> · Cv '+s.cv+'<br>';return}
+  var F=v.P*s.A*.0645,f=flowOf(s,v.u),st,col;
+  if(airOn){st='Điều khiển';col='#10b981'}else if(s.lock){st='STAY PUT · trôi '+Math.round(Math.abs(v.u-v.held)*100)+' %';col='#f59e0b'}else{st='Lò xo về '+(s.dir>0?'ĐÓNG':'MỞ');col='#ef4444'}
+  e.innerHTML='Độ mở: <span>'+Math.round(v.u*100)+' %</span> ('+f1(v.u*s.trv)+'/'+s.trv+' mm)<br>Áp xi lanh: <span>'+v.P.toFixed(2)+' bar</span> · Lực: <span>'+f1(F)+' kN</span><br>Lưu lượng: <span>'+Math.round(f*100)+' %</span> · Cv≈'+Math.round(s.cv*f*10)/10+'<br><span style="color:'+col+'">'+st+'</span>'})
+}
+// ================= CHẾ ĐỘ HIỂN THỊ / MẶT CẮT / LỚP =================
+var EMo={solid:.3,glass:.5,xray:.8};
+function applyTM(){cuts.forEach(function(x){if(tmode=='solid'){x.opacity=1;x.transparent=false;x.depthWrite=true;x.metalness=.7;x.roughness=.38}else{x.transparent=true;x.depthWrite=false;x.opacity=tmode=='glass'?.2:.07;x.metalness=0;x.roughness=tmode=='glass'?.08:.3}x.needsUpdate=true});EM.opacity=EMo[tmode]}
+var plane=new T.Plane(new T.Vector3(0,0,-1),0),flip=1;
+function applySec(){var a=$('sa').value,p=+$('sp').value/10;$('spv').textContent=a=='n'?'':f1(p*100)+' mm';
+ if(a=='n'){rd.clippingPlanes=[];return}
+ plane.normal.set(a=='x'?-flip:0,a=='y'?-flip:0,a=='z'?-flip:0);plane.constant=flip*p;rd.clippingPlanes=[plane]}
+function applyLay(){['B','T','A','X','F'].forEach(function(k){var on=$('L_'+k).checked;built.forEach(function(g){g.userData[k].visible=on})})}
+function clearScene(){built.forEach(function(g){scene.remove(g);g.traverse(function(o){if(o.geometry)o.geometry.dispose();if(o.material&&o.material.map)o.material.map.dispose()})});built=[];V=[];cuts.length=0}
+var tgt=new T.Vector3(0,5,0),th=.2,ph=1.3,dist=150;
+function show(list,lay,cam0){clearScene();var lite=list.length>6;
+ list.forEach(function(S,i){var p=lay(i),v=(S.prv?buildPRV:build)(S,p[0],p[1],lite);built.push(v.G);V.push(v);
+  var sp=new T.Sprite(new T.SpriteMaterial({map:txtTex(S.tag,S.lab||'',256,96,'rgba(255,255,255,.92)'),depthTest:false,transparent:true}));
+  sp.scale.set(lite?14:11,lite?5.2:4.1,1);sp.position.set(0,v.top+(lite?4:3),0);sp.renderOrder=9;v.G.add(sp);v.G.userData.X.add(sp)});
+ targets();V.forEach(function(v){v.u=v.tu;v.held=v.u;v.Ph=v.P});applyTM();applyLay();
+ var st=$('st');st.innerHTML=list.length>6?'':list.map(function(S,i){return '<div class="bx"><h3>'+S.tag+(S.hyp?' (giả định)':'')+'</h3><div id="b'+i+'"></div></div>'}).join('');
+ tgt.set(cam0[0],cam0[1],0);dist=cam0[2];place();ui()}
+function oneCam(S){var top=(S.prv?4.3:(S.piston?S.yk/100:S.top/100+2)),bot=S.prv?-1.2:(S.kind=='a'?-(S.yb+S.L)/100-4:-S.yb/100),h=top-bot;return [0,(top+bot)/2,Math.max(70,h*2.5)]}
+function setView(val){mode=val;
+ if(val=='cmp5'){var a=byN(3),b=byN(2),c=byN(21),d=byN(21),e=byN(21);
+  Object.assign(a,{lab:'FC · mất khí đóng'});Object.assign(b,{lab:'FO · mất khí mở'});Object.assign(c,{lab:'FL · stay put'});
+  d=mk(DB.filter(function(q){return q.n==21})[0],{tag:'FL-NC (giả định)',t2:'',hyp:1,lab:'FL-NC · lò xo trên',lo:1.2,hi:3});e=mk(DB.filter(function(q){return q.n==21})[0],{tag:'FL-NO (giả định)',t2:'',hyp:1,lab:'FL-NO · lò xo dưới',code:'A50',dir:-1,lo:.2,hi:1,fail:'STAY PUT (TEND TO OPEN)'});
+  var xs=[-40,-20,0,20,40];show([a,b,c,d,e],function(i){return [xs[i],0]},[0,3,175])}
+ else if(val=='all'){var l=DB.map(function(r){return mk(r)});show(l,function(i){return [(i%7)*26-78,-Math.floor(i/7)*46]},[0,-135,430])}
+ else{var S=mk(DB.filter(function(r){return r.n==+val})[0]);show([S],function(){return [0,0]},oneCam(S))}}
+// ================= KHỞI TẠO UI =================
+var vs=$('vs');vs.innerHTML='<option value="cmp5">★ So sánh 5 loại (FC · FO · FL · NC · NO)</option><option value="all">★ Tất cả '+DB.length+' van (tổng quan)</option>'+DB.map(function(r){return '<option value="'+r.n+'">'+('0'+r.n).slice(-2)+' · '+r.tag+' · DN'+r.dn+' '+r.rate.split(' ')[0]+(r.kind=='a'?' góc':'')+(r.kind=='p'?' PRV':'')+'</option>'}).join('');
+vs.onchange=function(){setView(this.value)};
+$('tm').onchange=function(){tmode=this.value;applyTM()};
+$('sa').onchange=applySec;$('sp').oninput=applySec;$('fl').onclick=function(){flip=-flip;applySec()};
+['B','T','A','X','F'].forEach(function(k){$('L_'+k).onchange=applyLay});
+$('p').oninput=function(){sig=+this.value/100;targets();ui()};
+$('t').oninput=function(){simT=+this.value;$('tv').textContent=simT+' phút';targets();ui()};
+$('loss').onclick=function(){airOn=!airOn;if(!airOn){V.forEach(function(v){v.Ph=v.P;v.held=v.u});simT=0;$('t').value=0;$('tv').textContent='0 phút'}targets();ui()};
+// ================= CAMERA =================
+function place(){cam.position.set(tgt.x+dist*Math.sin(ph)*Math.sin(th),tgt.y+dist*Math.cos(ph),tgt.z+dist*Math.sin(ph)*Math.cos(th));cam.lookAt(tgt)}
+var ptr={},pd0=0;
+function dd(){var k=Object.keys(ptr),a=ptr[k[0]],b=ptr[k[1]];return Math.hypot(a.x-b.x,a.y-b.y)}
+box.addEventListener('pointerdown',function(e){box.setPointerCapture(e.pointerId);ptr[e.pointerId]={x:e.clientX,y:e.clientY};if(Object.keys(ptr).length==2)pd0=dd()});
+box.addEventListener('pointermove',function(e){var p=ptr[e.pointerId];if(!p)return;
+ if(Object.keys(ptr).length==1){th-=(e.clientX-p.x)*.008;ph=Math.max(.2,Math.min(2.6,ph-(e.clientY-p.y)*.006));p.x=e.clientX;p.y=e.clientY}
+ else{p.x=e.clientX;p.y=e.clientY;var n=dd();if(pd0)dist=Math.max(15,Math.min(700,dist*pd0/n));pd0=n}place()});
+function up(e){delete ptr[e.pointerId];pd0=0}
+box.addEventListener('pointerup',up);box.addEventListener('pointercancel',up);
+box.addEventListener('wheel',function(e){e.preventDefault();dist=Math.max(15,Math.min(700,dist*(1+e.deltaY*.001)));place()},{passive:false});
+function resize(){var w=box.clientWidth||800,h=box.clientHeight||450;rd.setSize(w,h);cam.aspect=w/h;cam.updateProjectionMatrix()}
+addEventListener('resize',resize);
+var fr=0,last=performance.now();
+function animate(){requestAnimationFrame(animate);
+ try{var now=performance.now(),dt=Math.min(.05,(now-last)/1000);last=now;
+  V.forEach(function(v){v.u+=(v.tu-v.u)*.08;v.upd(v.u);v.air[0].opacity=.06+.42*Math.min(1,v.P/(v.s.hi*1.3||1));if(v.step)v.step(dt,v.s.prv?1:flowOf(v.s,v.u))});
+  if(++fr%6==0)ui();rd.render(scene,cam)}
+ catch(e){$('err').style.display='block';$('err').textContent='Lỗi: '+e.message}}
+setTimeout(function(){resize();setView('cmp5');applySec()},50);animate();
+window.__dbg={DB:DB,mk:mk,build:build,setView:setView,V:function(){return V}};
+})();
+</script></body></html>
