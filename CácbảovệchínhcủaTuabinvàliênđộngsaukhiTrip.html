@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Các bảo vệ chính của Tuabin và liên động sau khi Trip</title>
+<title>Báo cáo kỹ thuật ETS/TCS – Tổ máy 540 MW – NMNĐ Mông Dương 1</title>
 <style>
   :root{
     --primary: #0b5394;
@@ -15,8 +15,6 @@
     --warning-light: #fff8e1;
     --success: #27ae60;
     --success-light: #e8f8ef;
-    --purple: #7d3c98;
-    --purple-light: #f4ecf7;
     --border: #d0d7de;
     --bg: #f7f9fc;
     --text: #1f2328;
@@ -29,130 +27,147 @@
     background: var(--bg);
     color: var(--text);
     line-height: 1.65;
-    font-size: 16px;
+    font-size: 15px;
+    padding: 24px;
   }
-  .container{
-    max-width: 1180px;
+  .document{
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 32px 22px 80px;
+    background: #fff;
+    padding: 48px 56px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    border-radius: 8px;
   }
-  header{
-    background: linear-gradient(135deg, #7b0d0d 0%, #c0392b 50%, #e74c3c 100%);
-    color: #fff;
-    padding: 38px 28px;
-    text-align: center;
-    border-radius: 12px;
-    margin-bottom: 28px;
-    box-shadow: 0 6px 24px rgba(192,57,43,0.35);
-    position: relative;
-    overflow: hidden;
+
+  /* ---------- HEADER ---------- */
+  header.report-header{
+    border-bottom: 3px solid var(--primary);
+    padding-bottom: 18px;
+    margin-bottom: 26px;
   }
-  header::before{
-    content: "🛡";
-    position: absolute;
-    font-size: 12rem;
-    opacity: 0.08;
-    top: -10px;
-    right: 20px;
-    line-height: 1;
+  header.report-header .org{
+    font-size: 0.88em;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin: 0 0 8px;
+    font-weight: 700;
   }
-  header h1{
-    margin: 0 0 12px;
-    font-size: 1.65rem;
-    line-height: 1.35;
-    position: relative;
+  header.report-header h1{
+    color: var(--primary-dark);
+    font-size: 1.8em;
+    margin: 0 0 6px;
+    line-height: 1.25;
   }
-  header .subtitle{
-    margin: 0;
-    opacity: 0.96;
-    font-size: 1rem;
-    font-style: italic;
-    position: relative;
-  }
-  header .scope{
-    display: inline-block;
-    margin-top: 14px;
-    background: rgba(0,0,0,0.25);
-    border: 1px solid rgba(255,255,255,0.35);
-    padding: 6px 18px;
-    border-radius: 20px;
-    font-size: 0.88rem;
+  header.report-header h2{
+    color: var(--primary);
+    font-size: 1.12em;
     font-weight: 500;
-    position: relative;
+    margin: 0 0 14px;
   }
-  h2{
+  header.report-header .meta{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 6px 24px;
+    font-size: 0.88em;
+    color: var(--muted);
+  }
+  header.report-header .meta span strong{color: var(--text);}
+  
+  .badge{
+    display: inline-block;
+    background: var(--primary-light);
+    color: var(--primary);
+    border: 1px solid #b8d8f5;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    font-weight: 600;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+
+  /* ---------- HEADINGS ---------- */
+  h2.section{
     color: var(--primary);
     border-left: 5px solid var(--primary);
     padding-left: 14px;
-    margin-top: 42px;
-    margin-bottom: 16px;
-    font-size: 1.35rem;
+    margin-top: 44px;
+    font-size: 1.34em;
+    scroll-margin-top: 20px;
   }
-  h3{
+  h3.subsection{
     color: var(--primary-dark);
-    margin-top: 24px;
+    font-size: 1.08em;
+    margin-top: 28px;
+  }
+  h4{
+    color: var(--primary);
+    font-size: 1em;
+    margin-top: 22px;
     margin-bottom: 10px;
-    font-size: 1.14rem;
   }
-  p{margin: 10px 0;}
-  ul, ol{margin: 8px 0 12px; padding-left: 24px;}
-  li{margin: 6px 0;}
-  code{
-    background: #eef2f7;
-    padding: 2px 7px;
-    border-radius: 4px;
-    font-family: "Consolas", "Courier New", monospace;
+
+  /* ---------- TABLES ---------- */
+  table{
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0 22px;
     font-size: 0.9em;
-    color: #b83280;
-    white-space: nowrap;
-  }
-
-  /* PROTECTION GROUP CARDS */
-  .prot-group{
     background: #fff;
+  }
+  th, td{
     border: 1px solid var(--border);
-    border-radius: 12px;
-    margin-bottom: 20px;
-    overflow: hidden;
-    box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+    padding: 8px 12px;
+    text-align: left;
+    vertical-align: top;
   }
-  .prot-header{
-    padding: 14px 22px;
+  th{
+    background: var(--primary);
     color: #fff;
-    font-size: 1.08rem;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 12px;
+    font-weight: 600;
+    font-size: 0.92em;
   }
-  .prot-header .num{
-    background: rgba(255,255,255,0.25);
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    flex-shrink: 0;
-    font-size: 1rem;
+  tbody tr:nth-child(even){background: #f4f7fb;}
+  tbody tr:hover{background: #e8f0fb;}
+  td.num{text-align: center; white-space: nowrap;}
+  .setpoint-table td:nth-child(2){font-weight: 600; min-width: 180px;}
+
+  .val-warn{color: #b9770e; font-weight: 700; font-family: "Consolas", monospace;}
+  .val-trip{color: var(--accent); font-weight: 700; font-family: "Consolas", monospace;}
+
+  /* ---------- HIGHLIGHT CLASSES (MỤC 3.2) ---------- */
+  .hl-warn {
+    background-color: #fff3cd;
+    color: #856404;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-weight: bold;
+    font-style: normal;
   }
-  .prot-header .icon{
-    font-size: 1.3rem;
-  }
-  .prot-header.h-1{background: linear-gradient(135deg, #b9770e 0%, #f39c12 100%);}
-  .prot-header.h-2{background: linear-gradient(135deg, #7b0d0d 0%, #c0392b 100%);}
-  .prot-header.h-3{background: linear-gradient(135deg, #7d3c98 0%, #9b59b6 100%);}
-  .prot-header.h-4{background: linear-gradient(135deg, #a04000 0%, #e67e22 100%);}
-  .prot-header.h-5{background: linear-gradient(135deg, #0b5394 0%, #1a73c9 100%);}
-  .prot-header.h-6{background: linear-gradient(135deg, #1e8449 0%, #27ae60 100%);}
-  .prot-header.h-7{background: linear-gradient(135deg, #1a5276 0%, #2980b9 100%);}
-  .prot-header.h-8{background: linear-gradient(135deg, #4a235a 0%, #7d3c98 100%);}
-  .prot-body{
-    padding: 4px 18px 14px;
+  .hl-trip {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-weight: bold;
+    font-style: normal;
   }
 
-  /* INTERLOCK LIST */
+  /* ---------- CALLOUTS ---------- */
+  .callout{
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 0.95em;
+    border-radius: 6px;
+    border-left: 5px solid;
+  }
+  .callout.warn{background: var(--warning-light); border-left-color: var(--warning);}
+  .callout.note{background: var(--primary-light); border-left-color: var(--primary);}
+  .callout.ok  {background: var(--success-light); border-left-color: var(--success);}
+  .callout.danger {background: var(--accent-light); border-left-color: var(--accent);}
+
+  /* ---------- INTERLOCK LIST ---------- */
   .interlock-list{
     counter-reset: int;
     list-style: none;
@@ -185,503 +200,674 @@
     font-weight: 700;
     font-size: 0.95rem;
   }
-  .interlock-list li strong{
-    color: #1e8449;
-  }
+  .interlock-list li strong{color: #1e8449;}
 
-  table{
-    width: 100%;
-    border-collapse: collapse;
-    margin: 0;
-    background: #fff;
-    font-size: 0.92rem;
+  /* ---------- DETAIL LIST ---------- */
+  ol.detail-list{
+    counter-reset:item;
+    list-style:none;
+    padding-left:0;
+    margin:0 0 16px;
   }
-  thead{
-    background: var(--primary);
-    color: #fff;
+  ol.detail-list > li{
+    position:relative;
+    padding:10px 12px 10px 46px;
+    margin-bottom:8px;
+    border:1px solid var(--border);
+    border-radius:6px;
+    background:#fbfcfe;
+    font-size:0.92em;
   }
-  th, td{
-    padding: 10px 14px;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
-    vertical-align: top;
+  ol.detail-list > li::before{
+    counter-increment:item;
+    content:counter(item);
+    position:absolute;
+    left:10px;
+    top:10px;
+    width:26px;
+    height:26px;
+    background:var(--primary);
+    color:#fff;
+    border-radius:50%;
+    text-align:center;
+    line-height:26px;
+    font-weight:600;
+    font-size:0.85em;
   }
-  tbody tr:nth-child(even){background: #f4f7fb;}
-  tbody tr:hover{background: #e8f0fb;}
-  th{font-weight: 600; font-size: 0.86rem;}
-  .prot-table th:nth-child(1){width: 55%;}
-  .prot-table th:nth-child(2){width: 45%;}
+  ol.detail-list > li strong.title{color:var(--primary-dark);display:block;margin-bottom:2px;}
+  ol.detail-list > li .params{display:block;color:var(--text);font-size:0.92em;}
+  ol.detail-list > li .params .sep{color:var(--muted);margin:0 4px;}
 
-  .val-warn{
-    color: #b9770e;
-    font-weight: 700;
-    font-family: "Consolas", monospace;
-  }
-  .val-trip{
-    color: var(--accent);
-    font-weight: 700;
-    font-family: "Consolas", monospace;
-  }
-
-  .badge{
-    display: inline-block;
-    padding: 3px 10px;
-    border-radius: 12px;
-    font-size: 0.76rem;
-    font-weight: 600;
-    color: #fff;
-  }
-  .badge.blue{background: var(--primary);}
-  .badge.red{background: var(--accent);}
-  .badge.green{background: var(--success);}
-  .badge.orange{background: var(--warning);}
-  .badge.purple{background: var(--purple);}
-
+  /* ---------- TOC ---------- */
   .toc{
     background: #fff;
     border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 18px 22px;
-    margin-bottom: 24px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    border-radius: 8px;
+    padding: 16px 26px;
+    margin-bottom: 32px;
   }
-  .toc h3{
-    margin-top: 0;
-    color: var(--primary);
-    font-size: 1rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  .toc ol{
-    margin: 0;
-    padding-left: 22px;
-    columns: 2;
-    column-gap: 30px;
-  }
-  .toc li{margin: 6px 0;break-inside: avoid;}
-  .toc a{
-    color: var(--primary-dark);
-    text-decoration: none;
-    transition: color .2s;
-  }
-  .toc a:hover{
-    color: var(--accent);
-    text-decoration: underline;
-  }
+  .toc h3{margin-top: 0; color: var(--primary); font-size: 0.95em; text-transform: uppercase; letter-spacing: 0.05em;}
+  .toc ol{margin: 0; padding-left: 24px; columns: 2; column-gap: 32px;}
+  .toc a{color: var(--primary-dark); text-decoration: none;}
+  .toc a:hover{color: var(--accent); text-decoration: underline;}
 
-  .callout{
-    background: var(--primary-light);
-    border-left: 4px solid var(--primary);
-    padding: 14px 18px;
-    border-radius: 6px;
-    margin: 18px 0;
-  }
-  .callout.danger{
-    background: var(--accent-light);
-    border-left-color: var(--accent);
-  }
-  .callout.success{
-    background: var(--success-light);
-    border-left-color: var(--success);
-  }
-  .callout strong{color: var(--primary-dark);}
-  .callout.danger strong{color: var(--accent);}
-  .callout.success strong{color: #1e8449;}
-
-  footer{
-    margin-top: 50px;
-    padding-top: 20px;
+  /* ---------- FOOTER ---------- */
+  footer.report-footer{
+    margin-top: 48px;
+    padding-top: 18px;
     border-top: 1px solid var(--border);
     text-align: center;
+    font-size: 0.85em;
     color: var(--muted);
-    font-size: 0.88rem;
+    font-style: italic;
   }
 
-  @media(max-width: 720px){
-    header h1{font-size: 1.2rem;}
-    header::before{font-size: 7rem; top: 10px;}
-    h2{font-size: 1.15rem;}
+  @media print{
+    body{background: #fff; padding: 0;}
+    .document{box-shadow: none; padding: 20px; max-width: 100%;}
+    h2.section, h3.subsection{page-break-after: avoid;}
+    table, .interlock-list li{page-break-inside: avoid;}
     .toc ol{columns: 1;}
-    table{font-size: 0.8rem;}
-    th, td{padding: 8px 9px;}
-    .interlock-list li{padding: 14px 16px 14px 62px;}
-    .interlock-list li::before{width: 32px; height: 32px; font-size: 0.88rem; left: 14px; top: 14px;}
+    .hl-warn, .hl-trip { border: 1px solid #ccc; }
   }
 </style>
 </head>
 <body>
-<div class="container">
+<div class="document">
 
-  <header>
-    <h1>Các bảo vệ chính của Tuabin và liên động sau khi Trip</h1>
-    <p class="subtitle">8 nhóm bảo vệ cốt lõi – 10 liên động tự động sau Trip</p>
-    <span class="scope">Hệ thống bảo vệ tuabin – Nhà máy nhiệt điện</span>
-  </header>
-
-  <!-- TOC -->
-  <div class="toc">
-    <h3>Mục lục</h3>
-    <ol>
-      <li><a href="#p1">Dầu bôi trơn &amp; Dầu thủy lực (EH)</a></li>
-      <li><a href="#p2">Tốc độ &amp; Vượt tốc (Overspeed)</a></li>
-      <li><a href="#p3">Rung động &amp; Cơ khí Rô-to (TSI)</a></li>
-      <li><a href="#p4">Nhiệt độ kim loại gối &amp; Tầng cánh</a></li>
-      <li><a href="#p5">Chân không &amp; Nhiệt độ hơi thoát</a></li>
-      <li><a href="#p6">Thông số hơi chính &amp; Tái nhiệt</a></li>
-      <li><a href="#p7">Nước làm mát Stator Máy phát</a></li>
-      <li><a href="#p8">Sự cố Lò hơi &amp; Lệnh dừng khẩn cấp</a></li>
-      <li><a href="#interlock">10 liên động tự động sau khi Tuabin Trip</a></li>
-    </ol>
+<!-- ========== HEADER ========== -->
+<header class="report-header">
+  <p class="org">Công ty Nhiệt điện Mông Dương – Tổ máy 540 MW</p>
+  <h1>BÁO CÁO KỸ THUẬT TỔNG HỢP TOÀN DIỆN</h1>
+  <h2>Hệ thống Bảo vệ Dừng Khẩn cấp Tuabin (ETS/TCS) &amp; Chuỗi Liên động <span class="badge">Bản Hoàn chỉnh REV08</span></h2>
+  <div class="meta">
+    <span><strong>Mã tài liệu:</strong> ETS-540MW-MD1-REV08</span>
+    <span><strong>Hệ điều khiển:</strong> GE Mark VIe / VM600</span>
+    <span><strong>Cấu hình:</strong> 2 lò CFB (1A/1B) – 1 tuabin 540 MW</span>
+    <span><strong>Cơ sở dữ liệu:</strong> QT/22-VH / O&amp;M Doosan – GE / TL Liên động</span>
   </div>
+</header>
 
-  <!-- I -->
-  <section>
-    <h2>I. Các bảo vệ chính của Tuabin (8 nhóm cốt lõi)</h2>
+<!-- ========== TOC ========== -->
+<nav class="toc">
+  <h3>Mục lục</h3>
+  <ol>
+    <li><a href="#s1">Mục đích và phạm vi</a></li>
+    <li><a href="#s2">Cơ sở thiết kế hệ thống ETS/TCS</a></li>
+    <li><a href="#s3">Cấu trúc 27 điều kiện bảo vệ</a></li>
+    <li><a href="#s4">Phân tích cơ chế hư hỏng và logic bảo vệ</a></li>
+    <li><a href="#s5">Bảng thông số cài đặt (Setpoints) chi tiết</a></li>
+    <li><a href="#s6">Logic Runback (Giảm tải tự động)</a></li>
+    <li><a href="#s7">10 chuỗi liên động tự động sau Trip</a></li>
+    <li><a href="#s8">Quy trình kiểm tra và bảo dưỡng</a></li>
+    <li><a href="#s9">Phụ lục: Thuật ngữ</a></li>
+  </ol>
+</nav>
 
-    <!-- 1 -->
-    <div class="prot-group" id="p1">
-      <div class="prot-header h-1">
-        <span class="num">1</span>
-        <span class="icon">🛢</span>
-        <span>Dầu bôi trơn &amp; Dầu thủy lực (EH)</span>
-      </div>
-      <div class="prot-body">
-        <table class="prot-table">
-          <thead>
-            <tr>
-              <th>Loại bảo vệ</th>
-              <th>Ngưỡng tác động</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Áp lực dầu bôi trơn thấp</td>
-              <td><span class="val-trip">≤ 1,21 bar</span> <span class="badge red">Trip có phá chân không</span></td>
-            </tr>
-            <tr>
-              <td>Mức dầu bể bôi trơn thấp</td>
-              <td><span class="val-trip">≤ 406 mm</span> <span style="color:var(--muted);font-size:0.85em;">(mức 0 cách đỉnh bể 914 mm)</span></td>
-            </tr>
-            <tr>
-              <td>Áp lực dầu thủy lực (EH) thấp</td>
-              <td><span class="val-trip">≤ 110 bar</span></td>
-            </tr>
-            <tr>
-              <td>Mức dầu bể thủy lực (EH) thấp</td>
-              <td><span class="val-trip">≤ 282 mm</span> <span style="color:var(--muted);font-size:0.85em;">(≤ 510 lít)</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+<!-- ========== 1 ========== -->
+<h2 class="section" id="s1">1. Mục đích và phạm vi</h2>
+<p>Báo cáo chuẩn hóa và cập nhật toàn diện cấu trúc thiết kế, tham số cài đặt của <strong>Hệ thống Bảo vệ Dừng Khẩn cấp Tuabin (ETS)</strong> tích hợp trong hệ điều khiển tuabin <strong>GE Mark VIe</strong> và hệ giám sát cơ học <strong>Vibro-Meter VM600</strong> cho tổ máy 540 MW – Nhà máy Nhiệt điện Mông Dương 1. Nội dung bao gồm:</p>
+<ul>
+  <li>Phân tích cơ chế vật lý – cơ tính – nhiệt động học của các điều kiện bảo vệ;</li>
+  <li>Danh mục chi tiết kèm setpoint, thời gian trễ, logic biểu quyết, mã tín hiệu và vị trí thiết bị (theo QT/22-VH);</li>
+  <li>Logic tác động tới mạch xả dầu Trip Header, cuộn solenoid ETD và cơ cấu đóng van hơi (MSV, CV, RSV, IV, BVV);</li>
+  <li>Đặc thù phối hợp trong cấu hình 2 lò CFB (1A/1B) cấp hơi cho 1 tuabin 540 MW.</li>
+</ul>
 
-    <!-- 2 -->
-    <div class="prot-group" id="p2">
-      <div class="prot-header h-2">
-        <span class="num">2</span>
-        <span class="icon">⚡</span>
-        <span>Tốc độ &amp; Vượt tốc (Overspeed)</span>
-      </div>
-      <div class="prot-body">
-        <table class="prot-table">
-          <thead>
-            <tr>
-              <th>Loại bảo vệ</th>
-              <th>Ngưỡng tác động</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Vượt tốc cơ khí / điện tử</td>
-              <td>Đạt <span class="val-trip">3 300 min⁻¹ (110 %)</span> hoặc <span class="val-trip">3 315 min⁻¹ (110,5 %)</span></td>
-            </tr>
-            <tr>
-              <td>Gia tốc biến thiên tốc độ quá nhanh</td>
-              <td><span class="val-trip">≥ 1 800 min⁻¹/s</span> hoặc <strong>mất tín hiệu đo tốc độ</strong></td>
-            </tr>
-            <tr>
-              <td>Chênh lệch cảm biến tốc độ</td>
-              <td><span class="val-trip">&gt; 5 %</span></td>
-            </tr>
-            <tr>
-              <td>Tần số lưới điện giảm thấp</td>
-              <td><span class="val-trip">&lt; 47 Hz</span> <span style="color:var(--muted);font-size:0.85em;">(tốc độ tuabin &lt; 2 820 min⁻¹)</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+<!-- ========== 2 ========== -->
+<h2 class="section" id="s2">2. Cơ sở thiết kế hệ thống ETS/TCS</h2>
 
-    <!-- 3 -->
-    <div class="prot-group" id="p3">
-      <div class="prot-header h-3">
-        <span class="num">3</span>
-        <span class="icon">📳</span>
-        <span>Rung động &amp; Cơ khí Rô-to (TSI)</span>
-      </div>
-      <div class="prot-body">
-        <table class="prot-table">
-          <thead>
-            <tr>
-              <th>Loại bảo vệ</th>
-              <th>Ngưỡng tác động / Giới hạn thiết kế</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Độ di trục rô-to cao</td>
-              <td><span class="val-trip">&lt; −0,63 mm</span> hoặc <span class="val-trip">&gt; +0,63 mm</span><br><span style="color:var(--muted);font-size:0.85em;">Thiết kế: ±0,89 mm</span></td>
-            </tr>
-            <tr>
-              <td>Độ rung gối trục cao</td>
-              <td><span class="val-trip">≥ 150 μm</span><br><span style="color:var(--muted);font-size:0.85em;">Thiết kế: ≥ 229 μm</span></td>
-            </tr>
-            <tr>
-              <td>Độ chênh giãn nở lớn</td>
-              <td><span class="val-trip">&lt; −7,67 mm</span> hoặc <span class="val-trip">&gt; +14,88 mm</span><br><span style="color:var(--muted);font-size:0.85em;">Thiết kế: &lt; −8,31 mm / &gt; +15,52 mm</span></td>
-            </tr>
-            <tr>
-              <td>Độ giãn nở rô-to lớn</td>
-              <td><span class="val-trip">&lt; −13,36 mm</span> hoặc <span class="val-trip">&gt; +43 mm</span><br><span style="color:var(--muted);font-size:0.85em;">Thiết kế: &lt; −14,12 mm / &gt; +46,3 mm</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+<h3 class="subsection">2.1. Đặc thù công nghệ tổ máy 540 MW Mông Dương 1</h3>
+<ul>
+  <li><strong>Tốc độ định mức:</strong> 3 000 r/min; tần số lưới 50 Hz.</li>
+  <li><strong>Thông số hơi danh định:</strong> áp suất hơi chính 167,7 bar; nhiệt độ hơi chính và hơi tái nhiệt 538 °C (theo QT/22-VH).</li>
+  <li><strong>Cấu trúc hệ trục:</strong> 6 gối đỡ tuabin (HP/IP/LP) + 2 gối máy phát, kèm 1 gối chặn độc lập tại cụm đầu tuabin.</li>
+  <li><strong>Hệ điều khiển:</strong> GE Mark VIe với cấu trúc module phân tán – card bảo vệ chính PTUR, card bảo vệ khẩn cấp độc lập PPRO/TPRO, mạch solenoid ETD.</li>
+  <li><strong>Môi chất điều khiển:</strong> dầu thủy lực chống cháy EH áp lực cao (áp lực làm việc bình thường 151,7~165,5 bar). Khi xả Trip Header, các van hơi tự đóng kín bằng lực nén lò xo cơ khí (nguyên lý fail-safe).</li>
+</ul>
 
-    <!-- 4 -->
-    <div class="prot-group" id="p4">
-      <div class="prot-header h-4">
-        <span class="num">4</span>
-        <span class="icon">🌡</span>
-        <span>Nhiệt độ kim loại gối &amp; Tầng cánh</span>
-      </div>
-      <div class="prot-body">
-        <table class="prot-table">
-          <thead>
-            <tr>
-              <th>Loại bảo vệ</th>
-              <th>Ngưỡng tác động / Trip thiết kế</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Nhiệt độ gối chặn cao</td>
-              <td><span class="val-trip">≥ 99 °C</span><br><span style="color:var(--muted);font-size:0.85em;">Thiết kế: ≥ 105 °C</span></td>
-            </tr>
-            <tr>
-              <td>Nhiệt độ gối đỡ 1 – 3</td>
-              <td><span class="val-trip">≥ 116 °C</span><br><span style="color:var(--muted);font-size:0.85em;">Thiết kế: ≥ 127 °C</span></td>
-            </tr>
-            <tr>
-              <td>Nhiệt độ gối đỡ 4 – 8</td>
-              <td><span class="val-trip">≥ 107 °C</span><br><span style="color:var(--muted);font-size:0.85em;">Thiết kế: ≥ 121 °C</span></td>
-            </tr>
-            <tr>
-              <td>Nhiệt độ kim loại tầng cánh cuối LP</td>
-              <td><span class="val-trip">≥ 232 °C</span><br><span style="color:var(--muted);font-size:0.85em;">Thiết kế: ≥ 260 °C</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+<h3 class="subsection">2.2. Triết lý thiết kế và phân tầng phòng vệ</h3>
+<p>Hệ thống tuân thủ nguyên tắc phòng vệ theo chiều sâu (Defense-in-Depth):</p>
+<ul>
+  <li><strong>Lớp 1 – Điều khiển bình thường:</strong> vòng điều tốc Speed/Load Governor điều tiết độ mở CV/IV duy trì thông số ổn định.</li>
+  <li><strong>Lớp 2 – Bảo vệ chính (Primary Trip):</strong> module phần mềm trong card PTUR phát hiện vượt ngưỡng hoặc thông số công nghệ bất thường để de-energize relay trip chính.</li>
+  <li><strong>Lớp 3 – Bảo vệ khẩn cấp dự phòng (Emergency Trip):</strong> module firmware độc lập trong card PPRO/TPRO và bộ ngắt cơ ETD bảo đảm ngắt nguồn cấp hơi khi lớp chính không xử lý được.</li>
+  <li><strong>Nguyên tắc fail-safe:</strong> mất nguồn điều khiển hoặc mất áp lực dầu EH đều khiến van tự đóng về trạng thái an toàn.</li>
+</ul>
 
-    <!-- 5 -->
-    <div class="prot-group" id="p5">
-      <div class="prot-header h-5">
-        <span class="num">5</span>
-        <span class="icon">💨</span>
-        <span>Chân không &amp; Nhiệt độ hơi thoát</span>
-      </div>
-      <div class="prot-body">
-        <table class="prot-table">
-          <thead>
-            <tr>
-              <th>Loại bảo vệ</th>
-              <th>Ngưỡng tác động</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Mất chân không bình ngưng</td>
-              <td>Áp suất tuyệt đối <span class="val-trip">≥ 0,18 bar</span><br><span style="color:var(--muted);font-size:0.85em;">(hoặc ≥ 0,254 bar khi tốc độ ≥ 300 min⁻¹)</span></td>
-            </tr>
-            <tr>
-              <td>Nhiệt độ hơi thoát HP cao</td>
-              <td><span class="val-trip">≥ 482,2 °C</span> kéo dài quá <strong>15 min</strong><br>hoặc <span class="val-trip">≥ 510 °C</span> tức thời</td>
-            </tr>
-            <tr>
-              <td>Nhiệt độ hơi thoát LP cao</td>
-              <td><span class="val-trip">≥ 93,3 °C</span><br><span style="color:var(--muted);font-size:0.85em;">Thiết kế: ≥ 107,2 °C</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+<h3 class="subsection">2.3. Các dạng hư hỏng cần ngăn chặn</h3>
+<table>
+  <thead>
+    <tr><th>Dạng hư hỏng</th><th>Nguyên nhân điển hình</th><th>Hậu quả</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Va quệt cánh – vỏ / bạc</td><td>Giãn nở vi sai, dịch trục, rung lớn</td><td>Gãy cánh, kẹt rotor</td></tr>
+    <tr><td>Cháy bạc lót / bạc chặn</td><td>Mất màng dầu, quá nhiệt</td><td>Hư rotor, bó kẹt trục</td></tr>
+    <tr><td>Biến dạng nhiệt rotor / stator</td><td>Sốc nhiệt, lọt nước</td><td>Cong vênh không hồi phục</td></tr>
+    <tr><td>Nổ / hư van hơi</td><td>Mất áp EH, mất điều khiển</td><td>Mất kiểm soát tải / overspeed</td></tr>
+    <tr><td>Hư máy phát / hệ thống điện</td><td>Ngắn mạch, mất kích từ</td><td>Mất tải đột ngột → overspeed</td></tr>
+    <tr><td>Quá tốc độ (overspeed)</td><td>Mất tải, van kẹt mở</td><td>Vỡ cánh, nổ tuabin</td></tr>
+  </tbody>
+</table>
 
-    <!-- 6 -->
-    <div class="prot-group" id="p6">
-      <div class="prot-header h-6">
-        <span class="num">6</span>
-        <span class="icon">🔥</span>
-        <span>Thông số hơi chính &amp; Tái nhiệt</span>
-      </div>
-      <div class="prot-body">
-        <table class="prot-table">
-          <thead>
-            <tr>
-              <th>Loại bảo vệ</th>
-              <th>Ngưỡng tác động</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Nhiệt độ hơi chính / tái nhiệt cao</td>
-              <td><span class="val-trip">≥ 565 °C</span> sau <strong>15 min</strong><br><span style="color:var(--muted);font-size:0.85em;">Báo động tại <span class="val-warn">551 °C</span></span></td>
-            </tr>
-            <tr>
-              <td>Tốc độ giảm nhiệt độ hơi nhanh</td>
-              <td>Giảm <span class="val-trip">≥ 65,5 °C / 15 min</span><br><span style="color:var(--muted);font-size:0.85em;">(≥ 150 °F / 15 min)</span></td>
-            </tr>
-            <tr>
-              <td>Chênh lệch nhiệt độ hơi giữa 2 lò</td>
-              <td><span class="val-trip">&gt; 41,7 °C</span> kéo dài quá <strong>15 min</strong></td>
-            </tr>
-            <tr>
-              <td>Chênh lệch nhiệt độ đầu vào HP, IP</td>
-              <td><span class="val-trip">&gt; 24 °C</span> <span style="color:var(--muted);font-size:0.85em;">(75 °F)</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+<!-- ========== 3 ========== -->
+<h2 class="section" id="s3">3. Cấu trúc 27 điều kiện bảo vệ và danh mục chi tiết</h2>
 
-    <!-- 7 -->
-    <div class="prot-group" id="p7">
-      <div class="prot-header h-7">
-        <span class="num">7</span>
-        <span class="icon">💧</span>
-        <span>Nước làm mát Stator Máy phát</span>
-      </div>
-      <div class="prot-body">
-        <table class="prot-table">
-          <thead>
-            <tr>
-              <th>Loại bảo vệ</th>
-              <th>Ngưỡng tác động</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Áp lực nước làm mát stator thấp</td>
-              <td><span class="val-trip">&lt; 5,86 bar</span> trong <strong>60 min</strong></td>
-            </tr>
-            <tr>
-              <td>Lưu lượng nước làm mát stator thấp</td>
-              <td><span class="val-trip">&lt; 56 m³/h</span> trong <strong>60 min</strong></td>
-            </tr>
-            <tr>
-              <td>Nhiệt độ nước làm mát stator cao</td>
-              <td><span class="val-trip">&gt; 83 °C</span> trong <strong>60 min</strong></td>
-            </tr>
-            <tr>
-              <td>Kết hợp dòng stator cao hoặc độ dẫn điện cao</td>
-              <td>
-                <span class="val-trip">&gt; 7 754,5 A</span> trong <strong>120 s</strong><br>
-                <span class="val-trip">&gt; 3 677 A</span> trong <strong>210 s</strong><br>
-                hoặc độ dẫn điện <span class="val-trip">&gt; 0,5 μS/cm</span> trong <strong>600 s</strong>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+<h3 class="subsection">3.1. Phân nhóm hệ thống</h3>
+<table>
+  <thead>
+    <tr><th style="width:60px;">Nhóm</th><th style="width:110px;">Số điều kiện</th><th>Phạm vi bảo vệ</th><th>Nguồn tín hiệu chính</th></tr>
+  </thead>
+  <tbody>
+    <tr><td class="num">I</td><td class="num">7</td><td>Cơ khí và giám sát trục (TSI): tốc độ, di trục, độ rung, giãn nở vi sai, độ lệch tâm</td><td>VM600, proximity probe, keyphasor</td></tr>
+    <tr><td class="num">II</td><td class="num">7</td><td>Dầu bôi trơn và thủy lực điều khiển: áp lực/mức dầu bôi trơn; áp lực/mức/nhiệt độ dầu EH; nhiệt gối</td><td>Transmitter áp lực/mức, RTD/TE</td></tr>
+    <tr><td class="num">III</td><td class="num">6</td><td>Thông số hơi và chu trình nhiệt: chân không, nhiệt độ thoát HP/LP, hơi chính/tái nhiệt, mức BGN CA</td><td>Transmitter buồng ngưng, TE hơi, logic mức</td></tr>
+    <tr><td class="num">IV</td><td class="num">4</td><td>Liên động công nghệ: MFT 2 lò, bảo vệ điện máy phát, nước làm mát Stator, tần số thấp, lỗi nguồn ETS</td><td>FSSS 2 lò, tủ rơ-le điện, card TREG/TTRP</td></tr>
+    <tr><td class="num">V</td><td class="num">3</td><td>Tác động dừng máy: nút CCR, nút tại chỗ, lệnh Shutdown L1SDTRIP</td><td>Nút cứng bàn điều khiển, nút đầu tuabin, HMI TCS</td></tr>
+    <tr><td class="num">—</td><td class="num"><strong>27</strong></td><td colspan="2"><strong>Toàn bộ liên động ngắt van hơi và xả Trip Header</strong></td></tr>
+  </tbody>
+</table>
 
-    <!-- 8 -->
-    <div class="prot-group" id="p8">
-      <div class="prot-header h-8">
-        <span class="num">8</span>
-        <span class="icon">🚨</span>
-        <span>Sự cố Lò hơi &amp; Lệnh dừng khẩn cấp</span>
-      </div>
-      <div class="prot-body">
-        <table class="prot-table">
-          <thead>
-            <tr>
-              <th>Loại bảo vệ</th>
-              <th>Ngưỡng tác động</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Trip từ Lò hơi</td>
-              <td><strong>MFT đồng thời cả 02 lò hơi</strong> (Lò 1A và Lò 1B)</td>
-            </tr>
-            <tr>
-              <td>Trip từ Máy phát</td>
-              <td>Máy phát sự cố nội bộ hoặc <strong>rơ-le bảo vệ điện</strong> tác động</td>
-            </tr>
-            <tr>
-              <td>Lỗi van thông hơi xilanh (BVV)</td>
-              <td>Van <strong>BVV</strong> bị lỗi điều khiển</td>
-            </tr>
-            <tr>
-              <td>Dừng khẩn cấp bằng tay</td>
-              <td>Nhấn nút <strong>Emergency Trip</strong> tại DCS hoặc tại chỗ</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </section>
+<h3 class="subsection">3.2. Danh mục chi tiết 27 điều kiện bảo vệ (Cập nhật theo QT/22-VH)</h3>
+<p>Mỗi mục dưới đây ghi đầy đủ <strong>ngưỡng cảnh báo · ngưỡng trip · thời gian trễ · logic biểu quyết · vị trí thiết bị</strong>.</p>
 
-  <!-- II -->
-  <section id="interlock">
-    <h2>II. Các liên động tự động sau khi Tuabin Trip</h2>
+<h4>Nhóm I – Cơ khí và giám sát trục (TSI) – 7 điều kiện</h4>
+<ol class="detail-list">
+  <li>
+    <strong class="title">Quá tốc độ chính (electronic overspeed)</strong>
+    <span class="params">Trip: <span class="hl-trip">3 300 r/min (110 %)</span><span class="sep">·</span>Delay: <em>0 s</em><span class="sep">·</span>Logic: <em>2/3</em><span class="sep">·</span>3 magnetic pickup trên bánh răng trục – card PTUR</span>
+  </li>
+  <li>
+    <strong class="title">Quá tốc độ khẩn cấp (emergency overspeed)</strong>
+    <span class="params">Trip: <span class="hl-trip">3 315 r/min (110,5 %)</span><span class="sep">·</span>Delay: <em>0 s</em><span class="sep">·</span>Logic: <em>2/3 + cơ cấu cơ khí</em><span class="sep">·</span>Card PPRO/TPRO độc lập, búa đập gối 1</span>
+  </li>
+  <li>
+    <strong class="title">Dịch chuyển dọc trục rotor (axial displacement)</strong>
+    <span class="params">Cảnh báo: <span class="hl-warn">±0,635 mm</span><span class="sep">·</span>Trip: <span class="hl-trip">≥ +0,89 mm hoặc ≤ -0,89 mm</span><span class="sep">·</span>Delay: <em>0,1 s</em><span class="sep">·</span>Logic: <em>2/3</em><span class="sep">·</span>Proximity probe mặt đĩa bạc chặn gối 1/2 – VM600</span>
+  </li>
+  <li>
+    <strong class="title">Rung gối trục tuyệt đối (bearing housing vibration)</strong>
+    <span class="params">Cảnh báo: <span class="hl-warn">150 µm</span><span class="sep">·</span>Trip: <span class="hl-trip">229 µm</span><span class="sep">·</span>Delay: <em>1,0 s</em><span class="sep">·</span>Logic: <em>2/2</em><span class="sep">·</span>Accelerometer vỏ gối 1–6 – VM600</span>
+  </li>
+  <li>
+    <strong class="title">Rung tương đối thân trục (shaft relative vibration)</strong>
+    <span class="params">Cảnh báo: <span class="hl-warn">125 µm</span><span class="sep">·</span>Trip: <span class="hl-trip">229 µm</span><span class="sep">·</span>Delay: <em>1,0 s</em><span class="sep">·</span>Logic: <em>2/2 (X/Y mỗi gối)</em><span class="sep">·</span>Proximity probe 90° gối 1–6 – VM600</span>
+  </li>
+  <li>
+    <strong class="title">Giãn nở vi sai cao (differential expansion)</strong>
+    <span class="params">Trip: <span class="hl-trip">< -8,3 mm hoặc > +15,5 mm</span><span class="sep">·</span>Delay: <em>1,0 s</em><span class="sep">·</span>Logic: <em>2/2</em><span class="sep">·</span>Proximity đo giãn nở rotor – vỏ HP/IP/LP – VM600</span>
+  </li>
+  <li>
+    <strong class="title">Độ võng trục khi quay chậm (rotor eccentricity)</strong>
+    <span class="params">Cảnh báo: <span class="hl-warn">0,038 mm</span><span class="sep">·</span>Trip: <span class="hl-trip">0,06 mm</span><span class="sep">·</span>Delay: <em>0 s (khóa tăng tốc)</em><span class="sep">·</span>Logic: <em>1/2</em><span class="sep">·</span>Proximity khi tốc độ &lt; 600 r/min (turning gear)</span>
+  </li>
+</ol>
 
-    <div class="callout danger">
-      <strong>Lưu ý:</strong> Sau khi Tuabin Trip, hệ thống bảo vệ sẽ tự động kích hoạt <strong>10 liên động</strong> theo trình tự để bảo vệ tuabin, máy phát và lò hơi khỏi hư hỏng thứ cấp.
-    </div>
+<h4>Nhóm II – Dầu bôi trơn và thủy lực điều khiển – 7 điều kiện</h4>
+<ol class="detail-list" start="8">
+  <li>
+    <strong class="title">Áp lực góp dầu bôi trơn thấp (lube oil header pressure low)</strong>
+    <span class="params">Cảnh báo: <span class="hl-warn">1,79 ~ 2,0 bar (Bình thường)</span><span class="sep">·</span>Trip: <span class="hl-trip">≤ 1,21 bar</span><span class="sep">·</span>Delay: <em>0,5 s</em><span class="sep">·</span>Logic: <em>2/3</em><span class="sep">·</span>Transmitter trên ống góp cấp dầu các gối</span>
+  </li>
+  <li>
+    <strong class="title">Mức dầu thùng chính thấp (main oil tank level low)</strong>
+    <span class="params">Cảnh báo: <span class="hl-warn">Mức 0</span><span class="sep">·</span>Trip: <span class="hl-trip">≤ 406 mm (tính từ đỉnh bể)</span><span class="sep">·</span>Delay: <em>2,0 s</em><span class="sep">·</span>Logic: <em>2/3</em><span class="sep">·</span>Level transmitter thùng dầu bôi trơn chính</span>
+  </li>
+  <li>
+    <strong class="title">Nhiệt độ kim loại bạc đỡ cao (journal bearing metal temp)</strong>
+    <span class="params">Cảnh báo: <span class="hl-warn">105 °C (gối 1-3), 99 °C (gối 4-8)</span><span class="sep">·</span>Trip: <span class="hl-trip">≥ 127,2 °C (gối 1-3), ≥ 121,1 °C (gối 4-8)</span><span class="sep">·</span>Delay: <em>1,0 s</em><span class="sep">·</span>Logic: <em>2/2 (cùng gối)</em><span class="sep">·</span>Cặp nhiệt TE trong lớp babbitt</span>
+  </li>
+  <li>
+    <strong class="title">Nhiệt độ kim loại bạc chặn cao (thrust bearing metal temp)</strong>
+    <span class="params">Cảnh báo: <span class="hl-warn">99 °C</span><span class="sep">·</span>Trip: <span class="hl-trip">≥ 105 °C</span><span class="sep">·</span>Delay: <em>1,0 s</em><span class="sep">·</span>Logic: <em>2/2</em><span class="sep">·</span>Cặp nhiệt TE má động/tĩnh bạc chặn gối 2</span>
+  </li>
+  <li>
+    <strong class="title">Áp lực dầu EH thấp (EH oil pressure low)</strong>
+    <span class="params">Cảnh báo: <span class="hl-warn">< 130 bar</span><span class="sep">·</span>Trip: <span class="hl-trip">≤ 110,316 bar</span><span class="sep">·</span>Delay: <em>0,5 s</em><span class="sep">·</span>Logic: <em>2/3</em><span class="sep">·</span>Transmitter cấp dầu EH van hơi (Bình thường 151,7~165,5 bar)</span>
+  </li>
+  <li>
+    <strong class="title">Mức dầu thùng EH thấp (EH oil tank level low)</strong>
+    <span class="params">Cảnh báo: <span class="hl-warn">505,46 mm</span><span class="sep">·</span>Trip: <span class="hl-trip">≤ 281,94 mm</span><span class="sep">·</span>Delay: <em>2,0 s</em><span class="sep">·</span>Logic: <em>2/3</em><span class="sep">·</span>Level transmitter thùng dầu EH (Bình thường 620 mm)</span>
+  </li>
+  <li>
+    <strong class="title">Nhiệt độ dầu EH cao (EH oil temperature high)</strong>
+    <span class="params">Cảnh báo: <span class="hl-warn">49 °C</span><span class="sep">·</span>Trip: <span class="hl-trip">≥ 65 °C (Bảo vệ gián tiếp)</span><span class="sep">·</span>Delay: <em>3,0 s</em><span class="sep">·</span>Logic: <em>2/3</em><span class="sep">·</span>RTD trên đường hồi dầu EH</span>
+  </li>
+</ol>
 
-    <ol class="interlock-list">
-      <li>
-        <strong>Đóng kín các van hơi cấp vào tuabin:</strong> Tức thời phát lệnh đóng hoàn toàn các van Stop hơi chính (<strong>MSV</strong>), van điều chỉnh hơi chính (<strong>CV</strong>), van Stop tái nhiệt (<strong>RSV</strong>) và van điều chỉnh tái nhiệt (<strong>IV</strong>).
-      </li>
-      <li>
-        <strong>Cô lập hệ thống hơi trích:</strong> Tự động đóng nhanh toàn bộ van một chiều và van chặn điện động trên tất cả <strong>08 cửa trích hơi</strong> (từ cửa trích số 1 đến số 8) đi các bình gia nhiệt cao áp, hạ áp và bình khử khí để ngăn chặn tuyệt đối nước hoặc hơi lọt ngược về làm hỏng tuabin.
-      </li>
-      <li>
-        <strong>Mở xả áp suất và thông hơi xilanh:</strong> Tự động mở van thông hơi xilanh cao áp (<strong>BVV</strong>) và van xả khẩn cấp đáy xilanh cao áp (<strong>BDV</strong>) xả về bình ngưng để làm mát tầng cánh cao áp và triệt tiêu áp suất hơi dư gây vượt tốc.
-      </li>
-      <li>
-        <strong>Kích hoạt hệ thống Bypass hơi:</strong> Tự động mở nhanh hệ thống Bypass cao áp (<strong>HP Bypass</strong>) và Bypass hạ áp (<strong>LP Bypass</strong>), đồng thời mở nước phun giảm ôn bypass để xả hơi về bình ngưng nhằm duy trì áp lực bao hơi, bảo vệ an toàn cho lò hơi và chống tác động van an toàn lò.
-      </li>
-      <li>
-        <strong>Mở hệ thống xả đọng tuabin (Drain Valves):</strong> Tự động mở toàn bộ các van xả đọng trên đường hơi chính, hơi tái nhiệt và các van xả vỏ trong/vỏ ngoài tuabin (<strong>SD1, SD2, S4</strong>) để tháo cạn nước ngưng, chống thủy kích khi tuabin giảm tốc.
-      </li>
-      <li>
-        <strong>Chuyển đổi nguồn cấp hơi chèn trục:</strong> Tự động ngắt nguồn hơi tự chèn, chuyển sang lấy hơi chèn từ ống góp hơi tự dùng (<strong>Auxiliary Steam Header</strong>), duy trì ổn định áp suất chèn ≈ <strong>0,28 bar</strong> nhằm giữ chân không bình ngưng trong quá trình giảm tốc.
-      </li>
-      <li>
-        <strong>Mở phun giảm ôn bảo vệ cổ thoát hạ áp:</strong> Mở van phun nước giảm ôn làm mát cổ thoát hơi tuabin hạ áp khi nhiệt độ hơi thoát dâng cao để bảo vệ màng an toàn và kết cấu xilanh hạ áp.
-      </li>
-      <li>
-        <strong>Cắt điện máy phát và kích từ:</strong> Tự động phát lệnh cắt máy cắt đầu cực máy phát <strong>901</strong> và cắt hệ thống kích từ để tách máy phát ra khỏi lưới điện an toàn.
-      </li>
-      <li>
-        <strong>Tự động vào thiết bị vần trục (Turning Gear):</strong> Khi tốc độ rô-to tuabin giảm dần về đúng <strong>0 min⁻¹</strong>, nếu áp lực dầu bôi trơn và nhiệt độ gối đạt yêu cầu, bộ vần trục tự động gài khớp quay trục để chống hiện tượng cong võng rô-to do giãn nở nhiệt không đều.
-      </li>
-    </ol>
+<h4>Nhóm III – Thông số hơi và chu trình nhiệt – 6 điều kiện</h4>
+<ol class="detail-list" start="15">
+  <li>
+    <strong class="title">Chân không bình ngưng thấp (condenser vacuum low)</strong>
+    <span class="params">Cảnh báo: <span class="hl-warn">≥ 0,17 bar</span><span class="sep">·</span>Trip: <span class="hl-trip">≥ 0,254 bar (và tốc độ ≥ 300 r/min)</span><span class="sep">·</span>Delay: <em>1,0 s</em><span class="sep">·</span>Logic: <em>2/3</em><span class="sep">·</span>Transmitter áp tuyệt đối buồng ngưng</span>
+  </li>
+  <li>
+    <strong class="title">Nhiệt độ buồng thoát hạ áp cao (LP exhaust hood temp)</strong>
+    <span class="params">Cảnh báo: <span class="hl-warn">93,3 °C</span><span class="sep">·</span>Trip: <span class="hl-trip">≥ 107,2 °C</span><span class="sep">·</span>Delay: <em>2,0 s</em><span class="sep">·</span>Logic: <em>2/3</em><span class="sep">·</span>TE vách thoát xilanh hạ áp vào bình ngưng</span>
+  </li>
+  <li>
+    <strong class="title">Nhiệt độ hơi thoát cao áp cao (HP exhaust hood temp)</strong>
+    <span class="params">Cảnh báo: <span class="hl-warn">—</span><span class="sep">·</span>Trip 1: <span class="hl-trip">≥ 482,2 °C (quá 15 phút)</span><span class="sep">·</span>Trip 2: <span class="hl-trip">≥ 510 °C (tức thời)</span><span class="sep">·</span>Delay: <em>0-15 phút</em><span class="sep">·</span>Logic: <em>2/3</em><span class="sep">·</span>TE tại vách thoát hơi HP</span>
+  </li>
+  <li>
+    <strong class="title">Áp suất hơi chính thấp (main steam pressure low)</strong>
+    <span class="params">Cảnh báo: <span class="hl-warn">—</span><span class="sep">·</span>Trip: <span class="hl-trip">— (Bảo vệ gián tiếp qua MFT)</span><span class="sep">·</span>Delay: <em>2,0 s–5,0 s</em><span class="sep">·</span>Logic: <em>2/3</em><span class="sep">·</span>Transmitter hơi chính trước MSV</span>
+  </li>
+  <li>
+    <strong class="title">Nhiệt độ hơi chính/tái nhiệt quá cao hoặc chênh lệch</strong>
+    <span class="params">Trip 1: <span class="hl-trip">Nhiệt độ ≥ 565 °C</span><span class="sep">·</span>Trip 2: <span class="hl-trip">Chênh lệch 2 nhánh > 41,7 °C/15 phút</span><span class="sep">·</span>Delay: <em>15 phút</em><span class="sep">·</span>Logic: <em>2/3</em><span class="sep">·</span>TE hơi chính và hơi tái nhiệt</span>
+  </li>
+  <li>
+    <strong class="title">Mức nước bình gia nhiệt CA cực cao (HP heater level high-high)</strong>
+    <span class="params">Cảnh báo: <span class="hl-warn">—</span><span class="sep">·</span>Trip: <span class="hl-trip">Đóng van trích hơi (Level L3)</span><span class="sep">·</span>Delay: <em>1,0 s</em><span class="sep">·</span>Logic: <em>2/3</em><span class="sep">·</span>Level transmitter BGN CA</span>
+  </li>
+</ol>
 
-    <div class="callout success">
-      <strong>Nguyên tắc chung:</strong> Toàn bộ 10 liên động trên được kích hoạt <strong>tự động và tức thời</strong> sau khi Tuabin Trip, không cần can thiệp thủ công. Vận hành viên cần giám sát để xác nhận các liên động đã hoạt động đúng, và can thiệp bằng tay nếu có liên động nào không tự động tác động.
-    </div>
-  </section>
+<h4>Nhóm IV – Liên động công nghệ (Lò – Điện – Điều khiển) – 4 điều kiện</h4>
+<ol class="detail-list" start="21">
+  <li>
+    <strong class="title">Sự cố lò hơi MFT (boiler MFT 1A/1B)</strong>
+    <span class="params">Trip: <span class="hl-trip">Cả 2 lò cùng Trip hoặc 1 lò Trip gửi tín hiệu</span><span class="sep">·</span>Delay: <em>0 s</em><span class="sep">·</span>Logic: <em>Tiếp điểm cứng 2/2</em><span class="sep">·</span>FSSS lò 1A và 1B</span>
+  </li>
+  <li>
+    <strong class="title">Bảo vệ nước làm mát Stator máy phát</strong>
+    <span class="params">Trip: <span class="hl-trip">P ≤ 3,2 bar HOẶC Q &lt; 56 m³/h HOẶC T &gt; 83,2 °C</span><span class="sep">·</span>Delay: <em>120s, 210s, 600s, 3600s</em><span class="sep">·</span>Logic: <em>Kết hợp với I, độ dẫn</em><span class="sep">·</span>Hệ thống làm mát Stator</span>
+  </li>
+  <li>
+    <strong class="title">Bảo vệ tần số thấp (underfrequency)</strong>
+    <span class="params">Trip: <span class="hl-trip">&lt; 47 Hz (Tốc độ &lt; 2820 r/min)</span><span class="sep">·</span>Delay: <em>1,0 s</em><span class="sep">·</span>Logic: <em>2/3</em><span class="sep">·</span>Relay tần số tủ bảo vệ</span>
+  </li>
+  <li>
+    <strong class="title">Mất nguồn điều khiển ETS &amp; Màng an toàn LP</strong>
+    <span class="params">Trip: <span class="hl-trip">Mất đồng thời 2 nguồn HOẶC Áp thoát LP ≥ 5 psi</span><span class="sep">·</span>Delay: <em>0,2 s</em><span class="sep">·</span>Logic: <em>Fail-safe</em><span class="sep">·</span>Card nguồn TREG/TTRP, màng phòng nổ LP</span>
+  </li>
+</ol>
 
-  <footer>
-    Tài liệu vận hành – Bảo vệ Tuabin &amp; liên động sau Trip<br>
-    8 nhóm bảo vệ cốt lõi – 10 liên động tự động
-  </footer>
+<h4>Nhóm V – Tác động dừng máy vận hành – 3 điều kiện</h4>
+<ol class="detail-list" start="25">
+  <li>
+    <strong class="title">Nút ấn dừng khẩn cấp CCR (hardwired push button)</strong>
+    <span class="params">Delay: <em>0 s</em><span class="sep">·</span>Logic: <em>Tiếp điểm cứng</em><span class="sep">·</span>Nút đấm cơ khí bàn điều khiển trung tâm – ngắt nguồn ETD</span>
+  </li>
+  <li>
+    <strong class="title">Nút ấn khẩn cấp tại chỗ (local emergency stop)</strong>
+    <span class="params">Delay: <em>0 s</em><span class="sep">·</span>Logic: <em>Tiếp điểm cứng</em><span class="sep">·</span>Nút ấn đầu tuabin – ngắt nguồn ETD</span>
+  </li>
+  <li>
+    <strong class="title">Lệnh dừng Shutdown L1SDTRIP (HMI TCS)</strong>
+    <span class="params">Delay: <em>0 s</em><span class="sep">·</span>Logic: <em>Lệnh mềm qua mạng</em><span class="sep">·</span>Màn hình vận hành TCS – Mark VIe</span>
+  </li>
+</ol>
+
+<h3 class="subsection">3.3. Sơ đồ mạch tác động dừng khẩn cấp</h3>
+<div style="background:#0f1c2e;color:#d7e3f0;padding:18px 22px;border-radius:4px;font-family:monospace;font-size:0.85em;line-height:1.5;white-space:pre;overflow-x:auto;margin:14px 0;">
+[Tín hiệu cảm biến công nghệ / TSI]
+       │
+       ├──> [Card bảo vệ chính PTUR (Mark VIe)] ──> [Relay Trip chính] ──┐
+       │                                                                ├──> [Cuộn Solenoid ETD]
+       └──> [Card bảo vệ khẩn cấp PPRO/TPRO] ────> [Relay Emergency] ──┘         │
+                                                                                 ▼
+                                                                          [Xả Trip Header]
+                                                                                 │
+                                                                                 ▼
+                                                                 [MSV, CV, RSV, IV đóng lò xo]
+
+[Nút ấn khẩn cấp CCR (cơ cứng)] ─────────────┐
+[Nút ấn dừng khẩn cấp tại chỗ (đầu tuabin)] ─┴─> [Ngắt trực tiếp nguồn cuộn ETD – Hardware Trip]</div>
+
+<!-- ========== 4 ========== -->
+<h2 class="section" id="s4">4. Phân tích cơ chế hư hỏng và logic bảo vệ vật lý</h2>
+
+<h3 class="subsection">4.1. Nhóm I – Cơ khí và giám sát trục (TSI)</h3>
+<table>
+  <thead>
+    <tr><th style="width:32%;">Điều kiện bảo vệ</th><th>Cơ chế vật lý / hiện tượng</th><th>Hậu quả phá hủy nếu không trip kịp</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1. Quá tốc độ chính (110 %)</td>
+      <td>Lực ly tâm F<sub>cf</sub> = mω<sup>2</sup>r. Khi mất tải đột ngột hoặc kẹt van, năng lượng hơi thừa gia tốc trục tăng vọt.</td>
+      <td>Vượt giới hạn chảy của hợp kim cánh, dão cánh, cọ vành chèn hướng kính, nguy cơ đứt cánh tầng cuối.</td>
+    </tr>
+    <tr>
+      <td>2. Quá tốc độ khẩn cấp (110,5 %)</td>
+      <td>Lớp phòng vệ thứ ba khi mạch điều khiển và bảo vệ phần mềm chính bị vô hiệu hoặc không đóng được van hơi.</td>
+      <td>Ứng suất kéo vượt giới hạn bền phá hủy rotor, vỡ đĩa rotor, phá hủy vỏ và nổ tổ máy.</td>
+    </tr>
+    <tr>
+      <td>3. Dịch chuyển dọc trục (±0,89 mm)</td>
+      <td>Mất cân bằng lực đẩy dọc trục do chênh áp hơi qua tầng cánh, kẹt van hoặc xẹp màng dầu gối chặn. Cài đặt rất sát (0,89 mm) để bảo vệ bạc chặn.</td>
+      <td>Cháy đĩa bạc chặn, cọ mặt đầu tĩnh – động rotor/stator, gãy toàn bộ tầng cánh theo phương dọc trục.</td>
+    </tr>
+    <tr>
+      <td>4. Rung gối &amp; 5. Rung thân trục (229 µm)</td>
+      <td>Mất cân bằng động học, cong trục nhiệt, phân rã màng dầu thủy động hoặc va chạm cơ khí cục bộ (rubbing).</td>
+      <td>Phá vỡ babbitt, mỏi trục gây nứt gãy rotor, phá hệ thống làm kín dầu chèn máy phát.</td>
+    </tr>
+    <tr>
+      <td>6. Giãn nở vi sai (-8,3/+15,5 mm)</td>
+      <td>Rotor và vỏ giãn nở khác nhau. Dải giãn nở thực tế được cài đặt rộng hơn để phù hợp đặc tính nhiệt của tuabin.</td>
+      <td>Va chạm chóp cánh động với vách ngăn tĩnh hoặc vành chèn hướng trục, kẹt cứng rotor.</td>
+    </tr>
+    <tr>
+      <td>7. Độ võng trục (0,06 mm)</td>
+      <td>Rotor biến dạng nhiệt cục bộ (bowed rotor) do mất turning gear hoặc làm mát không đều khi ngừng máy.</td>
+      <td>Lực ly tâm lệch tâm cực lớn khi qua tốc độ tới hạn, phá gối, cọ cánh, cong vĩnh viễn rotor.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 class="subsection">4.2. Nhóm II – Dầu bôi trơn và thủy lực điều khiển</h3>
+<table>
+  <thead>
+    <tr><th style="width:32%;">Điều kiện bảo vệ</th><th>Cơ chế vật lý / hiện tượng</th><th>Hậu quả phá hủy nếu không trip kịp</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>8. Áp lực dầu bôi trơn (≤ 1,21 bar)</td>
+      <td>Màng dầu thủy động bị phá vỡ. Ngưỡng 1,21 bar được đặt cao hơn tiêu chuẩn để bảo vệ bạc ngay khi áp lực bắt đầu sụt giảm.</td>
+      <td>Ma sát khô, nhiệt kim loại tăng hàng trăm °C trong vài giây, chảy babbitt, bó kẹt trục.</td>
+    </tr>
+    <tr>
+      <td>9. Mức dầu thùng chính (≤ 406 mm)</td>
+      <td>Hụt dầu làm hút khí vào bơm (cavitation), giảm lưu lượng tuần hoàn dù áp lực còn duy trì tạm thời.</td>
+      <td>Bơm mất khả năng cấp dầu, mất màng dầu toàn hệ thống, hư bạc nhanh chóng.</td>
+    </tr>
+    <tr>
+      <td>10. Nhiệt độ kim loại bạc đỡ (127,2 °C)</td>
+      <td>Babbitt mất độ bền khi vượt 110–120 °C. Gối 1-3 chịu tải cao hơn nên ngưỡng trip cao hơn (127,2 °C) so với gối 4-8 (121,1 °C).</td>
+      <td>Nóng chảy babbitt, mất định vị tâm trục, cọ sát rotor–stator, hư rotor.</td>
+    </tr>
+    <tr>
+      <td>11. Nhiệt độ bạc chặn (105 °C)</td>
+      <td>Bạc chặn chịu lực dọc trục lớn, ngưỡng nhiệt được cài đặt rất chặt (105 °C) để bảo vệ sớm.</td>
+      <td>Cháy bạc chặn, rotor dịch dọc, va quệt cánh, phá hủy tầng cánh.</td>
+    </tr>
+    <tr>
+      <td>12. Áp lực dầu EH (≤ 110,3 bar)</td>
+      <td>Dầu EH duy trì van hơi mở. Mất áp lực làm van mất kiểm soát. Áp lực bình thường rất cao (151,7~165,5 bar).</td>
+      <td>Van không đóng/mở theo lệnh, dao động tải, không thể trip khẩn cấp khi có sự cố.</td>
+    </tr>
+    <tr>
+      <td>13. Mức dầu thùng EH (≤ 281,9 mm)</td>
+      <td>Hụt dầu gây cavitation bơm EH, mất áp lực điều khiển, hỏng bơm và servo van.</td>
+      <td>Mất khả năng điều khiển van hơi, nguy cơ overspeed hoặc không trip được.</td>
+    </tr>
+    <tr>
+      <td>14. Nhiệt độ dầu EH (&gt; 65 °C)</td>
+      <td>Dầu este photphat bị thoái hóa, giảm độ nhớt, tăng độ axit, hỏng seal và servo valve.</td>
+      <td>Mất đặc tính điều khiển, kẹt servo, mất khả năng đóng van khẩn cấp.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 class="subsection">4.3. Nhóm III – Thông số hơi và chu trình nhiệt</h3>
+<table>
+  <thead>
+    <tr><th style="width:32%;">Điều kiện bảo vệ</th><th>Cơ chế vật lý / nhiệt động</th><th>Hậu quả phá hủy nếu không trip kịp</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>15. Chân không bình ngưng (≥ 0,254 bar)</td>
+      <td>Áp thoát cao làm giảm enthalpy khả dụng, tăng mật độ hơi buồng thoát, tăng lực dọc trục.</td>
+      <td>Windage làm nóng cánh LP, nứt chân cánh tầng cuối, phá màng phòng nổ, đe dọa bạc chặn.</td>
+    </tr>
+    <tr>
+      <td>16. Nhiệt độ hơi thoát LP (≥ 107,2 °C)</td>
+      <td>Phun sương làm mát không đủ, biến dạng nhiệt không đều xilanh hạ áp.</td>
+      <td>Lệch tâm gối số 4/5, cọ vành chèn hơi LP, biến dạng vỏ không hồi phục.</td>
+    </tr>
+    <tr>
+      <td>17. Nhiệt độ hơi thoát HP (&gt; 510 °C)</td>
+      <td>Nhiệt độ hơi thoát HP quá cao gây ứng suất nhiệt lớn cho vỏ xilanh và rotor. Trip ngay ở 510 °C hoặc duy trì 482,2 °C quá 15 phút.</td>
+      <td>Biến dạng dẻo vỏ xilanh HP, nứt thân tuabin, rão vật liệu.</td>
+    </tr>
+    <tr>
+      <td>18. Nhiệt độ hơi chính/tái nhiệt (&gt; 565 °C)</td>
+      <td>Quá nhiệt độ cho phép của vật liệu thép hợp kim (CrMoV) làm giảm tuổi thọ creep của ống và cánh.</td>
+      <td>Rão vật liệu, nổ ống hơi chính, nứt cánh tuabin.</td>
+    </tr>
+    <tr>
+      <td>19. Chênh lệch nhiệt độ 2 nhánh (&gt; 41,7 °C)</td>
+      <td>Chênh lệch nhiệt độ giữa 2 đường dẫn hơi gây uốn cong vỏ tuabin và rotor.</td>
+      <td>Cong vênh rotor, cọ sát cánh, hỏng gối đỡ.</td>
+    </tr>
+    <tr>
+      <td>20. Mức nước BGN CA cực cao</td>
+      <td>Nước tràn hồi lưu ngược qua đường trích hơi vào tuabin (water induction).</td>
+      <td>Va đập thủy lực, cong cánh, nứt thân tuabin, hỏng tầng cánh HP/IP.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 class="subsection">4.4. Nhóm IV – Liên động công nghệ (Lò – Điện – Điều khiển)</h3>
+<table>
+  <thead>
+    <tr><th style="width:32%;">Điều kiện bảo vệ</th><th>Nguyên lý liên động</th><th>Tác dụng bảo vệ</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>21. Sự cố lò hơi MFT (1A/1B)</td>
+      <td>FSSS của một hoặc cả hai lò phát lệnh MFT → cắt nhiên liệu, mất nguồn hơi đột ngột.</td>
+      <td>Ngăn hút kiệt áp hơi tồn dư, tránh lọt ẩm vào cánh, bảo toàn thiết bị.</td>
+    </tr>
+    <tr>
+      <td>22. Bảo vệ nước làm mát Stator</td>
+      <td>Mất áp lực, giảm lưu lượng hoặc nhiệt độ nước làm mát tăng cao kết hợp với dòng điện và độ dẫn cao.</td>
+      <td>Ngăn chặn máy phát bị quá nhiệt, chập cháy cuộn dây Stator.</td>
+    </tr>
+    <tr>
+      <td>23. Bảo vệ tần số thấp (&lt; 47 Hz)</td>
+      <td>Tần số lưới giảm sâu; tuabin không duy trì đồng bộ ổn định, tốc độ rơi xuống &lt; 2820 r/min.</td>
+      <td>Ngăn dao động tốc độ gây mỏi cánh, mất đồng bộ máy phát, hư cánh do low-cycle fatigue.</td>
+    </tr>
+    <tr>
+      <td>24. Mất nguồn ETS &amp; Màng an toàn LP</td>
+      <td>Mất nguồn điều khiển hoặc áp thoát LP tăng &gt; 5 psi làm vỡ màng an toàn.</td>
+      <td>Nguyên tắc fail-safe: mất điện → cuộn ETD de-energize → xả trip header. Bảo vệ xilanh LP khỏi nổ.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 class="subsection">4.5. Nhóm V – Tác động dừng máy vận hành</h3>
+<table>
+  <thead>
+    <tr><th style="width:32%;">Phương thức</th><th>Vai trò</th><th>Cơ chế tác động</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>25. Nút ấn dừng khẩn cấp CCR</td>
+      <td>Kênh cứng độc lập phần mềm, dùng khi phát hiện bất thường chưa đạt ngưỡng tự động.</td>
+      <td>Ngắt trực tiếp mạch nguồn cuộn solenoid ETD (hardwired), bỏ qua Mark VIe.</td>
+    </tr>
+    <tr>
+      <td>26. Nút ấn khẩn cấp tại chỗ</td>
+      <td>Kênh cơ khí độc lập, dùng khi mất điều khiển từ xa hoặc cần trip tức thời tại chỗ.</td>
+      <td>Ngắt nguồn cuộn ETD tại chỗ, xả trip header trực tiếp.</td>
+    </tr>
+    <tr>
+      <td>27. Lệnh Shutdown L1SDTRIP</td>
+      <td>Lệnh mềm từ màn hình vận hành, thuận tiện trong thao tác bình thường.</td>
+      <td>Lệnh qua mạng truyền thông → Mark VIe kích relay trip → xả trip header.</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ========== 5 ========== -->
+<h2 class="section" id="s5">5. Bảng thông số cài đặt (Setpoints) chi tiết</h2>
+<p>Bảng tổng hợp các ngưỡng Cảnh báo (Alarm) và Cắt sự cố (Trip) thực tế, được đối chiếu từ Quy trình QT/22-VH:</p>
+
+<table class="setpoint-table">
+  <thead>
+    <tr>
+      <th>STT</th><th>Tên điều kiện bảo vệ</th><th>Ngưỡng cảnh báo</th>
+      <th>Ngưỡng cắt sự cố (Trip)</th><th>Delay</th><th>Ghi chú</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- NHÓM DẦU -->
+    <tr><td class="num">1</td><td>Áp lực dầu bôi trơn thấp</td><td>—</td><td class="val-trip">≤ 1,21 bar</td><td>0,5 s</td><td>Trip có phá chân không</td></tr>
+    <tr><td class="num">2</td><td>Mức dầu bể bôi trơn thấp</td><td>—</td><td class="val-trip">≤ 406 mm</td><td>2 s</td><td>Mức 0 cách đỉnh bể 914 mm</td></tr>
+    <tr><td class="num">3</td><td>Áp lực dầu thủy lực (EH) thấp</td><td class="val-warn">&lt; 130 bar</td><td class="val-trip">≤ 110,316 bar</td><td>0,5 s</td><td>Bình thường 151,7~165,5 bar</td></tr>
+    <tr><td class="num">4</td><td>Mức dầu bể thủy lực (EH) thấp</td><td class="val-warn">≤ 505,46 mm</td><td class="val-trip">≤ 281,94 mm</td><td>2 s</td><td>Bình thường 620 mm</td></tr>
+    
+    <!-- NHÓM TỐC ĐỘ -->
+    <tr><td class="num">5</td><td>Vượt tốc cơ khí / điện tử</td><td>—</td><td class="val-trip">3300 v/p (110%) / 3315 v/p (110,5%)</td><td>0 s</td><td>—</td></tr>
+    <tr><td class="num">6</td><td>Gia tốc tốc độ quá nhanh</td><td>—</td><td class="val-trip">≥ 1800 v/p/s</td><td>0 s</td><td>Hoặc mất tín hiệu đo tốc độ</td></tr>
+    <tr><td class="num">7</td><td>Chênh lệch cảm biến tốc độ</td><td>—</td><td class="val-trip">&gt; 5 %</td><td>0 s</td><td>—</td></tr>
+    <tr><td class="num">8</td><td>Tần số lưới giảm thấp</td><td>—</td><td class="val-trip">&lt; 47 Hz</td><td>1 s</td><td>Tốc độ &lt; 2820 v/p</td></tr>
+    <tr><td class="num">9</td><td>Bảo vệ tốc độ 0</td><td>—</td><td class="val-trip">≤ 1,8 v/p</td><td>0 s</td><td>Kích hoạt bảo vệ tốc độ 0</td></tr>
+
+    <!-- NHÓM TSI -->
+    <tr><td class="num">10</td><td>Độ di trục rô-to cao</td><td class="val-warn">±0,635 mm</td><td class="val-trip">≥ +0,89 mm hoặc ≤ -0,89 mm</td><td>0,1 s</td><td>Trip có phá chân không</td></tr>
+    <tr><td class="num">11</td><td>Độ rung gối trục cao</td><td class="val-warn">≥ 150 μm</td><td class="val-trip">≥ 229 μm</td><td>1 s</td><td>—</td></tr>
+    <tr><td class="num">12</td><td>Độ chênh lệch giãn nở lớn</td><td class="val-warn">&lt; -7,67 / &gt; +14,88 mm</td><td class="val-trip">&lt; -8,31 / &gt; +15,52 mm</td><td>1 s</td><td>—</td></tr>
+    <tr><td class="num">13</td><td>Độ giãn nở rô-to lớn</td><td class="val-warn">&lt; -13,36 / &gt; +43 mm</td><td class="val-trip">&lt; -14,12 / &gt; +46,3 mm</td><td>1 s</td><td>—</td></tr>
+
+    <!-- NHÓM NHIỆT ĐỘ GỐI -->
+    <tr><td class="num">14</td><td>Nhiệt độ gối chặn cao</td><td class="val-warn">≥ 99 °C</td><td class="val-trip">≥ 105 °C</td><td>1 s</td><td>Trip có phá chân không</td></tr>
+    <tr><td class="num">15</td><td>Nhiệt độ gối đỡ 1 – 3</td><td class="val-warn">≥ 116 °C</td><td class="val-trip">≥ 127,2 °C</td><td>1 s</td><td>Trip có phá chân không</td></tr>
+    <tr><td class="num">16</td><td>Nhiệt độ gối đỡ 4 – 8</td><td class="val-warn">≥ 107 °C</td><td class="val-trip">≥ 121,1 °C</td><td>1 s</td><td>Trip có phá chân không</td></tr>
+    <tr><td class="num">17</td><td>Nhiệt độ kim loại tầng cánh cuối LP</td><td class="val-warn">≥ 232 °C</td><td class="val-trip">≥ 260 °C</td><td>1 s</td><td>—</td></tr>
+
+    <!-- NHÓM HƠI THOÁT & CHÂN KHÔNG -->
+    <tr><td class="num">18</td><td>Mất chân không bình ngưng</td><td>—</td><td class="val-trip">≥ 0,254 bar</td><td>1 s</td><td>Và tốc độ ≥ 300 v/p</td></tr>
+    <tr><td class="num">19</td><td>Nhiệt độ hơi thoát HP cao</td><td>—</td><td class="val-trip">≥ 482,2 °C (15p) / ≥ 510 °C (0s)</td><td>15p / 0s</td><td>Trip không phá chân không</td></tr>
+    <tr><td class="num">20</td><td>Nhiệt độ hơi thoát LP cao</td><td class="val-warn">≥ 93,3 °C</td><td class="val-trip">≥ 107,2 °C</td><td>1 s</td><td>—</td></tr>
+
+    <!-- NHÓM HƠI CHÍNH -->
+    <tr><td class="num">21</td><td>Nhiệt độ hơi chính / tái nhiệt cao</td><td class="val-warn">551 °C</td><td class="val-trip">≥ 565 °C</td><td>15 min</td><td>—</td></tr>
+    <tr><td class="num">22</td><td>Tốc độ giảm nhiệt độ hơi nhanh</td><td class="val-warn">≥ 100 °F/15p (~37,8 °C)</td><td class="val-trip">≥ 150 °F/15p (~83,3 °C)</td><td>15 min</td><td>—</td></tr>
+    <tr><td class="num">23</td><td>Chênh lệch nhiệt độ 2 nhánh hơi</td><td class="val-warn">≥ 13,9 °C</td><td class="val-trip">&gt; 41,7 °C</td><td>15 min</td><td>—</td></tr>
+    <tr><td class="num">24</td><td>Độ quá nhiệt hơi không đạt</td><td>—</td><td class="val-trip">ΔT &lt; Ngưỡng cho phép</td><td>—</td><td>Chống lọt nước</td></tr>
+
+    <!-- NHÓM NƯỚC LÀM MÁT STATOR -->
+    <tr><td class="num">25</td><td>Nước làm mát Stator (Runback)</td><td>—</td><td class="val-trip">P ≤ 3,2 bar / Q &lt; 56 m³/h / T &gt; 83,2 °C</td><td>—</td><td>Kích hoạt Runback 2,7 MW/s</td></tr>
+    <tr><td class="num">26</td><td>Trip Stator (Mức 1)</td><td>—</td><td class="val-trip">Điều kiện 25 + Dòng &gt; 9300,2 A</td><td>120 s</td><td>—</td></tr>
+    <tr><td class="num">27</td><td>Trip Stator (Mức 2)</td><td>—</td><td class="val-trip">Điều kiện 25 + Dòng &gt; 4292,4 A</td><td>210 s</td><td>—</td></tr>
+    <tr><td class="num">28</td><td>Trip Stator (Mức 3)</td><td>—</td><td class="val-trip">Điều kiện 25 + Độ dẫn &gt; 0,5 μS/cm</td><td>600 s</td><td>—</td></tr>
+    <tr><td class="num">29</td><td>Trip Stator (Mức 4)</td><td>—</td><td class="val-trip">Điều kiện 25 duy trì</td><td>3600 s</td><td>Trip chắc chắn</td></tr>
+
+    <!-- NHÓM LÒ & ĐIỆN & BƠM -->
+    <tr><td class="num">30</td><td>Trip từ Lò hơi</td><td>—</td><td class="val-trip">MFT đồng thời cả 2 lò</td><td>0 s</td><td>—</td></tr>
+    <tr><td class="num">31</td><td>Mất bơm tuần hoàn / bơm cấp</td><td>—</td><td class="val-trip">Không có bơm nào làm việc</td><td>10 s</td><td>Bảo vệ nhà máy</td></tr>
+    <tr><td class="num">32</td><td>Mất bơm nước làm mát kín / phụ</td><td>—</td><td class="val-trip">Không có bơm nào làm việc</td><td>300 s</td><td>Bảo vệ nhà máy</td></tr>
+    <tr><td class="num">33</td><td>Lỗi van thông hơi xilanh (BVV)</td><td>—</td><td class="val-trip">Lỗi điều khiển BVV</td><td>0 s</td><td>—</td></tr>
+    <tr><td class="num">34</td><td>Dừng khẩn cấp bằng tay</td><td>—</td><td class="val-trip">Nhấn nút Emergency Trip</td><td>0 s</td><td>Tại CCR hoặc tại chỗ</td></tr>
+    <tr><td class="num">35</td><td>Dừng tự động (Auto Stop)</td><td>—</td><td class="val-trip">Tải tham chiếu = 0 MW</td><td>0 s</td><td>Khi ấn Auto Stop</td></tr>
+  </tbody>
+</table>
+
+<!-- ========== 6 ========== -->
+<h2 class="section" id="s6">6. Logic Runback (Giảm tải tự động)</h2>
+<p>Runback là cơ chế tự động giảm tải tuabin với tốc độ định trước (thay vì Trip ngay) khi một số thiết bị phụ trợ quan trọng gặp sự cố, nhằm duy trì vận hành an toàn ở mức tải thấp hơn.</p>
+
+<table>
+  <thead>
+    <tr><th>Sự cố kích hoạt</th><th>Tốc độ giảm tải</th><th>Điều kiện / Ghi chú</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Nước làm mát Stator gặp sự cố (P ≤ 3,2 bar / Q &lt; 56 m³/h / T &gt; 83,2 °C)</td>
+      <td class="val-trip">2,7 MW/s</td>
+      <td>Sau 120s/210s đối chiếu dòng điện (9300A/4292A) để Trip nếu không phục hồi.</td>
+    </tr>
+    <tr>
+      <td>Mất 1 bơm tuần hoàn (khi tải &gt; 315 MW)</td>
+      <td class="val-trip">9 MW/s</td>
+      <td>Đặt tải về 216 MW, dưới 310 MW thì Reset.</td>
+    </tr>
+    <tr>
+      <td>Mất 1 bơm ngưng (khi tải &gt; 320 MW)</td>
+      <td class="val-trip">9 MW/s</td>
+      <td>Đặt tải về 216 MW, dưới 310 MW thì Reset.</td>
+    </tr>
+    <tr>
+      <td>Mất 1 bơm cấp (khi tải &gt; 385 MW)</td>
+      <td class="val-trip">9 MW/s</td>
+      <td>Đặt tải về 216 MW, dưới 310 MW thì Reset.</td>
+    </tr>
+    <tr>
+      <td>Lò hơi gặp sự cố (MFT 1 lò)</td>
+      <td class="val-trip">10 %/s</td>
+      <td>Runback lò còn lại về 68% Boiler Master.</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ========== 7 ========== -->
+<h2 class="section" id="s7">7. 10 chuỗi liên động tự động sau khi Tuabin Trip</h2>
+
+<div class="callout danger">
+  <strong>Nguyên tắc an toàn:</strong> Ngay sau khi Tuabin Trip, hệ thống sẽ tự động kích hoạt <strong>10 liên động</strong> theo trình tự để bảo vệ tuabin, máy phát và lò hơi khỏi các hư hỏng thứ cấp.
+</div>
+
+<ol class="interlock-list">
+  <li>
+    <strong>Đóng kín các van hơi cấp vào tuabin:</strong> Tức thời phát lệnh đóng hoàn toàn các van Stop hơi chính (<strong>MSV</strong>), van điều chỉnh hơi chính (<strong>CV</strong>), van Stop tái nhiệt (<strong>RSV</strong>) và van điều chỉnh tái nhiệt (<strong>IV</strong>).
+  </li>
+  <li>
+    <strong>Cô lập hệ thống hơi trích:</strong> Tự động đóng nhanh toàn bộ van một chiều và van chặn điện động trên tất cả <strong>08 cửa trích hơi</strong> đi các bình gia nhiệt và bình khử khí để ngăn chặn tuyệt đối nước hoặc hơi lọt ngược về làm hỏng tuabin.
+  </li>
+  <li>
+    <strong>Mở xả áp suất và thông hơi xilanh:</strong> Tự động mở van thông hơi xilanh cao áp (<strong>BVV</strong>) và van xả khẩn cấp đáy xilanh cao áp (<strong>BDV</strong>) xả về bình ngưng để làm mát tầng cánh cao áp và triệt tiêu áp suất hơi dư.
+  </li>
+  <li>
+    <strong>Kích hoạt hệ thống Bypass hơi:</strong> Tự động mở nhanh hệ thống Bypass cao áp (<strong>HP Bypass</strong>) và Bypass hạ áp (<strong>LP Bypass</strong>), đồng thời mở nước phun giảm ôn bypass để xả hơi về bình ngưng nhằm duy trì áp lực bao hơi, bảo vệ an toàn cho lò hơi và chống tác động van an toàn lò.
+  </li>
+  <li>
+    <strong>Mở hệ thống xả đọng tuabin (Drain Valves):</strong> Tự động mở toàn bộ các van xả đọng trên đường hơi chính, hơi tái nhiệt và các van xả vỏ trong/vỏ ngoài tuabin (<strong>SD1, SD2, S4</strong>) để tháo cạn nước ngưng, chống thủy kích khi tuabin giảm tốc.
+  </li>
+  <li>
+    <strong>Chuyển đổi nguồn cấp hơi chèn trục:</strong> Tự động ngắt nguồn hơi tự chèn, chuyển sang lấy hơi chèn từ ống góp hơi tự dùng (<strong>Auxiliary Steam Header</strong>), duy trì ổn định áp suất chèn ≈ <strong>0,28 bar</strong> nhằm giữ chân không bình ngưng trong quá trình giảm tốc.
+  </li>
+  <li>
+    <strong>Mở phun giảm ôn bảo vệ cổ thoát hạ áp:</strong> Mở van phun nước giảm ôn làm mát cổ thoát hơi tuabin hạ áp khi nhiệt độ hơi thoát dâng cao để bảo vệ màng an toàn và kết cấu xilanh hạ áp.
+  </li>
+  <li>
+    <strong>Cắt điện máy phát và kích từ:</strong> Tự động phát lệnh cắt máy cắt đầu cực máy phát <strong>901</strong> và cắt hệ thống kích từ để tách máy phát ra khỏi lưới điện an toàn.
+  </li>
+  <li>
+    <strong>Đưa hệ thống điều khiển về chế độ MAN (Manual):</strong> Tự động chuyển Boiler Master và Turbine Master về chế độ điều khiển bằng tay để người vận hành can thiệp kịp thời, tránh các dao động tự động không mong muốn.
+  </li>
+  <li>
+    <strong>Tự động vào thiết bị vần trục (Turning Gear):</strong> Khi tốc độ rô-to tuabin giảm dần về đúng <strong>0 v/p</strong>, nếu áp lực dầu bôi trơn và nhiệt độ gối đạt yêu cầu, bộ vần trục tự động gài khớp quay trục (4 v/p) để chống hiện tượng cong võng rô-to do giãn nở nhiệt không đều.
+  </li>
+</ol>
+
+<!-- ========== 8 ========== -->
+<h2 class="section" id="s8">8. Quy trình kiểm tra và bảo dưỡng</h2>
+<ul>
+  <li><strong>Proof test (6-12 tháng):</strong> Kiểm tra các kênh bảo vệ ít tác động (overspeed, tần số thấp, lỗi BVV, mất nguồn, bảo vệ tốc độ 0).</li>
+  <li><strong>Partial Stroke Test - PST (3-6 tháng):</strong> Kiểm tra hành trình đóng/mở một phần các van hơi MSV, CV, RSV, IV để tránh kẹt van.</li>
+  <li><strong>Kiểm tra thời gian đáp ứng:</strong> Đảm bảo van hơi đóng hoàn toàn trong &lt; 1s khi có lệnh Trip.</li>
+  <li><strong>Hiệu chuẩn cảm biến:</strong> Định kỳ 12 tháng cho các cảm biến TSI (VM600), transmitter áp lực/nhiệt độ.</li>
+  <li><strong>Kiểm tra nguồn:</strong> Đo điện áp, kiểm tra chuyển nguồn tự động cho card TREG/TTRP.</li>
+</ul>
+
+<!-- ========== 9 ========== -->
+<h2 class="section" id="s9">9. Phụ lục: Thuật ngữ</h2>
+<table>
+  <thead>
+    <tr><th style="width:100px;">Từ viết tắt</th><th>Diễn giải</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>ETS / TCS</td><td>Emergency Trip System / Turbine Control System</td></tr>
+    <tr><td>MSV / CV / RSV / IV / BVV / BDV</td><td>Main Stop Valve / Control Valve / Reheat Stop Valve / Intercept Valve / Bypass Valve / Bottom Drain Valve</td></tr>
+    <tr><td>TSI</td><td>Turbine Supervisory Instrumentation</td></tr>
+    <tr><td>EH</td><td>Electro-Hydraulic (Dầu thủy lực điều khiển)</td></tr>
+    <tr><td>MFT</td><td>Master Fuel Trip</td></tr>
+    <tr><td>HP / IP / LP</td><td>High Pressure / Intermediate Pressure / Low Pressure (Cao áp / Trung áp / Hạ áp)</td></tr>
+    <tr><td>PST</td><td>Partial Stroke Test</td></tr>
+    <tr><td>UMC / FA / PA</td><td>Unit Master Control / Full Arc / Partial Arc</td></tr>
+    <tr><td>RO / TTC / VWO / THO</td><td>Rated Output / Test Turbine Condition / Valve Wide Open / Test Heat Output</td></tr>
+  </tbody>
+</table>
+
+<footer class="report-footer">
+  Báo cáo được tổng hợp từ tài liệu O&amp;M Doosan – GE Mark VIe / VM600, Quy trình QT/22-VH và Tài liệu Bảo vệ &amp; Liên động Tuabin.<br>
+  Ký hiệu và đơn vị tuân theo ISO 80000 / SI. Logic biểu quyết viết dạng 2/3, 2/2, 1/2, 1/1.
+</footer>
 
 </div>
 </body>
