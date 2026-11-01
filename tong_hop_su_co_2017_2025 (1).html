@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HỆ THỐNG QUẢN LÝ HỒ SƠ SỰ CỐ (2017 - 2025) - NMNĐ MÔNG DƯƠNG 1</title>
+  <style>
+    :root {
+      --primary: #0f172a;
+      --secondary: #1e293b;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --border: #e2e8f0;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --danger: #dc2626;
+      --warning: #d97706;
+      --success: #16a34a;
+      --sidebar-width: 340px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header Bar */
+    header {
+      background: var(--primary);
+      color: #fff;
+      padding: 10px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+      z-index: 30;
+      flex-shrink: 0;
+    }
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .btn-toggle-menu {
+      display: none;
+      background: #334155;
+      color: #fff;
+      border: 1px solid #475569;
+      font-size: 1.25rem;
+      border-radius: 6px;
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+    .btn-toggle-menu:hover { background: #475569; }
+    
+    .header-logo {
+      font-size: 1.5rem;
+    }
+    .header-title h1 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .header-title p {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .header-tools {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .search-box {
+      position: relative;
+    }
+    .search-box input {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #fff;
+      padding: 7px 12px 7px 32px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      width: 240px;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .search-box input:focus {
+      border-color: var(--accent);
+      background: #0f172a;
+      width: 280px;
+    }
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.82rem;
+      color: #94a3b8;
+    }
+    .btn-action {
+      background: #334155;
+      color: #fff;
+      border: none;
+      padding: 7px 11px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .btn-action:hover { background: #475569; }
+
+    /* Main Container Layout */
+    .app-body {
+      display: flex;
+      flex: 1;
+      height: calc(100vh - 58px);
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Left Sidebar: Folder Explorer */
+    .explorer {
+      width: var(--sidebar-width);
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      user-select: none;
+      z-index: 25;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .explorer-header {
+      padding: 12px 16px;
+      background: #f1f5f9;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .btn-close-sidebar {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 1.25rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px;
+    }
+    .folder-tree {
+      overflow-y: auto;
+      flex: 1;
+      padding: 8px 6px;
+    }
+
+    /* Year Folder Item */
+    .year-folder {
+      margin-bottom: 5px;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+    }
+    .year-folder.active-folder {
+      border-color: #cbd5e1;
+      background: #f8fafc;
+    }
+    .folder-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 10px;
+      cursor: pointer;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.88rem;
+      transition: background 0.15s;
+    }
+    .folder-row:hover {
+      background: #f1f5f9;
+    }
+    .folder-row-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .folder-icon {
+      font-size: 1.1rem;
+      color: #f59e0b;
+      transition: transform 0.2s;
+    }
+    .folder-toggle-icon {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      transition: transform 0.2s;
+    }
+    .year-folder.open .folder-toggle-icon {
+      transform: rotate(90deg);
+    }
+    .folder-badge {
+      background: #e2e8f0;
+      color: #475569;
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 10px;
+      font-weight: 600;
+    }
+
+    /* Sub-files inside year folder */
+    .folder-children {
+      display: none;
+      padding: 4px 6px 8px 20px;
+      list-style: none;
+    }
+    .year-folder.open .folder-children {
+      display: block;
+    }
+    .file-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 5px;
+      font-size: 0.82rem;
+      color: #334155;
+      cursor: pointer;
+      margin-bottom: 2px;
+      transition: all 0.15s;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .file-item:hover {
+      background: #e2e8f0;
+      color: var(--primary);
+    }
+    .file-item.selected {
+      background: #dbeafe;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .file-icon {
+      font-size: 0.88rem;
+      color: #64748b;
+      flex-shrink: 0;
+    }
+
+    /* Mobile Backdrop Overlay */
+    .sidebar-backdrop {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.5);
+      backdrop-filter: blur(2px);
+      z-index: 22;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .sidebar-backdrop.active {
+      display: block;
+      opacity: 1;
+    }
+
+    /* Right Main Content Viewer */
+    .viewer {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 30px;
+      background: var(--bg);
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .viewer-hero {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .viewer-hero-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 10px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .viewer-hero h2 {
+      font-size: 1.35rem;
+      color: var(--primary);
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+    .viewer-hero p {
+      color: var(--text-muted);
+      font-size: 0.88rem;
+    }
+    .quick-stats {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+    .stat-chip {
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Incident Detail Card (inside Year) */
+    .incident-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 22px 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .incident-section:hover {
+      border-color: #cbd5e1;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.08);
+    }
+    .incident-section.highlight {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(37,99,235,0.25);
+    }
+
+    .incident-title {
+      font-size: 1.15rem;
+      color: var(--primary);
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 2px solid #f1f5f9;
+      padding-bottom: 10px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+    .badge-elec { background: #dbeafe; color: #1e40af; }
+    .badge-mech { background: #ffedd5; color: #9a3412; }
+    .badge-boiler { background: #fee2e2; color: #991b1b; }
+    .badge-aux { background: #f3e8ff; color: #6b21a8; }
+
+    h3.sub-title {
+      font-size: 0.92rem;
+      color: var(--secondary);
+      margin: 15px 0 8px 0;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border-left: 3px solid var(--accent);
+      padding-left: 8px;
+      font-weight: 700;
+    }
+
+    p, li {
+      font-size: 0.92rem;
+      color: #334155;
+      text-align: justify;
+      margin-bottom: 8px;
+      word-break: break-word;
+    }
+
+    ul, ol {
+      margin-left: 20px;
+      margin-bottom: 12px;
+    }
+
+    /* Responsive Tables */
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      margin: 12px 0 18px 0;
+      -webkit-overflow-scrolling: touch;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+    .data-table {
+      width: 100%;
+      min-width: 600px;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    .data-table th, .data-table td {
+      border: 1px solid var(--border);
+      padding: 8px 10px;
+      text-align: left;
+    }
+    .data-table th {
+      background-color: #f8fafc;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .data-table tr:nth-child(even) { background-color: #fcfdfe; }
+
+    .callout {
+      background-color: #eff6ff;
+      border-left: 4px solid var(--accent);
+      padding: 12px 15px;
+      border-radius: 0 6px 6px 0;
+      margin: 12px 0;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    .callout-warning {
+      background-color: #fffbeb;
+      border-left-color: var(--warning);
+    }
+    .callout-danger {
+      background-color: #fef2f2;
+      border-left-color: var(--danger);
+    }
+
+    .doc-official-header {
+      width: 100%;
+      margin-bottom: 18px;
+      border-collapse: collapse;
+      font-size: 0.84rem;
+    }
+    .doc-official-header td { border: none; vertical-align: top; }
+    .text-right { text-align: right; }
+
+    .sign-section {
+      margin-top: 20px;
+      display: flex;
+      justify-content: flex-end;
+    }
+    .sign-box {
+      text-align: center;
+      width: 220px;
+      font-size: 0.85rem;
+    }
+    .sign-box .space { height: 50px; }
+
+    /* Mobile Floating Action Button (FAB) */
+    .fab-menu {
+      display: none;
+      position: fixed;
+      bottom: 22px;
+      right: 22px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      padding: 12px 18px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      box-shadow: 0 4px 12px rgba(37,99,235,0.4);
+      cursor: pointer;
+      z-index: 24;
+      align-items: center;
+      gap: 8px;
+      transition: transform 0.2s, background 0.2s;
+    }
+    .fab-menu:active { transform: scale(0.95); background: var(--accent-hover); }
+
+    /* Mobile Responsive Breakpoints */
+    @media (max-width: 900px) {
+      .search-box input { width: 180px; }
+      .search-box input:focus { width: 210px; }
+      .btn-action.desktop-only { display: none; }
+    }
+
+    @media (max-width: 768px) {
+      body { height: 100%; overflow: auto; }
+      header {
+        position: sticky;
+        top: 0;
+        padding: 8px 12px;
+      }
+      .btn-toggle-menu {
+        display: inline-flex;
+      }
+      .header-title h1 {
+        font-size: 0.92rem;
+      }
+      .header-title p {
+        display: none;
+      }
+      .header-tools {
+        gap: 6px;
+      }
+      .search-box input {
+        width: 130px;
+        font-size: 0.78rem;
+        padding: 6px 10px 6px 28px;
+      }
+      .search-box input:focus {
+        width: 170px;
+      }
+      .btn-action {
+        display: none;
+      }
+
+      .app-body {
+        height: auto;
+        overflow: visible;
+        display: block;
+      }
+
+      /* Drawer Sidebar on Mobile */
+      .explorer {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 82%;
+        max-width: 320px;
+        box-shadow: 4px 0 20px rgba(0,0,0,0.25);
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 35;
+      }
+      .explorer.mobile-open {
+        transform: translateX(0);
+      }
+      .btn-close-sidebar {
+        display: block;
+      }
+
+      .viewer {
+        padding: 16px 14px;
+        overflow: visible;
+      }
+      .viewer-hero {
+        padding: 16px;
+      }
+      .viewer-hero h2 {
+        font-size: 1.15rem;
+      }
+      .incident-section {
+        padding: 16px;
+      }
+      .incident-title {
+        font-size: 1.05rem;
+      }
+
+      .fab-menu {
+        display: flex;
+      }
+    }
+
+    @media print {
+      body { overflow: visible; height: auto; }
+      header, .explorer, .fab-menu, .sidebar-backdrop { display: none !important; }
+      .viewer { padding: 0 !important; overflow: visible !important; }
+      .incident-section { border: none; box-shadow: none; padding: 15px 0; page-break-after: always; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header Bar -->
+  <header>
+    <div class="header-brand">
+      <button class="btn-toggle-menu" onclick="toggleMobileSidebar()" aria-label="Mở danh mục">☰</button>
+      <span class="header-logo">⚡</span>
+      <div class="header-title">
+        <h1>Hồ sơ sự cố NĐ Mông Dương 1</h1>
+        <p>Cơ sở dữ liệu lưu trữ kỹ thuật & Điều tra sự cố (2017 – 2025)</p>
+      </div>
+    </div>
+    <div class="header-tools">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="Tìm sự cố, thiết bị...">
+      </div>
+      <button class="btn-action desktop-only" onclick="expandAllFolders()">📂 Mở hết</button>
+      <button class="btn-action desktop-only" onclick="collapseAllFolders()">📁 Thu gọn</button>
+      <button class="btn-action" onclick="window.print()">🖨️ In</button>
+    </div>
+  </header>
+
+  <!-- App Body -->
+  <div class="app-body">
+    <!-- Left Explorer: Directory / Folders by Year -->
+    <!-- Mobile Backdrop -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeMobileSidebar()"></div>
+
+    <!-- Left Explorer: Directory / Folders by Year -->
+    <aside class="explorer" id="sidebarExplorer">
+      <div class="explorer-header">
+        <span>Thư mục hồ sơ</span>
+        <button class="btn-close-sidebar" onclick="closeMobileSidebar()" aria-label="Đóng danh mục">✕</button>
+      </div>
+      <div class="folder-tree" id="folderTree">
+        <!-- Folders rendered by JS -->
+      </div>
+    </aside>
+
+    <!-- Right Viewer: Main Content Container -->
+    <main class="viewer" id="mainViewer">
+      <!-- Year views rendered here -->
+    </main>
+  </div>
+
+  <script>
+    // Data registry by year
+    const incidentData = {2017: [{'id': 'sc-ups1', 'title': 'SỰ CỐ ĐIỆN\n        1. Sự cố Trip bộ UPS khối 1 (27/01/2017)', 'html': '<section id="sc-ups1" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-elec">SỰ CỐ ĐIỆN</span>\n        1. Sự cố Trip bộ UPS khối 1 (27/01/2017)\n      </div>\n\n      <table class="doc-official-header">\n        <tr>\n          <td style="width: 50%;">\n            <strong>TỔNG CÔNG TY PHÁT ĐIỆN 3</strong><br>\n            <strong>CÔNG TY NHIỆT ĐIỆN MÔNG DƯƠNG</strong><br>\n            <em>Phân xưởng Vận hành</em>\n          </td>\n          <td style="width: 50%;" class="text-right">\n            <strong>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</strong><br>\n            <strong>Độc lập - Tự do - Hạnh phúc</strong><br>\n            <em>Mông Dương, ngày 03 tháng 02 năm 2017</em>\n          </td>\n        </tr>\n      </table>\n\n      <h3 class="sub-title">I. Thông tin chung và tình trạng trước sự cố</h3>\n      <p><strong>Thời điểm xảy ra:</strong> 23h28 ngày 27 tháng 01 năm 2017.</p>\n      <p><strong>Vị trí:</strong> Tủ UPS khối 1 (KKS: 16BRU01), Tầng 3 phòng điện 0.4kV.</p>\n      <p><strong>Tình trạng tổ máy:</strong> Tổ máy S1 đang vận hành cấu hình 2 lò 1 máy. Tổ máy S2 vận hành bình thường. Không có công tác sửa chữa trên hệ thống kích từ, máy phát và máy biến áp.</p>\n\n      <h3 class="sub-title">II. Diễn biến sự cố</h3>\n      <ul>\n        <li>23h28: Hệ thống UPS 1 báo Trip, mất nguồn thanh cái 16BRA.</li>\n        <li>Tổ máy số 1 bị trip do mất nguồn điều khiển hệ thống điều khiển khối 1.</li>\n        <li>Trưởng kíp điện kiểm tra các cảnh báo: Báo lỗi Inverter Voltage Error, Output Out of Tolerance, Fan Fault, nổ giàn tụ CB03.</li>\n      </ul>\n\n      <h3 class="sub-title">III. Nguyên nhân sự cố</h3>\n      <div class="callout callout-danger">\n        <strong>Nguyên nhân kỹ thuật:</strong> Giàn tụ điện CB03 bị nổ 01 tụ 55 µF; qua kiểm tra và đo đạc xác định bộ khóa chuyển mạch tĩnh EN (module A035) của bộ UPS 1 bị hư hỏng, dẫn tới dừng Inverter và gián đoạn nguồn cấp khẩn cấp 16BRA.\n      </div>\n\n      <h3 class="sub-title">IV. Đánh giá và Biện pháp xử lý</h3>\n      <p><strong>Phân loại:</strong> Sự cố khách quan do lỗi thiết bị phần cứng.</p>\n      <p><strong>Biện pháp:</strong> Khẩn trương thay thế giàn tụ CB03; làm việc với nhà thầu HDEC bảo hành, kiểm tra căn chỉnh card và module EN; rà soát định kỳ toàn bộ hệ thống nguồn bảo đảm chuyển mạch an toàn.</p>\n\n      <div class="sign-section">\n        <div class="sign-box">\n          <strong>TRƯỞNG ĐOÀN ĐIỀU TRA</strong><br>\n          <em>P. Quản đốc Phân xưởng</em>\n          <div class="space"></div>\n          <strong>Dương Chí Hải</strong>\n        </div>\n      </div>\n    </section>\n\n    '}, {'id': 'sc-ups2', 'title': 'SỰ CỐ ĐIỆN\n        2. Sự cố bộ UPS 2 gây sụt áp và Trip tổ máy S1 (19/03/2017)', 'html': '<section id="sc-ups2" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-elec">SỰ CỐ ĐIỆN</span>\n        2. Sự cố bộ UPS 2 gây sụt áp và Trip tổ máy S1 (19/03/2017)\n      </div>\n\n      <h3 class="sub-title">I. Tình trạng thiết bị trước sự cố</h3>\n      <p>Dòng đầu ra bộ nghịch lưu lệch nhiều (Ia = 102A, Ib = 94A, Ic = 67A). Giàn tụ CB03 của UPS khối 2 bị nổ và nhiều tụ phồng. Đơn vị đã thống nhất mượn giàn tụ CB03 từ UPS 1 sang thay thế cho UPS 2 kèm thay quạt làm mát.</p>\n\n      <h3 class="sub-title">II. Diễn biến sự cố trong quá trình thao tác</h3>\n      <ul>\n        <li><strong>07h30:</strong> Tách UPS 2 ra bảo dưỡng, chuyển khóa Bypass Q050 về vị trí "Bypass" cấp phụ tải bình thường.</li>\n        <li><strong>10h00:</strong> Nhà thầu thay xong tụ và quạt làm mát, đưa UPS 2 vào kiểm tra hoạt động ổn định.</li>\n        <li><strong>10h28:</strong> Khi thực hiện khôi phục hệ thống (bước 10), chuyển khóa Q050 về vị trí "Test" thì xảy ra hiện tượng <strong>sụt áp thanh cái khẩn cấp 26BRA từ 402V xuống 302V</strong>, máy biến áp điều chỉnh làm việc và tổ máy số 1 bị trip.</li>\n      </ul>\n\n      <h3 class="sub-title">III. Phân tích nguyên nhân</h3>\n      <div class="callout callout-warning">\n        <strong>Nguyên nhân:</strong> Nghi ngờ tiếp điểm tĩnh EN bị rò, khi chuyển khóa Q050 hòa 2 nguồn khác nhau từ Bypass và Inverter gây sụt áp tức thời. Do tủ hòa đồng bộ tổ máy 1 nhận cáp cấp nguồn liên thông từ thanh cái khẩn cấp nên khi xảy ra sụt áp ngắn hạn, tiếp điểm trạng thái bị mở ra và gửi lệnh <em>TBN Trip command from GPR</em> làm trip tổ máy 1.\n      </div>\n\n      <h3 class="sub-title">IV. Khắc phục</h3>\n      <ul>\n        <li>Tạm thời force tín hiệu và siết chặt toàn bộ hàng kẹp tín hiệu S1.L52GX tại TCS, tủ GCB và tủ hòa đồng bộ.</li>\n        <li>Kiểm tra, tách biệt nguồn cấp độc lập; yêu cầu nhà thầu lắp đặt hoàn thiện bộ chuyển đổi nguồn nhanh ATS tự động độc lập cho tủ hòa đồng bộ.</li>\n      </ul>\n    </section>\n\n    '}, {'id': 'sc-c92a', 'title': 'SỰ CỐ ĐIỆN\n        3. Chập cháy cầu chì TU đầu vào thanh cái C92A gây mất bơm tuần hoàn và Trip S1 (03/08/2017)', 'html': '<section id="sc-c92a" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-elec">SỰ CỐ ĐIỆN</span>\n        3. Chập cháy cầu chì TU đầu vào thanh cái C92A gây mất bơm tuần hoàn và Trip S1 (03/08/2017)\n      </div>\n\n      <h3 class="sub-title">I. Diễn biến sự cố</h3>\n      <p>Lúc 11h30 ngày 03/08/2017, phát hiện chập cháy cầu chì biến điện áp (TU) đầu vào thanh cái 10kV C92A (tầng 2 phòng điện 10kV). Bảo vệ so lệch thanh cái 87B tác động nhảy MC liên lạc 930-2A. Bảo vệ rơ le MBA TD92 tác động áp lực dầu tăng đột ngột nhảy MC 532, 562 sân phân phối.</p>\n      <p>Do ngăn MC đầu vào trạm tuần hoàn nhánh 1 (06BBG01) đang bị lỗi cơ cấu cắt chờ sửa chữa, thanh cái C9G và C9H mất điện toàn bộ. Cả 2 bơm tuần hoàn 1A và 1B mất điện dừng sự cố, dẫn tới mất chân không và trip tổ máy 1.</p>\n\n      <h3 class="sub-title">II. Biện pháp xử lý &amp; Khôi phục</h3>\n      <ul>\n        <li>08h42 - 09h06: Khẩn trương khắc phục kẹt cơ cấu MC trạm tuần hoàn, chuyển sang nhận nguồn 10kV từ thanh cái C91B qua nhánh số 1, khôi phục lại bơm tuần hoàn.</li>\n        <li>Cô lập máy biến áp T2, TD92, đóng tiếp địa thanh cái C92A phục vụ thí nghiệm và thay thế TU bị hư hại.</li>\n      </ul>\n    </section>\n\n    '}, {'id': 'sc-khi-nen-08', 'title': 'SỰ CỐ KHÍ NÉN / TUABIN\n        4. Kẹt van đầu vào tháp sấy bộ sấy khí B gây Trip tổ máy 1 (15/08/2017)', 'html': '<section id="sc-khi-nen-08" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-mech">SỰ CỐ KHÍ NÉN / TUABIN</span>\n        4. Kẹt van đầu vào tháp sấy bộ sấy khí B gây Trip tổ máy 1 (15/08/2017)\n      </div>\n\n      <h3 class="sub-title">I. Diễn biến và nguyên nhân</h3>\n      <p>Lúc 05h51 ngày 15/08/2017, hệ thống sấy khí Atlas Copco tự động thực hiện chu trình chuyển đổi tháp sấy từ tháp B sang tháp A. Tuy nhiên van đầu vào tháp A bị kẹt không mở được. Áp lực khí nén điều khiển tụt nhanh từ 7,8 bar xuống dưới 4 bar trong vòng 2 phút 35 giây.</p>\n      <p>Nhân viên vận hành phát hiện kịp thời và dùng thanh gỗ gõ trợ lực cơ khí tại chỗ nhưng van không nhả. Áp lực dưới 4 bar kích hoạt bảo vệ nhà máy tác động trip tổ máy 1.</p>\n      <p><strong>Kết luận:</strong> Sự cố khách quan do lỗi cơ cấu kẹt van khí nén của hãng Atlas Copco. Đơn vị đã vệ sinh, bảo dưỡng cơ cấu chấp hành và yêu cầu đại diện hãng kiểm tra định kỳ van chuyển tháp.</p>\n    </section>\n\n    '}, {'id': 'sc-khi-nen-11', 'title': 'SỰ CỐ KHÍ NÉN / TUABIN\n        5. Thao tác nhầm van bộ sấy khí B làm mất áp khí điều khiển, Trip S1 (30/11/2017)', 'html': '<section id="sc-khi-nen-11" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-mech">SỰ CỐ KHÍ NÉN / TUABIN</span>\n        5. Thao tác nhầm van bộ sấy khí B làm mất áp khí điều khiển, Trip S1 (30/11/2017)\n      </div>\n\n      <h3 class="sub-title">I. Diễn biến</h3>\n      <p>10h00 cấp phiếu công tác lắp tiêu âm bộ sấy khí B. Lúc 10h25, Máy phó thực hiện thao tác đóng van cách ly bộ sấy khí B tại chỗ nhưng đóng nhầm vào van đầu ra của bộ sấy khí A (bộ đang làm việc). Nguồn cấp khí điều khiển bị chặn, áp lực bình tích tụt nhanh.</p>\n      <p>Khi áp lực giảm còn 4,8 bar, vận hành xử lý chạy lại bộ sấy B nhưng do phán đoán nhầm vị trí van đã thao tác trước đó dẫn tới việc đóng cả van đầu ra bộ sấy B. Đến 10h33, áp lực tụt dưới ngưỡng bảo vệ 4 bar, bảo vệ nhà máy kích hoạt trip tổ máy S1 đang mang tải 480 MW.</p>\n\n      <h3 class="sub-title">II. Kết luận &amp; Trách nhiệm</h3>\n      <div class="callout callout-danger">\n        <strong>Kết luận điều tra:</strong> Sự cố hoàn toàn do yếu tố chủ quan. Nhân viên vận hành không thực hiện đối chiếu kiểm tra nhãn mác thiết bị và đường ống công nghệ trước khi thao tác. Phân xưởng đã tổ chức họp kiểm điểm, hạ mức đánh giá thi đua và quán triệt quy trình thao tác van trong toàn phân xưởng.\n      </div>\n    </section>\n\n    '}, {'id': 'sc-nuoc-tuabin', 'title': 'SỰ CỐ TUABIN\n        6. Nước tràn vào thân Tuabin 2 qua đường hơi tái lạnh (16/12/2017)', 'html': '<section id="sc-nuoc-tuabin" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-mech">SỰ CỐ TUABIN</span>\n        6. Nước tràn vào thân Tuabin 2 qua đường hơi tái lạnh (16/12/2017)\n      </div>\n\n      <h3 class="sub-title">I. Hiện tượng &amp; Xử lý khẩn cấp</h3>\n      <p>Lúc 13h32 ngày 16/12/2017, trong quá trình tháo tuabin cao/trung áp tổ máy 2 (đang dừng kiểm tra bảo hành FAC), đơn vị công tác phát hiện nước chảy tràn từ vỏ tuabin cao áp xuống đường hơi tái lạnh (Cold Reheat). Máy trưởng lập tức mở toàn bộ các van xả đọng trên đường hơi tái lạnh của cả lò 2A và 2B để tháo kiệt nước.</p>\n\n      <h3 class="sub-title">II. Cơ chế xuất hiện dòng nước</h3>\n      <p>Trong thời gian chạy bơm cấp 2A/2B phục vụ công tác khác, van tay trích tầng giữa của bơm cấp đi cấp phun giảm ôn hơi tái nhiệt bị hở. Đồng thời cụm van chặn và van điều chỉnh phun giảm ôn lò 2B bị rò rỉ (lưu lượng rò đo đạc đạt tới 39 t/h và 5 t/h). Nước tích tụ đầy trong đường ống hơi tái nhiệt ở cao trình 15,6m ÷ 30m.</p>\n      <p>Khi mở van cách ly phục vụ thử nghiệm chống ăn mòn, cột nước dồn xuống hạ lưu, qua đường ống liên thông cân bằng giữa 2 lò rồi lọt qua van 1 chiều hơi tái lạnh đi ngược vào khoang xi lanh tuabin 2.</p>\n    </section>\n\n    '}, {'id': 'sc-vat-lieu', 'title': 'THÔNG SỐ VẬT LIỆU\n        7. Vật liệu ống trao đổi nhiệt Bình gia nhiệt cao áp (HP Heaters #6, #7, #8)', 'html': '<section id="sc-vat-lieu" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-boiler">THÔNG SỐ VẬT LIỆU</span>\n        7. Vật liệu ống trao đổi nhiệt Bình gia nhiệt cao áp (HP Heaters #6, #7, #8)\n      </div>\n\n      <p>Tài liệu rà soát quy cách vật liệu đường ống trao đổi nhiệt cho các bình gia nhiệt cao áp tổ máy S1 &amp; S2:</p>\n<div class="table-container"><table class="data-table">\n        <thead>\n          <tr>\n            <th>Thiết bị</th>\n            <th>Hồ sơ mời thầu</th>\n            <th>Hồ sơ chào thầu</th>\n            <th>Thực tế lắp đặt tại nhà máy</th>\n            <th>Thành phần Cr / Ni thực tế</th>\n          </tr>\n        </thead>\n        <tbody>\n          <tr>\n            <td><strong>BGN #6</strong></td>\n            <td>Thép hợp kim (Cr &gt; 13%)</td>\n            <td>SA213 - TP304</td>\n            <td><strong>SA213 - TP304N</strong></td>\n            <td>Cr: 18 - 20% | Ni: 8 - 11% (C ≤ 0.08%, Si ≤ 1%)</td>\n          </tr>\n          <tr>\n            <td><strong>BGN #7</strong></td>\n            <td>Thép hợp kim (Cr &gt; 13%)</td>\n            <td>SA213 - TP304</td>\n            <td><strong>SA213 - TP304N</strong></td>\n            <td>Cr: 18 - 20% | Ni: 8 - 11% (C ≤ 0.08%, Si ≤ 1%)</td>\n          </tr>\n          <tr>\n            <td><strong>BGN #8</strong></td>\n            <td>Thép hợp kim (Cr &gt; 13%)</td>\n            <td>SA213 - TP304</td>\n            <td><strong>SA213 - TP304N</strong></td>\n            <td>Cr: 18 - 20% | Ni: 8 - 11% (C ≤ 0.08%, Si ≤ 1%)</td>\n          </tr>\n        </tbody>\n      </table></div>\n    </section>\n  '}], 2018: [{'id': 'sc-0106', 'title': 'PHẦN LÒ HƠI\n        1. Sự cố tắc than máy cấp số 7 và sai lầm điều khiển dẫn đến Trip Lò 2A (01/06/2018)', 'html': '<section id="sc-0106" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-boiler">PHẦN LÒ HƠI</span>\n        1. Sự cố tắc than máy cấp số 7 và sai lầm điều khiển dẫn đến Trip Lò 2A (01/06/2018)\n      </div>\n\n      <h3 class="sub-title">I. Tình trạng tổ máy trước sự cố</h3>\n      <p>Lúc 16h55 ngày 01/06/2018: Công suất tổ máy S2 đạt 450 MW. Boiler Master (BM) lò 2A: 66%, lò 2B: 72%. Tổng lưu lượng cấp than lò 2A: 99 t/h, lưu lượng gió lò 2A: 838 t/h, nhiệt độ sàn liệu lò 2A: 856°C. Máy cấp than số 7 đang cấp 34 t/h, máy số 8 cấp 19 t/h.</p>\n\n      <h3 class="sub-title">II. Diễn biến và sai lầm điều khiển</h3>\n      <ul>\n        <li><strong>16h56:</strong> Máy cấp than số 7 bị trip do tảng than ẩm bết dính gây tắc nghẽn tại cửa rót than định lượng xuống máng cào tường sau. Thiếu hụt than đột ngột làm nhiệt độ sàn liệu tụt nhanh.</li>\n        <li>Do hoảng hốt khi thấy nhiệt độ sàn liệu giảm, Lò trưởng đã tự ý chuyển chế độ và tăng Boiler Master từ 66% lên 69%.</li>\n        <li>Theo logic công nghệ CFB, tăng Boiler Master lập tức làm tăng lượng gió sơ cấp và thứ cấp cấp vào buồng đốt. Gió lạnh thổi mạnh vào trong khi buồng đốt đang thiếu nhiên liệu đã thổi nguội và dập tắt tầng sôi nhanh chóng. Nhiệt độ sàn liệu tụt sâu dưới 520°C, kích hoạt bảo vệ liên động trip toàn bộ các máy cấp than và MFT Lò 2A lúc 17h08.</li>\n      </ul>\n\n      <h3 class="sub-title">III. Bài học kinh nghiệm cốt lõi</h3>\n      <div class="callout callout-danger">\n        <strong>Bài học vận hành:</strong> Khi một máy cấp than bị tắc/trip gây sụt giảm nhiệt độ sàn liệu, tuyệt đối <strong>KHÔNG ĐƯỢC TĂNG BOILER MASTER</strong>. Hành động đúng là phải giảm ngay Boiler Master về mức tương ứng với lượng than thực tế còn lại để giảm lưu lượng gió, ngăn ngừa làm nguội tầng sôi; đồng thời khẩn trương tăng tải các máy cấp than còn lại và khởi động vòi dầu phụ trợ để giữ nhiệt độ buồng lửa.\n      </div>\n    </section>\n\n    '}, {'id': 'sc-0206', 'title': 'THIẾT BỊ PHỤ\n        2. Sự cố cháy lại và bục ống nước ngưng làm mát Stripper Cooler B Lò 2A (02/06/2018)', 'html': '<section id="sc-0206" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-boiler">THIẾT BỊ PHỤ</span>\n        2. Sự cố cháy lại và bục ống nước ngưng làm mát Stripper Cooler B Lò 2A (02/06/2018)\n      </div>\n\n      <h3 class="sub-title">I. Diễn biến sự cố</h3>\n      <ul>\n        <li><strong>03h33 ngày 02/06/2018:</strong> Lò 2A đang chạy 8 máy cấp than và thải xỉ qua Stripper Cooler D (SC-D). Nhân viên vận hành tiến hành khởi động quạt gió để đưa Stripper Cooler B (SC-B) vào làm việc.</li>\n        <li><strong>03h46:</strong> Nhiệt độ khoang Cooler 2 SC-B tăng vọt bất thường từ 201°C lên 494°C (bình thường &lt; 450°C), nhiệt độ nước ngưng ra tăng lên 164°C.</li>\n        <li><strong>04h01:</strong> Xảy ra hiện tượng cháy lại xỉ chưa cháy kiệt trong khoang Cooler 2 SC-B. Nhiệt độ khoang tăng phi mã lên 880°C, nhiệt độ nước ngưng ra vọt lên 637,7°C, lưu lượng nước bổ sung bình ngưng tăng mạnh.</li>\n        <li><strong>04h13 - 04h15:</strong> Nhiệt độ vách ống kim loại vượt 650°C (nhiệt độ tính toán chịu đựng tối đa của ống thép là 427°C) dẫn đến nổ bục ống trao đổi nhiệt. Dòng nước ngưng áp lực cao phun ra và tràn ngược vào đáy lò làm nhiệt độ sàn liệu giảm đột ngột về 520°C, trip toàn bộ máy cấp than và MFT dừng Lò 2A.</li>\n      </ul>\n\n      <h3 class="sub-title">II. Nguyên nhân &amp; Biện pháp khắc phục</h3>\n      <div class="callout callout-warning">\n        <strong>Nguyên nhân:</strong> Bề mặt ống trao đổi nhiệt vốn đã bị mài mòn cơ học do ma sát với dòng xỉ đáy; khi xỉ chưa cháy kiệt gặp luồng gió làm mát đã bốc cháy dữ dội gây quá nhiệt vượt giới hạn bền của vật liệu. Ngoài ra, việc vận hành force tín hiệu để đưa SC-B vào làm việc khi công suất lò chưa đạt trên 50% là trái với thiết kế.\n      </div>\n      <p><strong>Khắc phục:</strong> Cô lập đường nước ngưng làm mát SC-B; thay thế các đoạn ống bị nổ bục và hàn gia cố; quán triệt nghiêm ngặt quy định không đưa các bộ làm mát xỉ B, D vào làm việc khi tải lò chưa đạt định mức &gt; 50%.</p>\n    </section>\n\n    '}, {'id': 'sc-2106', 'title': 'PHẦN LÒ HƠI\n        3. Dừng Lò 2A do bục khớp giãn nở đường cấp gió sơ cấp PA (21/06/2018)', 'html': '<section id="sc-2106" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-boiler">PHẦN LÒ HƠI</span>\n        3. Dừng Lò 2A do bục khớp giãn nở đường cấp gió sơ cấp PA (21/06/2018)\n      </div>\n\n      <h3 class="sub-title">I. Hiện tượng &amp; Diễn biến</h3>\n      <p>Vào lúc 16h00 ngày 21/06/2018, tổ máy S2 đang vận hành ổn định ở mức tải 185 MW thì nhân viên đi ca phát hiện tiếng rít lớn và khói bụi phát tán mạnh tại khu vực đường ống gió sơ cấp (PA) cấp vào hộp gió sàn ghi Lò 2A. Kiểm tra tại chỗ phát hiện khớp giãn nở phi kim/kim loại đường gió sơ cấp bị rách bục diện rộng.</p>\n\n      <h3 class="sub-title">II. Nguyên nhân &amp; Xử lý</h3>\n      <p>Khớp giãn nở làm việc lâu ngày dưới điều kiện rung động cao, nhiệt độ gió nóng và áp lực đẩy lớn từ quạt PA dẫn đến mỏi cơ học và rách mép liên kết. Áp lực và lưu lượng gió sơ cấp vào buồng đốt bị sụt giảm nghiêm trọng, không đảm bảo duy trì lớp sôi tối thiểu. Trưởng ca đã xin lệnh điều độ A0 chủ động tách và dừng Lò 2A an toàn để đội sửa chữa EPS thay thế khớp giãn nở mới.</p>\n    </section>\n\n    '}, {'id': 'sc-1807', 'title': 'C&I / ĐIỆN\n        4. Sụt áp lưới 500kV làm Trip bơm dầu quạt khói, dẫn đến MFT Lò 1A (18/07/2018)', 'html': '<section id="sc-1807" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-elec">C&amp;I / ĐIỆN</span>\n        4. Sụt áp lưới 500kV làm Trip bơm dầu quạt khói, dẫn đến MFT Lò 1A (18/07/2018)\n      </div>\n\n      <h3 class="sub-title">I. Diễn biến sự cố</h3>\n      <ul>\n        <li>Lúc 20h09 ngày 18/07/2018, hệ thống lưới truyền tải điện 500kV khu vực miền Bắc xuất hiện dao động, điện áp sụt nhanh từ 500kV xuống 489kV.</li>\n        <li>Hiện tượng sụt áp làm rơ le bảo vệ hạ áp tác động trip động cơ bơm dầu bôi trơn số 2 của quạt khói 1A2 (IDF 1A2) Lò hơi 1A.</li>\n        <li>Theo logic thiết kế, bơm dầu bôi trơn dự phòng số 1 phải tự động khởi động hòa mạng nhưng đã không đóng vào làm việc.</li>\n        <li>Hệ thống bảo vệ áp lực dầu bôi trơn thấp của quạt khói 1A2 tác động trip quạt khói 1A2. Quạt khói dừng đột ngột làm suy giảm lưu lượng hút khói, dẫn đến bảo vệ tỷ lệ Gió / Nhiên liệu thấp (&lt; 0.96) kích hoạt lệnh MFT dừng khẩn cấp Lò 1A (công suất tổ máy tụt 88 MW).</li>\n      </ul>\n\n      <h3 class="sub-title">II. Biện pháp xử lý</h3>\n      <p>Kiểm tra rà soát lại toàn bộ mạch cấp nguồn, rơ le giám sát điện áp và logic liên động tự động dự phòng (ATS/Auto-start) của các bơm dầu quạt khói, quạt gió; đảm bảo tính sẵn sàng làm việc khi xảy ra dao động điện áp trên lưới.</p>\n    </section>\n\n    '}, {'id': 'sc-2407', 'title': 'PHẦN ĐIỆN\n        5. Nhảy Máy cắt 532 Sân phân phối 500kV làm Trip Tổ máy S2 (24/07/2018)', 'html': '<section id="sc-2407" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-elec">PHẦN ĐIỆN</span>\n        5. Nhảy Máy cắt 532 Sân phân phối 500kV làm Trip Tổ máy S2 (24/07/2018)\n      </div>\n\n      <h3 class="sub-title">I. Diễn biến và nguyên nhân</h3>\n      <p>Lúc 16h12 ngày 24/07/2018, tổ máy S2 đang phát công suất 190 MW lên lưới 500kV qua máy cắt 532. Trong quá trình đội công tác thực hiện thí nghiệm và thao tác tách mạch tín hiệu bảo vệ từ chối máy cắt 50BF tại tủ R8 (tủ bảo vệ MC 532), đã phát sinh xung tín hiệu trip giả lập truyền thẳng đến cuộn cắt của máy cắt 532.</p>\n      <p>Máy cắt 532 nhảy mở đột ngột làm mất đường truyền công suất tổ máy S2 lên hệ thống điện quốc gia. Rơ le công suất ngược và bảo vệ máy phát tác động cắt máy cắt đầu cực GCB, gây trip toàn bộ Tổ máy S2.</p>\n      <p><strong>Khắc phục:</strong> Rà soát quy trình thử nghiệm mạch nhị thứ, kiểm tra các khóa chuyển mạch và cô lập triệt để các ngõ ra tác động trip trước khi thao tác đo đạc tại tủ R8.</p>\n    </section>\n\n    '}, {'id': 'sc-2607', 'title': 'PHẦN MÁY / BYPASS\n        6. Thủy kích nghiêm trọng đường ống Bypass hạ áp 1A trong quá trình khởi động (26/07/2018)', 'html': '<section id="sc-2607" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-mech">PHẦN MÁY / BYPASS</span>\n        6. Thủy kích nghiêm trọng đường ống Bypass hạ áp 1A trong quá trình khởi động (26/07/2018)\n      </div>\n\n      <h3 class="sub-title">I. Hiện tượng &amp; Hư hại</h3>\n      <p>Vào lúc 02h58 ngày 26/07/2018, trong quá trình khởi động đốt dầu lên Lò 1A, Máy phó kiểm tra tại hiện trường phát hiện đường ống hơi Bypass hạ áp 1A (LP Bypass 1A) rung giật dữ dội kèm theo tiếng nổ va đập kim loại lớn. Cú sốc thủy lực làm cong ty các van xả đọng, xé toạc các tấm bọc bảo ôn và giật bung các giá treo đỡ đàn hồi của tuyến đường ống.</p>\n\n      <h3 class="sub-title">II. Phân tích nguyên nhân kỹ thuật</h3>\n      <ul>\n        <li>Trong giai đoạn chuẩn bị khởi động thử chân không bình ngưng, toàn bộ các van xả đọng trước van ngắt nhanh Bypass hạ áp đã bị chuyển sang chế độ Manual và đóng kín hoàn toàn để ngăn lọt khí.</li>\n        <li>Lượng hơi ngưng tụ thành một cột nước lạnh khổng lồ ứ đọng lại trong đường ống trước van ngắt nhanh mà không được xả kiệt. Trên màn hình DCS, các điểm đo nhiệt độ xả đọng (CT104, CT105, CT106) đều chỉ thị nhiệt độ rất thấp (40°C - 60°C) và nháy cảnh báo đỏ nhưng nhân viên vận hành không chú ý phát hiện.</li>\n        <li>Lúc 02h56: Van điều chỉnh áp lực Bypass hạ áp mở đến 100%, áp lực hơi tích tụ đạt 17,8 bar. Đến 02h58p07: Van ngắt nhanh Bypass hạ áp mở bung ra, luồng hơi áp lực cực cao đẩy toàn bộ cột nước ngưng đặc quánh di chuyển với tốc độ âm thanh va đập trực tiếp vào các cút uốn cong của đường ống, tạo nên hiện tượng thủy kích kinh hoàng.</li>\n      </ul>\n\n      <h3 class="sub-title">III. Quy trình chuẩn hóa sau sự cố</h3>\n      <div class="callout callout-danger">\n        <strong>Yêu cầu bắt buộc:</strong> Trong mọi chu trình khởi động lò máy, trước khi mở van ngắt nhanh Bypass hạ áp, Máy phó bắt buộc phải kiểm tra thông suốt các đường xả đọng. Chỉ được phép đưa Bypass vào làm việc khi nhiệt độ các điểm xả đọng tăng cao đồng đều và khẳng định chắc chắn đường ống đã được sấy nóng, xả kiệt toàn bộ nước đọng.\n      </div>\n    </section>\n\n    '}, {'id': 'sc-2707', 'title': 'PHẦN ĐIỆN\n        7. Bảo vệ so lệch 87GT tác động nhầm do mạch dòng TI 561 hai điểm nối đất, tách S1 (27/07/2018)', 'html': '<section id="sc-2707" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-elec">PHẦN ĐIỆN</span>\n        7. Bảo vệ so lệch 87GT tác động nhầm do mạch dòng TI 561 hai điểm nối đất, tách S1 (27/07/2018)\n      </div>\n\n      <h3 class="sub-title">I. Diễn biến sự cố</h3>\n      <p>Lúc 09h03 ngày 27/07/2018, trong khi sân phân phối 500kV đang tiến hành cắt điện máy cắt 561 và 571 để thí nghiệm định kỳ, rơ le bảo vệ so lệch khối MBA T1-TD91 (87GT) bất ngờ tác động, gửi lệnh nhảy MC 531, MC 901, 941A, 941B, tách Tổ máy S1 ra khỏi lưới điện quốc gia, công suất phát tụt từ 190 MW về 0 MW.</p>\n\n      <h3 class="sub-title">II. Phân tích mạch nhị thứ &amp; Xử lý thành công của kíp trực</h3>\n      <ul>\n        <li><strong>Xử lý giữ lò máy:</strong> Ngay khi máy cắt đầu cực nhảy mở, hệ thống van Bypass cao/hạ áp Quick Open. Lò trưởng nhanh chóng chuyển điều khiển sang Manual, giảm Boiler Master và Coal Master về mức hợp lý, kiểm soát tốt thông số; Máy trưởng đưa tốc độ tuabin về duy trì 2500 - 3000 v/p, <strong>giữ thành công Lò hơi 1A và Tuabin S1 không bị trip</strong>.</li>\n        <li><strong>Nguyên nhân kỹ thuật:</strong> Kiểm tra dữ liệu rơ le phát hiện tín hiệu dòng làm việc 223,3A của pha A biến dòng TI 561 gửi về dù máy cắt 561 đã cắt. Điều tra thực tế tại tủ MK2 MC 561 phát hiện chân số 2 hàng kẹp X601 bị lỏng ren; đồng thời mạch thứ cấp TI 561 bị đấu nối đất tại 2 điểm khác nhau. Sự chênh lệch điện thế đất tại sân phân phối 500kV đã tạo ra dòng điện cảm ứng khép vòng khép kín (~0,14A thứ cấp, tương đương 168A sơ cấp), khiến rơ le 87GT hiểu nhầm là dòng ngắn mạch so lệch nội bộ.</li>\n        <li><strong>Khắc phục:</strong> Tách triệt để điểm nối đất dư thừa tại tủ rơ le, siết chặt toàn bộ hàng kẹp tủ MK2; tiến hành hòa đồng bộ lại Tổ máy S1 lên lưới lúc 11h15 cùng ngày.</li>\n      </ul>\n    </section>\n\n    '}, {'id': 'sc-1408', 'title': 'PHẦN ĐIỆN\n        8. Dính tiếp điểm rơ le áp lực dầu thùng OLTC MBA T2 gây Trip Tổ máy S2 (14/08/2018)', 'html': '<section id="sc-1408" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-elec">PHẦN ĐIỆN</span>\n        8. Dính tiếp điểm rơ le áp lực dầu thùng OLTC MBA T2 gây Trip Tổ máy S2 (14/08/2018)\n      </div>\n\n      <h3 class="sub-title">I. Diễn biến sự cố</h3>\n      <ul>\n        <li>Lúc 15h30 ngày 14/08/2018: Công suất tổ máy S2 đang mang tải bình thường thì đột ngột giảm về 0 MW.</li>\n        <li>Kiểm tra hệ thống HMI và DCS phát hiện tín hiệu bảo vệ <em>Trip CB 532, 562 from transformer GT1-2</em>, các máy cắt 532, 562, 902, 942A, 942B nhảy mở; rơ le Lockout 86T nhảy; xuất hiện cảnh báo <em>OLTC PRESS RLF DEVICE TRIP</em>. MBA T2 và TD92 mất điện hoàn toàn.</li>\n        <li>Hệ thống thanh cái 10kV C92A, C92B đã tự động chuyển đổi nguồn nhanh sang nhận điện từ thanh cái C91, C92.</li>\n      </ul>\n\n      <h3 class="sub-title">II. Nguyên nhân &amp; Biện pháp xử lý</h3>\n      <div class="callout callout-warning">\n        <strong>Nguyên nhân:</strong> Rơ le bảo vệ quá áp suất thùng dầu bộ chuyển nấc dưới tải OLTC (mã hiệu CP086-F86) tại pha A máy biến áp chính T2 bị kẹt dính tiếp điểm cơ khí, dẫn tới phát tín hiệu trip giả làm nhảy rơ le bảo vệ khối MBA. Đây là lần thứ 2 thiết bị này tác động nhầm.\n      </div>\n      <p><strong>Xử lý:</strong> Kíp trực phối hợp với sửa chữa điện EPS kiểm tra, tạm thời tách chân tín hiệu trip X13/2-X13/12 và X13/33-X13/43 tại tủ MK pha A; giải trừ tín hiệu Lockout 86T; đóng điện khôi phục lại MBA T2, TD92 lúc 17h48 và hòa lưới tổ máy S2 thành công lúc 18h24 cùng ngày. Lập kế hoạch thay mới hoàn toàn rơ le áp suất dầu CP086.</p>\n    </section>\n\n    '}, {'id': 'sc-1508', 'title': 'PHẦN MÁY / TUABIN\n        9. Tăng nhiệt độ hơi tái nhiệt mất kiểm soát, buộc phải ấn dừng khẩn cấp Tuabin S2 (15/08/2018)', 'html': '<section id="sc-1508" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-mech">PHẦN MÁY / TUABIN</span>\n        9. Tăng nhiệt độ hơi tái nhiệt mất kiểm soát, buộc phải ấn dừng khẩn cấp Tuabin S2 (15/08/2018)\n      </div>\n\n      <h3 class="sub-title">I. Diễn biến chuỗi sai lầm công nghệ</h3>\n      <p>Lúc 06h22 ngày 15/08/2018, tổ máy S2 đang vận hành 1 lò 2B ở tải 144 MW và đang nâng thông số Lò 2A để chuẩn bị hòa hơi:</p>\n      <ul>\n        <li>Lưu lượng nước ngưng vào bình khử khí tăng làm áp lực bình khử khí sụt giảm. Do van cấp hơi tự dùng gia nhiệt bình khử khí đang để chế độ AUTO nên van tự động mở toang đến 76% rồi đạt 100%. Nguồn hơi này lấy trực tiếp từ đầu ra quá nhiệt, khiến lưu lượng hơi chính cấp vào tuabin bị sụt giảm nghiêm trọng kéo theo lượng hơi thoát quay về bộ tái nhiệt (hơi tái lạnh) giảm sâu.</li>\n        <li>Lúc 07h02: Thấy công suất tổ máy tụt giảm, Lò trưởng đã phán đoán sai lầm khi <strong>tăng Boiler Master và tăng cài đặt áp lực hơi chính</strong> để bù tải. Thao tác này khiến hệ thống điều khiển tuabin tự động khép nhỏ các van điều chỉnh CV lại, tiếp tục bóp nghẹt lưu lượng hơi tái lạnh qua bộ tái nhiệt.</li>\n        <li>Nhiệt độ khói buồng đốt tăng cao trong khi lưu lượng hơi làm mát bên trong ống tái nhiệt quá ít, làm nhiệt độ hơi tái nhiệt tăng vọt từ 554°C lên 565°C.</li>\n        <li>Máy trưởng xin lệnh Force tín hiệu bảo vệ trip tuabin ở 565°C để cố gắng xử lý; mở van phun giảm ôn và mở Bypass nhưng nhiệt độ hơi vẫn tiếp tục tăng không thể hãm lại được. Đến 07h36, nhiệt độ hơi tái nhiệt vượt ngưỡng nguy hiểm <strong>586°C</strong>, đe dọa nổ vỡ kim loại tuabin, buộc vận hành phải ấn nút dừng khẩn cấp (Trip) Tuabin S2.</li>\n      </ul>\n\n      <h3 class="sub-title">II. Bài học điều khiển kinh điển</h3>\n      <div class="callout callout-danger">\n        <strong>Bài học xương máu:</strong> Khi chuẩn bị hòa hơi hai lò hoặc chạy khởi động:\n        <ol>\n          <li>Bắt buộc phải chuyển van cấp hơi tự dùng bình khử khí sang chế độ MANUAL, khống chế độ mở nhỏ (15 - 25%), tuyệt đối không để AUTO.</li>\n          <li>Khi nhiệt độ hơi tái nhiệt có xu hướng tăng cao do thiếu lưu lượng hơi làm mát, nghiêm cấm tăng Boiler Master hay tăng áp lực hơi chính. Phải chủ động chuyển MANUAL Tuabin Master, mở lớn van CV để ép lưu lượng hơi đi qua tuabin sang làm mát bộ tái nhiệt.</li>\n        </ol>\n      </div>\n    </section>\n\n    '}, {'id': 'sc-2208', 'title': 'PHẦN C&I\n        10. Lỗi tín hiệu van đầu đẩy bơm nước làm mát phụ kích hoạt bảo vệ nhà máy Trip S2 (22/08/2018)', 'html': '<section id="sc-2208" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-elec">PHẦN C&amp;I</span>\n        10. Lỗi tín hiệu van đầu đẩy bơm nước làm mát phụ kích hoạt bảo vệ nhà máy Trip S2 (22/08/2018)\n      </div>\n\n      <h3 class="sub-title">I. Tình trạng và Diễn biến</h3>\n      <p>Lúc 12h37 ngày 22/08/2018, tổ máy S2 đang vận hành 2 lò 1 máy ở mức tải cao 400 MW. Bất ngờ xuất hiện tín hiệu bảo vệ nhà máy (Plant Protection) tác động làm trip khẩn cấp toàn bộ Tổ máy S2.</p>\n\n      <h3 class="sub-title">II. Nguyên nhân sự cố</h3>\n      <p>Qua kiểm tra bảng ghi sự kiện DCS xác định: Hệ thống giám sát bơm nước làm mát phụ (Auxiliary Cooling Water - ACW) bị lỗi tiếp điểm hành trình chỉ thị trạng thái đóng/mở van đầu đẩy của bơm đang vận hành. Tín hiệu chập chờn khiến logic bảo vệ DCS nhận định sai là <em>"Không có bơm nước làm mát phụ nào đang làm việc"</em>. Theo thiết kế logic liên động an toàn, khi mất hoàn toàn nước làm mát phụ, bảo vệ nhà máy lập tức phát lệnh trip tổ máy để chống quá nhiệt phá hủy các ổ đỡ tuabin và máy phát.</p>\n      <p><strong>Khắc phục:</strong> Căn chỉnh, thay thế công tắc hành trình tiếp điểm van đầu đẩy bơm ACW; kiểm tra bổ sung điều kiện lọc trễ (time delay) hợp lý cho logic bảo vệ để tránh tác động nhầm do xung tín hiệu ảo.</p>\n    </section>\n\n    '}, {'id': 'sc-khi-nen', 'title': 'HỆ THỐNG KHÍ NÉN\n        11. Tình trạng quá tải và suy giảm áp lực hệ thống 03 máy nén khí (Tháng 12/2018)', 'html': '<section id="sc-khi-nen" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-aux">HỆ THỐNG KHÍ NÉN</span>\n        11. Tình trạng quá tải và suy giảm áp lực hệ thống 03 máy nén khí (Tháng 12/2018)\n      </div>\n\n      <h3 class="sub-title">I. Hiện tượng vận hành</h3>\n      <p>Trước ngày 17/12/2018, hệ thống khí nén nhà máy gồm 03 máy nén khí trục vít Atlas Copco vận hành theo cấu hình 02 máy chạy mang tải (Loading) và 01 máy dự phòng nóng (Running). Tuy nhiên, định kỳ cứ 3 ~ 4 phút thì máy nén khí dự phòng lại bị kéo vào mang tải liên tục, áp lực khí nén toàn hệ thống dao động thấp, đe dọa trực tiếp đến độ an toàn của nguồn khí điều khiển các van công nghệ.</p>\n\n      <h3 class="sub-title">II. Phân tích nguyên nhân &amp; Giải pháp đồng bộ</h3>\n      <ul>\n        <li><strong>Nguyên nhân:</strong> Do các đơn vị thi công, sửa chữa và các phân xưởng sử dụng quá nhiều khí nén dịch vụ bừa bãi không kiểm soát; kết hợp rò rỉ tại 11 vị trí ống khí nén (7 điểm gian lò máy, 4 điểm gian hóa chất); hiệu suất các tổ máy nén giảm sau thời gian dài vận hành liên tục.</li>\n        <li><strong>Giải pháp đã triển khai:</strong> Đóng toàn bộ các van cấp khí dịch vụ sang hệ thống cấp than và xưởng sửa chữa EPS; siết chặt xử lý các điểm rò rỉ; lập kế hoạch bảo dưỡng tổng thể 03 máy nén khí vào tháng 01/2019 và cài đặt lại dải áp lực đóng/cắt tải (Load/Unload) hợp lý để cân bằng giờ chạy máy.</li>\n      </ul>\n    </section>\n  '}], 2019: [{'id': 'sc-1501', 'title': 'THIẾT BỊ PHỤ\n        1. Sự cố bộ sấy không khí (BSKK) Lò 2B dẫn đến phải dừng lò (15/01/2019)', 'html': '<section id="sc-1501" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-boiler">THIẾT BỊ PHỤ</span>\n        1. Sự cố bộ sấy không khí (BSKK) Lò 2B dẫn đến phải dừng lò (15/01/2019)\n      </div>\n\n      <h3 class="sub-title">I. Tình trạng và Diễn biến</h3>\n      <p>Lúc 15/01/2019, Lò hơi 2B đang vận hành mang tải thì xuất hiện rung động bất thường và nhiệt độ ổ đỡ gối trục bộ sấy không khí Lò 2B tăng cao vượt ngưỡng cho phép. Động cơ chính có dấu hiệu kẹt cơ cấu truyền động quay rotoc sấy khí.</p>\n\n      <h3 class="sub-title">II. Nguyên nhân &amp; Biện pháp xử lý</h3>\n      <div class="callout callout-warning">\n        <strong>Nguyên nhân:</strong> Do tro xỉ đóng bám nhiều ở bề mặt truyền nhiệt làm tăng tải cơ học; đồng thời hệ thống bôi trơn ổ đỡ bị suy giảm làm nhiệt độ gối tăng cao đe dọa bó kẹt trục quay bộ sấy không khí.\n      </div>\n      <p><strong>Xử lý:</strong> Trưởng ca xin lệnh điều độ chủ động giảm tải và dừng Lò 2B an toàn để tiến hành kiểm tra, vệ sinh thông tắc cánh truyền nhiệt và bảo dưỡng hệ thống ổ đỡ truyền động BSKK.</p>\n    </section>\n\n    '}, {'id': 'sc-2901', 'title': 'PHẦN LÒ HƠI\n        2. Sự cố bục ống sinh hơi và ống quá nhiệt Lò 1B (29/01/2019)', 'html': '<section id="sc-2901" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-boiler">PHẦN LÒ HƠI</span>\n        2. Sự cố bục ống sinh hơi và ống quá nhiệt Lò 1B (29/01/2019)\n      </div>\n\n      <h3 class="sub-title">I. Diễn biến sự cố</h3>\n      <p>Ngày 29/01/2019, Lò 1B đang vận hành thì hệ thống giám sát phát hiện chênh lệch lưu lượng nước cấp / lưu lượng hơi chính tăng bất thường; áp lực âm buồng đốt có xu hướng tăng về phía dương, dòng điện quạt khói tăng cao để duy trì độ chân không buồng đốt. Kiểm tra tiếng rít tại hiện trường khẳng định có hiện tượng bục ống sinh hơi áp lực cao.</p>\n\n      <h3 class="sub-title">II. Nguyên nhân mài mòn cơ học</h3>\n      <div class="callout callout-danger">\n        <strong>Nguyên nhân cốt lõi:</strong> Hiện tượng mài mòn cơ học xói mòn bề mặt ngoài của ống dưới tác động liên tục của dòng tro xỉ tuần hoàn vận tốc lớn trong lò tầng sôi (CFB), kết hợp hiệu ứng cắt luồng tại vị trí chân cos vách buồng đốt, làm chiều dày kim loại ống giảm mỏng dưới giới hạn chịu lực dẫn đến bục vỡ ống sinh hơi. Tia nước và hơi áp lực cao phụt ra tiếp tục thổi mòn các ống quá nhiệt lân cận.\n      </div>\n      <p><strong>Khắc phục:</strong> Giảm tải, tách hơi và ấn MFT dừng Lò 1B; tiến hành bắc giáo, kiểm tra đo chiều dày siêu âm toàn bộ khu vực lân cận, cắt thay thế các đoạn ống bị bục hỏng và hàn đắp bảo vệ các vị trí bị xói mòn.</p>\n    </section>\n\n    '}, {'id': 'sc-0304-1', 'title': 'PHẦN ĐIỆN\n        3. Lỗi chuyển nguồn thanh cái 10kV gây mất điện toàn bộ thanh cái 06BBB và 16BBB (03/04/2019 - 18h24)', 'html': '<section id="sc-0304-1" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-elec">PHẦN ĐIỆN</span>\n        3. Lỗi chuyển nguồn thanh cái 10kV gây mất điện toàn bộ thanh cái 06BBB và 16BBB (03/04/2019 - 18h24)\n      </div>\n\n      <h3 class="sub-title">I. Diễn biến sự cố</h3>\n      <p>Vào lúc 18h24 ngày 03/04/2019, ca vận hành tiến hành quy trình chuyển đổi nguồn tự dùng từ thanh cái 16BBB sang nhận nguồn từ đường 110kV:</p>\n      <ul>\n        <li>Trong quá trình chuyển đổi, máy cắt đầu vào thanh cái 06BBB (máy cắt 932) bị lỗi tiếp điểm phụ, làm mất tín hiệu trạng thái truyền lên DCS và hệ thống chuyển nguồn nhanh tự động FTS.</li>\n        <li>Do mất tín hiệu phản hồi từ MC 06BBB, bộ điều khiển FTS hiểu sai trạng thái logic, dẫn đến máy cắt đầu vào 16BBB tác động cắt nhầm.</li>\n        <li>Hậu quả làm <strong>mất điện toàn bộ cả 02 thanh cái 06BBB và 16BBB</strong>, gây mất điện hàng loạt phụ tải tự dùng quan trọng của khối 1 và khối 2.</li>\n      </ul>\n\n      <h3 class="sub-title">II. Khắc phục</h3>\n      <p>Kíp trực điện lập tức khôi phục nguồn điện tự dùng khẩn cấp từ các nguồn dự phòng; cô lập và kiểm tra căn chỉnh cơ cấu tiếp điểm chỉ thị trạng thái hành trình máy cắt 932 trước khi đưa vào liên động tự động.</p>\n    </section>\n\n    '}, {'id': 'sc-0304-2', 'title': 'C&I / ĐIỆN\n        4. Mất nguồn điều khiển khớp nối thủy lực bơm cấp & quạt khói, Trip Tổ máy S2 (03/04/2019 - 18h26)', 'html': '<section id="sc-0304-2" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-elec">C&amp;I / ĐIỆN</span>\n        4. Mất nguồn điều khiển khớp nối thủy lực bơm cấp &amp; quạt khói, Trip Tổ máy S2 (03/04/2019 - 18h26)\n      </div>\n\n      <h3 class="sub-title">I. Diễn biến dây chuyền sự cố</h3>\n      <p>Chỉ sau 2 phút từ sự cố mất điện thanh cái 10kV (lúc 18h26 ngày 03/04/2019), các thiết bị điều khiển phụ trợ bị ảnh hưởng dây chuyền nghiêm trọng:</p>\n      <ul>\n        <li>Hệ thống bị mất nguồn cấp điều khiển cho các khớp nối thủy lực bơm cấp nước và quạt khói tổ máy S2.</li>\n        <li>Các cơ cấu dẫn động không nhận được tín hiệu điều khiển, làm tê liệt khả năng điều tiết cấp nước lên bao hơi. Mức nước bao hơi dao động vượt ra ngoài dải an toàn không thể kiểm soát.</li>\n        <li>Bảo vệ mức nước bao hơi tác động MFT các lò và bảo vệ nhà máy kích hoạt <strong>Trip Tổ máy S2</strong>.</li>\n      </ul>\n\n      <h3 class="sub-title">II. Bài học kinh nghiệm</h3>\n      <div class="callout callout-danger">\n        <strong>Bài học nhị thứ / C&amp;I:</strong> Nguồn điều khiển của các bộ actuator, khớp nối thủy lực bơm cấp và quạt khói phải được cấp từ nguồn liên tục UPS độc lập hoặc qua thiết bị chuyển nguồn tự động ATS có độ trễ cực ngắn, tránh việc phụ thuộc đơn lẻ vào nguồn thanh cái tự dùng AC thông thường.\n      </div>\n    </section>\n\n    '}, {'id': 'sc-1105', 'title': 'PHẦN LÒ HƠI\n        5. Sự cố xì hở chân van hồi liệu Loop Seal Lò 2B (11/05/2019)', 'html': '<section id="sc-1105" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-boiler">PHẦN LÒ HƠI</span>\n        5. Sự cố xì hở chân van hồi liệu Loop Seal Lò 2B (11/05/2019)\n      </div>\n\n      <h3 class="sub-title">I. Hiện tượng &amp; Hậu quả</h3>\n      <p>Lúc 17h15 ngày 11/05/2019, tổ máy đang mang tải thì nhân viên đi ca phát hiện khói bụi than và tro nóng áp lực cao xì mạnh tại khu vực chân van hồi liệu (Loop Seal) Lò hơi 2B. Áp lực gió hồi liệu dao động, quá trình tuần hoàn hạt xỉ đáy bị gián đoạn, buộc phải dừng Lò 2B khẩn cấp để xử lý, thời gian khắc phục kéo dài 71,58 giờ (thiếu hụt 19,3 tr. kWh điện thương phẩm).</p>\n\n      <h3 class="sub-title">II. Nguyên nhân</h3>\n      <p>Lớp bê tông chịu nhiệt và gạch chịu mài mòn bên trong chân van hồi liệu bị nứt vỡ, bong tróc sau chu kỳ làm việc nhiệt độ cao; dòng liệu nóng có vận tốc lớn xói mòn trực tiếp vào vỏ kim loại gây xì hở áp lực ra ngoài môi trường.</p>\n    </section>\n\n    '}, {'id': 'sc-2505', 'title': 'PHẦN ĐIỆN\n        6. Sét đánh đường dây 571, 573 kích hoạt bảo vệ công suất ngược, Trip S1 & S2 (25/05/2019)', 'html': '<section id="sc-2505" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-elec">PHẦN ĐIỆN</span>\n        6. Sét đánh đường dây 571, 573 kích hoạt bảo vệ công suất ngược, Trip S1 &amp; S2 (25/05/2019)\n      </div>\n\n      <h3 class="sub-title">I. Diễn biến sự cố</h3>\n      <ul>\n        <li>Lúc 05h48 ngày 25/05/2019, khu vực Quảng Ninh xảy ra giông sét lớn; sét đánh đồng thời vào cả hai đường dây 500kV 571 và 573 truyền tải công suất của nhà máy.</li>\n        <li>Hệ thống bảo vệ rơ le tác động cắt máy cắt đường dây; máy cắt 573 đóng lặp lại (reclose) thành công.</li>\n        <li>Tuy nhiên, do xung điện áp phản hồi từ trạm 500kV Quảng Ninh dội ngược về cực kỳ mạnh trong thời gian ngắn làm biến động góc pha và chiều dòng công suất, kích hoạt rơ le bảo vệ công suất ngược (Reverse Power) của tổ máy tác động cắt máy cắt đầu cực, gây <strong>trip cả 2 tổ máy S1 và S2</strong>.</li>\n      </ul>\n\n      <h3 class="sub-title">II. Phân tích &amp; Đánh giá</h3>\n      <p><strong>Phân loại:</strong> Sự cố khách quan do thiên tai giông sét trên hệ thống lưới truyền tải điện quốc gia. Kíp trực đã khẩn trương thực hiện quy trình khởi động lại từ nguồn điện tự dùng và hòa lưới an toàn 2 tổ máy sau khi thời tiết ổn định.</p>\n    </section>\n\n    '}, {'id': 'sc-1907', 'title': 'PHẦN MÁY / TUABIN\n        7. Sự cố ngập nước cos âm gian Tuabin Tổ máy S2 (19/07/2019)', 'html': '<section id="sc-1907" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-mech">PHẦN MÁY / TUABIN</span>\n        7. Sự cố ngập nước cos âm gian Tuabin Tổ máy S2 (19/07/2019)\n      </div>\n\n      <h3 class="sub-title">I. Tình trạng sự cố</h3>\n      <p>Ngày 19/07/2019, phát hiện lượng nước lớn ngập sâu tại khu vực cos âm sàn gian tuabin tổ máy S2, đe dọa trực tiếp đến các động cơ bơm ngưng, bơm chân không, bơm dầu bôi trơn và các hộp đấu nối cáp điện/tín hiệu đặt tại tầng hầm.</p>\n\n      <h3 class="sub-title">II. Nguyên nhân &amp; Biện pháp</h3>\n      <div class="callout callout-warning">\n        <strong>Nguyên nhân:</strong> Do mưa lớn kéo dài kết hợp sự cố hệ thống bơm thoát nước hố thu gian máy (bơm hố thu bị sự cố điện không tự động khởi động hoặc phao báo mức bị kẹt rác) và rò rỉ từ đường nước tuần hoàn làm mát.\n      </div>\n      <p><strong>Xử lý:</strong> Huy động máy bơm chìm dã chiến bơm thoát nước khẩn cấp; kiểm tra bảo dưỡng hệ thống phao tự động và cơ cấu điện của bơm hố thu cos âm gian tuabin; che chắn an toàn các tủ điện đầu nối cáp tránh chạm chập.</p>\n    </section>\n\n    '}, {'id': 'sc-1508', 'title': 'PHẦN MÁY / TUABIN\n        8. Sự cố tràn dầu bôi trơn qua gối chặn Tuabin S2 (15/08/2019)', 'html': '<section id="sc-1508" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-mech">PHẦN MÁY / TUABIN</span>\n        8. Sự cố tràn dầu bôi trơn qua gối chặn Tuabin S2 (15/08/2019)\n      </div>\n\n      <h3 class="sub-title">I. Diễn biến và hiện tượng</h3>\n      <p>Ngày 15/08/2019, trong quá trình tuabin S2 đang vận hành, phát hiện lượng dầu bôi trơn lớn tràn ra ngoài qua khe hở cổ trục gối chặn tuabin, dầu nóng chảy xuống khu vực chân bệ máy gây bốc khói và nguy cơ mất an toàn cháy nổ cao.</p>\n\n      <h3 class="sub-title">II. Nguyên nhân cốt lõi</h3>\n      <p>Chênh lệch áp suất chân không buồng dầu gối trục không đảm bảo (quạt hút hơi dầu buồng gối bị suy giảm lưu lượng hoặc tắc lọc tách dầu); kết hợp khe hở phớt chắn dầu gối chặn bị mòn rơ làm dầu bôi trơn áp lực cao không hồi lưu kịp về thùng dầu chính mà tràn ra ngoài vỏ gối.</p>\n      <p><strong>Khắc phục:</strong> Cân chỉnh lại áp lực cấp dầu bôi trơn, thông tắc quạt hút hơi dầu tạo độ chân không âm hợp lý trong thân gối; trong kỳ dừng máy tiến hành kiểm tra thay thế căn chỉnh khe hở phớt chặn dầu chuẩn xác theo tiêu chuẩn nhà chế tạo.</p>\n    </section>\n  '}], 2020: [{'id': 'sc-2020-overview', 'title': 'TỔNG QUAN 2020 1. Tổng quan tình hình sự cố năm 2020 (18 vụ sự cố)', 'html': '<section id="sc-2020-overview" class="incident-section">\n    <div class="incident-title"><span class="badge badge-aux">TỔNG QUAN 2020</span> 1. Tổng quan tình hình sự cố năm 2020 (18 vụ sự cố)</div>\n    <p>Năm 2020 là năm bắt đầu chuyển sang đốt than trộn của TKV có hàm lượng xít đá cạnh sắc, độ cứng cao tăng từ 8-11% lên 17-27%, dẫn đến tình trạng mài mòn cơ học ống lò tăng vọt với 11 vụ bục ống áp lực lò hơi, 5 vụ sự cố điện/C&amp;I và 2 vụ sự cố chu trình nước cấp/bình khử khí.</p>\n  </section>\n\n  '}, {'id': 'sc-2020-0702', 'title': 'PHẦN ĐIỆN 2. Nhảy máy cắt đầu cực GCB S2 (07/02/2020)', 'html': '<section id="sc-2020-0702" class="incident-section">\n    <div class="incident-title"><span class="badge badge-elec">PHẦN ĐIỆN</span> 2. Nhảy máy cắt đầu cực GCB S2 (07/02/2020)</div>\n    <p>Lúc 07/02/2020, máy cắt đầu cực máy phát S2 bất ngờ nhảy mở khi đang phát tải lên lưới; bảo vệ liên động tác động trip Tổ máy S2 do lỗi cơ cấu tích năng / mạch điều khiển cuộn cắt.</p>\n  </section>\n\n  '}, {'id': 'sc-2020-2102', 'title': 'ÁP LỰC LÒ HƠI 3. Bục ống sinh hơi buồng đốt Lò 1A (21/02/2020)', 'html': '<section id="sc-2020-2102" class="incident-section">\n    <div class="incident-title"><span class="badge badge-boiler">ÁP LỰC LÒ HƠI</span> 3. Bục ống sinh hơi buồng đốt Lò 1A (21/02/2020)</div>\n    <p>Lúc 21h30 ngày 21/02/2020, phát hiện chênh lệch lưu lượng nước cấp / hơi tăng cao, áp lực âm buồng đốt dao động, dòng quạt khói tăng; dừng lò xử lý bục ống sinh hơi buồng đốt kéo dài 207,18 giờ.</p>\n  </section>\n\n  '}, {'id': 'sc-2020-0503', 'title': 'THIẾT BỊ PHỤ 4. Mất nước bình khử khí dẫn đến Trip hết bơm cấp, Trip Tổ máy S2 (05/03/2020)', 'html': '<section id="sc-2020-0503" class="incident-section">\n    <div class="incident-title"><span class="badge badge-aux">THIẾT BỊ PHỤ</span> 4. Mất nước bình khử khí dẫn đến Trip hết bơm cấp, Trip Tổ máy S2 (05/03/2020)</div>\n    <p>Lúc 19h02 ngày 05/03/2020, trong quá trình đưa bình gia nhiệt 8 vào làm việc thao tác mở van hơi trích nhanh làm sụt áp; van xả khẩn cấp BGN 6, 7 xả về bình ngưng làm mất nước dồn về bình khử khí. Mức nước bình khử khí tụt dưới -1825mm làm trip toàn bộ 02 bơm cấp, bảo vệ nhà máy trip Lò 2A, 2B và Tổ máy S2.</p>\n  </section>\n\n  '}, {'id': 'sc-2020-1303', 'title': 'ÁP LỰC LÒ HƠI 5. Bục màng ống sinh hơi chân hồi liệu Lò 2A (13/03/2020)', 'html': '<section id="sc-2020-1303" class="incident-section">\n    <div class="incident-title"><span class="badge badge-boiler">ÁP LỰC LÒ HƠI</span> 5. Bục màng ống sinh hơi chân hồi liệu Lò 2A (13/03/2020)</div>\n    <p>Lúc 17h16 ngày 13/03/2020, liệu nóng đỏ xì chảy ra ngoài bảo ôn tại chân hồi liệu B2 tường sau Lò 2A do màng kim loại bị lớp liệu tuần hoàn mài mòn thủng vách buồng đốt; dừng lò 9,53 giờ để hàn vá màng ống.</p>\n  </section>\n\n  '}, {'id': 'sc-2020-1503', 'title': 'ÁP LỰC LÒ HƠI 6. Bục nổ ống sinh hơi cút Kickout Lò 2A gây MFT (15/03/2020)', 'html': '<section id="sc-2020-1503" class="incident-section">\n    <div class="incident-title"><span class="badge badge-boiler">ÁP LỰC LÒ HƠI</span> 6. Bục nổ ống sinh hơi cút Kickout Lò 2A gây MFT (15/03/2020)</div>\n    <p>Lúc 20h48 ngày 15/03/2020, bục vỡ lớn ống sinh hơi tại góc chuyển dòng cút cong Kickout (Cos 8m) Lò 2A, áp lực buồng đốt vọt lên +25 mbar gây tác động bảo vệ MFT Lò 2A (dừng sửa chữa 137,85 giờ).</p>\n  </section>\n\n  '}, {'id': 'sc-2020-2503', 'title': 'ÁP LỰC LÒ HƠI 7. Bục ống sinh hơi buồng đốt Lò 1B (25/03/2020)', 'html': '<section id="sc-2020-2503" class="incident-section">\n    <div class="incident-title"><span class="badge badge-boiler">ÁP LỰC LÒ HƠI</span> 7. Bục ống sinh hơi buồng đốt Lò 1B (25/03/2020)</div>\n    <p>Lúc 06h09 ngày 25/03/2020, mài mòn cơ học làm thủng vách ống sinh hơi Lò 1B; dừng lò sửa chữa cắt thay ống trong 153,75 giờ.</p>\n  </section>\n\n  '}, {'id': 'sc-2020-0805', 'title': 'PHẦN ĐIỆN 8. Rơ le áp lực dầu pha C MBA chính T1 tác động nhầm, Trip S1 (08/05/2020)', 'html': '<section id="sc-2020-0805" class="incident-section">\n    <div class="incident-title"><span class="badge badge-elec">PHẦN ĐIỆN</span> 8. Rơ le áp lực dầu pha C MBA chính T1 tác động nhầm, Trip S1 (08/05/2020)</div>\n    <p>Lúc 08/05/2020, rơ le bảo vệ áp lực dầu thùng dầu pha C máy biến áp chính T1 tác động nhầm, nhảy MC 531, 561, trip máy biến áp T1 và tách Tổ máy S1.</p>\n  </section>\n\n  '}, {'id': 'sc-2020-1905', 'title': 'ÁP LỰC LÒ HƠI 9. Bục ống sinh hơi trong buồng đốt (19/05/2020)', 'html': '<section id="sc-2020-1905" class="incident-section">\n    <div class="incident-title"><span class="badge badge-boiler">ÁP LỰC LÒ HƠI</span> 9. Bục ống sinh hơi trong buồng đốt (19/05/2020)</div>\n    <p>Lúc 21h54 ngày 19/05/2020, xói mòn tro xỉ làm rách vách ống sinh hơi, dừng lò sửa chữa 60,87 giờ.</p>\n  </section>\n\n  '}, {'id': 'sc-2020-2805', 'title': 'LÒ - MÁY 10. Trip quạt khói A/B Lò 1A, Trip Tuabin S1 và kẹt Bypass cao áp gây MFT Lò 1B (28/05/2020)', 'html': '<section id="sc-2020-2805" class="incident-section">\n    <div class="incident-title"><span class="badge badge-boiler">LÒ - MÁY</span> 10. Trip quạt khói A/B Lò 1A, Trip Tuabin S1 và kẹt Bypass cao áp gây MFT Lò 1B (28/05/2020)</div>\n    <p>Lúc 04h42 - 04h50 ngày 28/05/2020, quạt khói A rồi quạt B Lò 1A bị trip do biến tần, gây MFT Lò 1A; nhiệt độ hơi chính tăng cao làm Trip Tuabin S1; van Bypass cao áp Lò 1B kẹt không mở làm MFT tiếp Lò 1B, ngừng toàn bộ tổ máy S1.</p>\n  </section>\n\n  '}, {'id': 'sc-2020-1806', 'title': 'ÁP LỰC LÒ HƠI 11. Bục màng ống sinh hơi Lò 1A (18/06/2020)', 'html': '<section id="sc-2020-1806" class="incident-section">\n    <div class="incident-title"><span class="badge badge-boiler">ÁP LỰC LÒ HƠI</span> 11. Bục màng ống sinh hơi Lò 1A (18/06/2020)</div>\n    <p>Lúc 08h47 ngày 18/06/2020, mài mòn làm rách màng ống sinh hơi buồng đốt Lò 1A, dừng lò 47,55 giờ để hàn gia cố.</p>\n  </section>\n\n  '}, {'id': 'sc-2020-2506', 'title': 'ÁP LỰC LÒ HƠI 12. Bục ống quá nhiệt khu đối lưu HRA (25/06/2020)', 'html': '<section id="sc-2020-2506" class="incident-section">\n    <div class="incident-title"><span class="badge badge-boiler">ÁP LỰC LÒ HƠI</span> 12. Bục ống quá nhiệt khu đối lưu HRA (25/06/2020)</div>\n    <p>Lúc 17h01 ngày 25/06/2020, dòng tro bay xói mòn gây bục chùm ống quá nhiệt phần đuôi lò HRA; dừng lò 24,20 giờ để xử lý.</p>\n  </section>\n\n  '}, {'id': 'sc-2020-2906', 'title': 'PHẦN ĐIỆN 13. Tín hiệu nhảy máy cắt đầu cực 901, 902 và lỗi kích từ (29/06/2020)', 'html': '<section id="sc-2020-2906" class="incident-section">\n    <div class="incident-title"><span class="badge badge-elec">PHẦN ĐIỆN</span> 13. Tín hiệu nhảy máy cắt đầu cực 901, 902 và lỗi kích từ (29/06/2020)</div>\n    <p>Lúc 09h21 &amp; 12h21 ngày 29/06/2020, hệ thống kích từ báo lỗi và xuất hiện xung tín hiệu tác động nhảy máy cắt đầu cực máy phát.</p>\n  </section>\n\n  '}, {'id': 'sc-2020-0207', 'title': 'PHẦN ĐIỆN 14. Bảo vệ 59GN chạm đất Stator tác động trip máy phát S2 (02/07/2020)', 'html': '<section id="sc-2020-0207" class="incident-section">\n    <div class="incident-title"><span class="badge badge-elec">PHẦN ĐIỆN</span> 14. Bảo vệ 59GN chạm đất Stator tác động trip máy phát S2 (02/07/2020)</div>\n    <p>Lúc 21h49 ngày 02/07/2020, rơ le bảo vệ quá điện áp chạm đất 59GN tác động ở giá trị Ue = 9,9V (ngưỡng 9,6V) do suy giảm cách điện giàn tụ quá điện áp đầu cực máy phát S2 (dừng xử lý 41,15 giờ, giữ được 2 lò hơi).</p>\n  </section>\n\n  '}, {'id': 'sc-2020-0508', 'title': 'PHẦN ĐIỆN 15. Dính tiếp điểm rơ le áp suất thùng dầu OLTC (CP088) MBA T1, Trip S1 (05/08/2020)', 'html': '<section id="sc-2020-0508" class="incident-section">\n    <div class="incident-title"><span class="badge badge-elec">PHẦN ĐIỆN</span> 15. Dính tiếp điểm rơ le áp suất thùng dầu OLTC (CP088) MBA T1, Trip S1 (05/08/2020)</div>\n    <p>Lúc 08h51 ngày 05/08/2020, tiếp điểm rơ le áp suất thùng dầu OLTC CP088 pha A MBA T1 bị kẹt dính cơ khí, phát tín hiệu trip giả làm nhảy MC 531, 561, mất điện MBA T1 và tách Tổ máy S1.</p>\n  </section>\n\n  '}, {'id': 'sc-2020-0209', 'title': 'PHẦN ĐIỆN 16. Lỗi rơ le bảo vệ máy phát & bục ống sinh hơi (02/09/2020)', 'html': '<section id="sc-2020-0209" class="incident-section">\n    <div class="incident-title"><span class="badge badge-elec">PHẦN ĐIỆN</span> 16. Lỗi rơ le bảo vệ máy phát &amp; bục ống sinh hơi (02/09/2020)</div>\n    <p>Lúc 10h16 ngày 02/09/2020 lỗi rơ le bảo vệ máy phát; cùng ngày lúc 22h39 xuất hiện bục ống sinh hơi trong buồng đốt làm dừng lò kéo dài 104,40 giờ.</p>\n  </section>\n\n  '}, {'id': 'sc-2020-0909', 'title': 'ÁP LỰC LÒ HƠI 17. Bục ống ngoài buồng đốt Lò 1A (09/09/2020)', 'html': '<section id="sc-2020-0909" class="incident-section">\n    <div class="incident-title"><span class="badge badge-boiler">ÁP LỰC LÒ HƠI</span> 17. Bục ống ngoài buồng đốt Lò 1A (09/09/2020)</div>\n    <p>Lúc 17h25 ngày 09/09/2020, xì hở đường ống lấy mẫu / xả đọng áp lực cao khu vực ngoài buồng đốt Lò 1A, dừng lò 4,42 giờ để hàn vá.</p>\n  </section>\n\n  '}, {'id': 'sc-2020-0411', 'title': 'ÁP LỰC LÒ HƠI 18. Bục ống sinh hơi buồng đốt Lò 1B (04/11/2020)', 'html': '<section id="sc-2020-0411" class="incident-section">\n    <div class="incident-title"><span class="badge badge-boiler">ÁP LỰC LÒ HƠI</span> 18. Bục ống sinh hơi buồng đốt Lò 1B (04/11/2020)</div>\n    <p>Lúc 18h30 ngày 04/11/2020, mài mòn xỉ than gây bục ống sinh hơi buồng đốt Lò 1B, dừng lò xử lý.</p>\n  </section>\n\n  '}, {'id': 'sc-2020-1212', 'title': 'ÁP LỰC LÒ HƠI 19. Bục ống sinh hơi số 99 và 100 Lò 2B (12/12/2020)', 'html': '<section id="sc-2020-1212" class="incident-section">\n    <div class="incident-title"><span class="badge badge-boiler">ÁP LỰC LÒ HƠI</span> 19. Bục ống sinh hơi số 99 và 100 Lò 2B (12/12/2020)</div>\n    <p>Lúc 15h30 ngày 12/12/2020, xì nước tại chân hồi liệu B1, B2 đáy hộp gió thứ cấp tường sau; đo siêu âm chiều dày ống 99 và 100 chỉ còn 2,8 - 3,5 mm (thiết kế 4,52 mm) do xói mòn cơ học than pha trộn nhiều xít.</p>\n  </section>\n'}], 2021: [{'id': 'sc-overview', 'title': 'ĐÁNH GIÁ CHUNG\n        Tình hình sự cố và phân loại kỹ thuật năm 2021', 'html': '<section id="sc-overview" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-aux">ĐÁNH GIÁ CHUNG</span>\n        Tình hình sự cố và phân loại kỹ thuật năm 2021\n      </div>\n      <p>Năm 2021 ghi nhận diễn biến sự cố phức tạp nhất kể từ khi vận hành thương mại, với tổng cộng <strong>20 vụ sự cố và bất thường kỹ thuật</strong> (trong đó có 01 sự cố cấp 1 nghiêm trọng tại máy phát S1 và 15 vụ sự cố liên quan đến hệ thống ống áp lực lò hơi do hiện tượng mài mòn xỉ than pha trộn):</p>\n      \n<div class="table-container"><table class="data-table">\n        <thead>\n          <tr>\n            <th>Phân loại theo hệ thống</th>\n            <th>Số vụ</th>\n            <th>Các sự cố trọng tâm</th>\n          </tr>\n        </thead>\n        <tbody>\n          <tr>\n            <td><strong>Sự cố phần Điện &amp; C&amp;I</strong></td>\n            <td>02 vụ</td>\n            <td>Cháy chổi than cổ góp máy phát S1 (27/03); Nhảy Atomat Q100 thanh cái UPS 16BRA (16/05).</td>\n          </tr>\n          <tr>\n            <td><strong>Sự cố phần Tuabin</strong></td>\n            <td>02 vụ</td>\n            <td>Trip tuabin S2 do điểm đo chênh giãn nở rôto (31/05); Lỗi hệ thống điều khiển tuabin S2 (28/11).</td>\n          </tr>\n          <tr>\n            <td><strong>Sự cố hệ thống phụ Lò</strong></td>\n            <td>01 vụ</td>\n            <td>Hệ thống thải xỉ gặp sự cố gây tắc xỉ buồng đốt, ấn MFT Lò 2A (26/09).</td>\n          </tr>\n          <tr>\n            <td><strong>Sự cố đường ống áp lực lò hơi</strong></td>\n            <td>15 vụ</td>\n            <td>Bục ống sinh hơi, bục màng ống vách, bục ống xả đọng/lấy mẫu và xì tết chèn van hơi chính.</td>\n          </tr>\n        </tbody>\n      </table></div>\n    </section>\n\n    '}, {'id': 'sc-2703', 'title': 'SỰ CỐ CẤP 1 - ĐIỆN\n        1. Sự cố cháy tại khu vực chổi than cổ góp kích từ Máy phát S1 (27/03/2021)', 'html': '<section id="sc-2703" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-elec">SỰ CỐ CẤP 1 - ĐIỆN</span>\n        1. Sự cố cháy tại khu vực chổi than cổ góp kích từ Máy phát S1 (27/03/2021)\n      </div>\n      <h3 class="sub-title">I. Diễn biến sự cố</h3>\n      <ul>\n        <li>Lúc 06h02 ngày 27/03/2021, tổ máy S1 đang mang tải cao thì xuất hiện phóng điện hồ quang dữ dội kèm theo khói lửa bốc lên tại khoang chổi than và vành trượt cổ góp máy phát điện S1.</li>\n        <li>Hệ thống bảo vệ rơ le tác động cắt máy cắt đầu cực GCB, trip máy phát S1, cắt hệ thống kích từ và dập lửa khẩn cấp.</li>\n        <li>Thời gian dừng máy sửa chữa, phục hồi bề mặt vành trượt, thay thế giá đỡ và hệ thống chổi than kéo dài tới <strong>648,5 giờ</strong> (~27 ngày), sản lượng điện thiếu hụt lên tới <strong>350,19 triệu kWh</strong>.</li>\n      </ul>\n      <h3 class="sub-title">II. Nguyên nhân &amp; Bài học</h3>\n      <div class="callout callout-danger">\n        <strong>Nguyên nhân:</strong> Do tiếp xúc cơ học và phân bố dòng điện không đều giữa các chổi than và bề mặt vành trượt, bụi than bám lâu ngày kết hợp lực tì lò xo chổi than bị suy giảm gây đánh lửa hồ quang cục bộ. Hồ quang phát triển nhanh chóng làm nóng chảy giá đỡ chổi than và bốc cháy vành trượt cổ góp.\n      </div>\n    </section>\n\n    '}, {'id': 'sc-1605', 'title': 'PHẦN ĐIỆN\n        2. Nhảy Atomat Q100 đầu vào thanh cái UPS 16BRA gây Trip Tổ máy S1 (16/05/2021)', 'html': '<section id="sc-1605" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-elec">PHẦN ĐIỆN</span>\n        2. Nhảy Atomat Q100 đầu vào thanh cái UPS 16BRA gây Trip Tổ máy S1 (16/05/2021)\n      </div>\n      <h3 class="sub-title">I. Diễn biến và nguyên nhân</h3>\n      <p>Lúc 18h05 ngày 16/05/2021, bất ngờ nhảy Atomat tổng Q100 cấp nguồn từ bộ nghịch lưu Inverter 1 vào thanh cái khẩn cấp 16BRA. Mất nguồn điều khiển cung cấp cho biến tần quạt khói, quạt gió và các bộ điều khiển trung tâm, dẫn tới bảo vệ nhà máy kích hoạt <strong>Trip Tổ máy S1</strong>.</p>\n      <p><strong>Khắc phục:</strong> Cô lập điểm ngắn mạch phụ tải nhánh; chuyển tạm thời nguồn cấp qua đường Bypass và đóng Atomat liên lạc Q300 nhận điện từ khối 2; nhanh chóng khôi phục lại tổ máy sau 0,58 giờ.</p>\n    </section>\n\n    '}, {'id': 'sc-3105', 'title': 'PHẦN TUABIN\n        3. Trip Tuabin S2 do điểm đo chênh giãn nở Rôto - Xilanh (31/05/2021)', 'html': '<section id="sc-3105" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-mech">PHẦN TUABIN</span>\n        3. Trip Tuabin S2 do điểm đo chênh giãn nở Rôto - Xilanh (31/05/2021)\n      </div>\n      <h3 class="sub-title">I. Hiện tượng &amp; Phân tích</h3>\n      <p>Lúc 16h24 ngày 31/05/2021, trong quá trình vận hành, hệ thống bảo vệ tuabin Mark VI ghi nhận tín hiệu chênh giãn nở tương đối giữa rôto và thân xilanh tuabin (Differential Expansion) vượt quá ngưỡng cho phép, tác động trip khẩn cấp Tuabin S2 và kéo theo MFT Lò 2A, 2B.</p>\n      <p><strong>Nguyên nhân:</strong> Do cảm biến đo dịch chuyển chênh giãn nở bị trôi điểm không hoặc lỗi chập chờn mạch cáp tín hiệu về card xử lý, phát lệnh trip giả lập trong khi độ giãn nở cơ khí thực tế của trục tuabin vẫn nằm trong giới hạn an toàn.</p>\n    </section>\n\n    '}, {'id': 'sc-2811', 'title': 'PHẦN TUABIN\n        4. Lỗi hệ thống điều khiển Tuabin gây Trip Tuabin S2 (28/11/2021)', 'html': '<section id="sc-2811" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-mech">PHẦN TUABIN</span>\n        4. Lỗi hệ thống điều khiển Tuabin gây Trip Tuabin S2 (28/11/2021)\n      </div>\n      <h3 class="sub-title">I. Diễn biến và xử lý</h3>\n      <p>Lúc 15h49 ngày 28/11/2021, xuất hiện sự cố bất thường trên mạch điều khiển van tuabin làm trip Tuabin S2. Kíp trực vận hành đã nhanh chóng thao tác chuyển Manual Boiler Master, mở Bypass cao/hạ áp kịp thời và <strong>giữ thành công 02 lò hơi 2A &amp; 2B tiếp tục vận hành ổn định</strong>, rút ngắn đáng kể thời gian hòa đồng bộ lại tổ máy (thời gian xử lý 4,43 giờ).</p>\n    </section>\n\n    '}, {'id': 'sc-2609', 'title': 'THIẾT BỊ PHỤ\n        5. Sự cố hệ thống thải xỉ gây nghẽn xỉ buồng đốt, ấn MFT Lò 2A (26/09/2021)', 'html': '<section id="sc-2609" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-boiler">THIẾT BỊ PHỤ</span>\n        5. Sự cố hệ thống thải xỉ gây nghẽn xỉ buồng đốt, ấn MFT Lò 2A (26/09/2021)\n      </div>\n      <h3 class="sub-title">I. Cơ chế sự cố</h3>\n      <p>Lúc 22h17 ngày 26/09/2021, hệ thống làm mát và thải xỉ đáy (Stripper Cooler) của Lò 2A gặp trục trặc cơ khí không thể thải xỉ ra ngoài. Lượng xỉ tích tụ dày đặc làm tăng vọt áp lực sàn liệu và nhiệt độ buồng đốt tăng mất kiểm soát. Để ngăn ngừa nguy cơ kết keo đóng tảng phá hủy sàn ghi phân phối gió, Lò trưởng đã chủ động ấn nút MFT dừng khẩn cấp Lò hơi 2A.</p>\n    </section>\n\n    '}, {'id': 'sc-buc-ong', 'title': 'ỐNG ÁP LỰC LÒ HƠI\n        6. Chuỗi 15 sự cố bục ống sinh hơi và phụ kiện áp lực lò hơi năm 2021', 'html': '<section id="sc-buc-ong" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-boiler">ỐNG ÁP LỰC LÒ HƠI</span>\n        6. Chuỗi 15 sự cố bục ống sinh hơi và phụ kiện áp lực lò hơi năm 2021\n      </div>\n      \n      <p>Năm 2021 là đỉnh điểm của hiện tượng mài mòn ống sinh hơi tầng sôi CFB tại NMNĐ Mông Dương 1 với 15 lần phải dừng lò khắc phục:</p>\n      \n<div class="table-container"><table class="data-table">\n        <thead>\n          <tr>\n            <th>Thời gian</th>\n            <th>Vị trí bục / Thiết bị</th>\n            <th>Thời gian khắc phục</th>\n            <th>Sản lượng thiếu hụt</th>\n            <th>Nguyên nhân chi tiết</th>\n          </tr>\n        </thead>\n        <tbody>\n          <tr>\n            <td>11/01/2021</td>\n            <td>Bục ống sinh hơi buồng đốt</td>\n            <td>72,17 giờ</td>\n            <td>19,48 tr. kWh</td>\n            <td>Mài mòn cơ học vách ống sinh hơi.</td>\n          </tr>\n          <tr>\n            <td>28/01/2021</td>\n            <td>Bục ống sinh hơi</td>\n            <td>71,72 giờ</td>\n            <td>19,36 tr. kWh</td>\n            <td>Xói mòn bề mặt kim loại dưới tác động của tro xỉ.</td>\n          </tr>\n          <tr>\n            <td>11/02/2021</td>\n            <td>Bục ống sinh hơi gây tăng áp buồng đốt</td>\n            <td>71,05 giờ</td>\n            <td>19,18 tr. kWh</td>\n            <td>Áp lực hơi phụt ra làm tăng dương áp suất buồng đốt.</td>\n          </tr>\n          <tr>\n            <td>02/03/2021</td>\n            <td>Bục ống sinh hơi</td>\n            <td>70,47 giờ</td>\n            <td>19,02 tr. kWh</td>\n            <td>Giảm mỏng chiều dày kim loại ống dưới 3.0 mm.</td>\n          </tr>\n          <tr>\n            <td>12/03/2021</td>\n            <td>Bục màng ống sinh hơi</td>\n            <td>50,88 giờ</td>\n            <td>13,73 tr. kWh</td>\n            <td>Mài mòn xé rách màng hàn liên kết giữa các ống.</td>\n          </tr>\n          <tr>\n            <td>13/03/2021</td>\n            <td>Bục ống sinh hơi</td>\n            <td>82,57 giờ</td>\n            <td>22,29 tr. kWh</td>\n            <td>Mòn vẹt ống tại vị trí tiếp giáp lớp bê tông chịu lửa.</td>\n          </tr>\n          <tr>\n            <td>24/03/2021</td>\n            <td>Bục ống sinh hơi</td>\n            <td>114,78 giờ</td>\n            <td>30,99 tr. kWh</td>\n            <td>Xói mòn diện rộng khu vực buồng đốt.</td>\n          </tr>\n          <tr>\n            <td>04/05/2021</td>\n            <td>Bục ống sinh hơi</td>\n            <td>69,08 giờ</td>\n            <td>18,65 tr. kWh</td>\n            <td>Mòn cơ học do xít than pha trộn.</td>\n          </tr>\n          <tr>\n            <td>06/05/2021</td>\n            <td>Bục ống sinh hơi</td>\n            <td>122,93 giờ</td>\n            <td>33,19 tr. kWh</td>\n            <td>Bục ống sinh hơi kéo theo xì hở ống lân cận.</td>\n          </tr>\n          <tr>\n            <td>29/05/2021</td>\n            <td>Bục đường lấy mẫu hơi chính</td>\n            <td>17,00 giờ</td>\n            <td>4,59 tr. kWh</td>\n            <td>Rung động và ăn mòn điểm hàn nối đường ống nhỏ.</td>\n          </tr>\n          <tr>\n            <td>05/06/2021</td>\n            <td>Bục ống xả đọng hơi chính Lò 2B</td>\n            <td>16,45 giờ</td>\n            <td>8,88 tr. kWh</td>\n            <td>Xói mòn tại van và đường ống xả đọng.</td>\n          </tr>\n          <tr>\n            <td>09/06/2021</td>\n            <td>Bục ống sinh hơi tường sau</td>\n            <td>70,08 giờ</td>\n            <td>18,92 tr. kWh</td>\n            <td>Tập trung mài mòn tại tường sau buồng đốt.</td>\n          </tr>\n          <tr>\n            <td>18/06/2021</td>\n            <td>Bục ống sinh hơi nóc lò &amp; quá nhiệt 3 (1B)</td>\n            <td>226,88 giờ</td>\n            <td>61,25 tr. kWh</td>\n            <td>Bục ống sinh hơi nóc lò và thổi mòn chùm ống quá nhiệt cấp 3.</td>\n          </tr>\n          <tr>\n            <td>25/08/2021</td>\n            <td>Bục ống sinh hơi tường sau (Cos Kickout)</td>\n            <td>67,97 giờ</td>\n            <td>18,35 tr. kWh</td>\n            <td>Mài mòn tại góc chuyển dòng cút cong Kickout (Cos 8m).</td>\n          </tr>\n          <tr>\n            <td>20/09/2021</td>\n            <td>Bục ống sinh hơi</td>\n            <td>63,38 giờ</td>\n            <td>0,00 tr. kWh</td>\n            <td>Mòn rỗ vách ống sinh hơi.</td>\n          </tr>\n          <tr>\n            <td>22/10/2021</td>\n            <td>Bục ống sinh hơi do mài mòn</td>\n            <td>58,13 giờ</td>\n            <td>15,69 tr. kWh</td>\n            <td>Mài mòn thành ống dưới tác động dòng liệu.</td>\n          </tr>\n          <tr>\n            <td>23/10 &amp; 24/11</td>\n            <td>Xì tết chèn ty van MOV hơi chính (1A, 1B)</td>\n            <td>~11,6 giờ</td>\n            <td>6,26 tr. kWh</td>\n            <td>Lão hóa tết chèn van chịu áp lực và nhiệt độ cao.</td>\n          </tr>\n          <tr>\n            <td>08/11/2021</td>\n            <td>Bục ống sinh hơi ngoài buồng đốt</td>\n            <td>22,70 giờ</td>\n            <td>6,12 tr. kWh</td>\n            <td>Rò rỉ mối hàn ống ngoài buồng đốt.</td>\n          </tr>\n          <tr>\n            <td>23/11/2021</td>\n            <td>Bục ống sinh hơi</td>\n            <td>71,33 giờ</td>\n            <td>0,00 tr. kWh</td>\n            <td>Mòn cơ học vách ống.</td>\n          </tr>\n        </tbody>\n      </table></div>\n\n      <h3 class="sub-title">III. Giải pháp đột phá kỹ thuật từ năm 2021</h3>\n      <div class="callout callout-warning">\n        Trước tình trạng bục ống lò xảy ra liên tiếp do than pha trộn có hàm lượng xít đá tăng cao (17 - 27%), nhà máy đã đề xuất và triển khai giải pháp căn cơ: <strong>Thay thế toàn bộ các mảng ống sinh hơi từ vật liệu nguyên bản thép carbon SA-210C sang thép hợp kim chịu nhiệt và chống mài mòn cao cấp SA-213 T91</strong> tại các khu vực xung yếu (Cos Kickout 8m đến 18m tường sau).\n      </div>\n    </section>\n  '}], 2022: [{'id': 'sc-overview', 'title': 'TỔNG QUAN VẬN HÀNH\n        Tình hình sự cố và phân loại kỹ thuật năm 2022', 'html': '<section id="sc-overview" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-aux">TỔNG QUAN VẬN HÀNH</span>\n        Tình hình sự cố và phân loại kỹ thuật năm 2022\n      </div>\n      <p>Năm 2022 ghi nhận sự nỗ lực lớn trong việc kiểm soát mài mòn ống sinh hơi sau khi bước đầu áp dụng các giải pháp phun phủ và hàn đắp bảo vệ. Tuy nhiên, các sự cố về mạch đo lường C&amp;I, lỗi module điều khiển van tuabin và sự cố mất nguồn thanh cái trạm bơm nước tuần hoàn tiếp tục là những điểm nóng vận hành:</p>\n      \n<div class="table-container"><table class="data-table">\n        <thead>\n          <tr>\n            <th>Thời gian</th>\n            <th>Hệ thống / Thiết bị</th>\n            <th>Phân loại</th>\n            <th>Diễn biến &amp; Hậu quả chính</th>\n          </tr>\n        </thead>\n        <tbody>\n          <tr>\n            <td><strong>04/02/2022</strong></td>\n            <td>Tuabin Tổ máy S2</td>\n            <td>C&amp;I / Tuabin</td>\n            <td>Trip tuabin S2 do lỗi cảm biến điểm đo chân không hơi thoát bình ngưng nhánh A.</td>\n          </tr>\n          <tr>\n            <td><strong>19/03/2022</strong></td>\n            <td>Lò hơi buồng đốt</td>\n            <td>Áp lực Lò</td>\n            <td>Bục ống sinh hơi buồng đốt, dừng lò xử lý 71,68 giờ.</td>\n          </tr>\n          <tr>\n            <td><strong>16/04/2022</strong></td>\n            <td>Lò hơi buồng đốt</td>\n            <td>Áp lực Lò</td>\n            <td>Bục ống sinh hơi buồng đốt, dừng lò sửa chữa thay thế ống 98,67 giờ.</td>\n          </tr>\n          <tr>\n            <td><strong>01/05/2022</strong></td>\n            <td>Van điều khiển Tuabin S2</td>\n            <td>C&amp;I / Tuabin</td>\n            <td>Dừng Tuabin S2 để xử lý lỗi module servo PSVO điều khiển các van CV1-CV3, MSV2, IV1, IV2.</td>\n          </tr>\n          <tr>\n            <td><strong>13/10/2022</strong></td>\n            <td>Hệ thống điều khiển Lò 1A</td>\n            <td>C&amp;I / Lò hơi</td>\n            <td>MFT dừng khẩn cấp Lò hơi 1A do lỗi hệ thống điều khiển DCS / Controller.</td>\n          </tr>\n          <tr>\n            <td><strong>20/12/2022</strong></td>\n            <td>Thanh cái 10kV 06BBH</td>\n            <td>Hệ thống Điện</td>\n            <td>Mất nguồn thanh cái tuần hoàn 06BBH làm trip cả 2 bơm tuần hoàn, dẫn đến Trip Tổ máy S2.</td>\n          </tr>\n        </tbody>\n      </table></div>\n    </section>\n\n    '}, {'id': 'sc-0402', 'title': 'C&I / TUABIN\n        1. Sự cố Trip Tuabin S2 do lỗi điểm đo chân không bình ngưng nhánh A (04/02/2022)', 'html': '<section id="sc-0402" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-mech">C&amp;I / TUABIN</span>\n        1. Sự cố Trip Tuabin S2 do lỗi điểm đo chân không bình ngưng nhánh A (04/02/2022)\n      </div>\n      <h3 class="sub-title">I. Diễn biến sự cố</h3>\n      <ul>\n        <li>Lúc 10h30 ngày 04/02/2022: Nhận lệnh điều độ A0 ngừng dự phòng Lò hơi 2A. Tổ máy S2 đang vận hành 1 lò 2B.</li>\n        <li>Lúc 10h47 ngày 04/02/2022: Xuất hiện tín hiệu báo lỗi độ chân không bình ngưng nhánh A suy giảm nghiêm trọng. Hệ thống bảo vệ Mark VI kích hoạt lệnh <strong>Trip Tuabin S2</strong> ngay tức thì.</li>\n        <li>Kiểm tra thông số thực tế cho thấy chân không bình ngưng thực tế vẫn duy trì mức cao (-0.92 bar), tuabin hoàn toàn bình thường.</li>\n      </ul>\n      <h3 class="sub-title">II. Nguyên nhân &amp; Khắc phục</h3>\n      <div class="callout callout-warning">\n        <strong>Nguyên nhân:</strong> Do hỏng cảm biến áp suất đo chân không (Transmitter) nhánh A hoặc bị nghẽn đường ống xung dẫn tín hiệu chân không, làm giá trị áp suất đo được tăng cao vượt ngưỡng bảo vệ trip tuabin.\n      </div>\n      <p><strong>Khắc phục:</strong> Vệ sinh đường ống xung, thay thế transmitter đo chân không mới; kiểm tra cấu hình logic biểu quyết (voting logic) để đảm bảo không bị trip nhầm khi chỉ có 1 kênh đo đơn lẻ bị lỗi.</p>\n    </section>\n\n    '}, {'id': 'sc-1903', 'title': 'ÁP LỰC LÒ HƠI\n        2. Các sự cố bục ống sinh hơi buồng đốt lò hơi (19/03/2022 & 16/04/2022)', 'html': '<section id="sc-1903" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-boiler">ÁP LỰC LÒ HƠI</span>\n        2. Các sự cố bục ống sinh hơi buồng đốt lò hơi (19/03/2022 &amp; 16/04/2022)\n      </div>\n      <h3 class="sub-title">I. Hiện tượng &amp; Hậu quả</h3>\n      <p>Trong tháng 3 và tháng 4/2022, lò hơi tiếp tục chịu ảnh hưởng của hiện tượng xói mòn cơ học do than xấu pha trộn:</p>\n      <ul>\n        <li><strong>Sự cố ngày 19/03/2022:</strong> Lưu lượng nước cấp tăng bất thường, buồng đốt dao động áp suất, phát hiện bục ống sinh hơi. Thời gian dừng lò khắc phục là <strong>71,68 giờ</strong>.</li>\n        <li><strong>Sự cố ngày 16/04/2022:</strong> Bục ống sinh hơi vách buồng đốt, vết rách phát triển lớn làm giảm nhanh mức nước bao hơi. Thời gian dừng sửa chữa, thay thế đoạn ống bị hỏng kéo dài <strong>98,67 giờ</strong>.</li>\n      </ul>\n      <h3 class="sub-title">II. Biện pháp kỹ thuật</h3>\n      <p>Tăng cường mật độ đo chiều dày siêu âm tại các kỳ dừng máy, mở rộng phạm vi phun phủ hợp kim chịu mài mòn và hàn ốp lá mía tại các góc chuyển dòng khói xỉ.</p>\n    </section>\n\n    '}, {'id': 'sc-0105', 'title': 'C&I / TUABIN\n        3. Dừng Tuabin S2 do lỗi module servo PSVO điều khiển hệ thống van hơi (01/05/2022)', 'html': '<section id="sc-0105" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-mech">C&amp;I / TUABIN</span>\n        3. Dừng Tuabin S2 do lỗi module servo PSVO điều khiển hệ thống van hơi (01/05/2022)\n      </div>\n      <h3 class="sub-title">I. Hiện tượng và Nguy cơ</h3>\n      <p>Lúc 12h36 ngày 01/05/2022, tổ máy S2 đang mang tải thì xuất hiện dao động vị trí và mất đồng bộ phản hồi độ mở tại các van điều chỉnh hơi chính CV1, CV2, CV3, van chặn chính MSV2 và các van đánh chặn IV1, IV2. Đèn cảnh báo Fault sáng trên các module điều khiển servo PSVO (4A1A, 4A2A, 4A3A) trong tủ điều khiển Mark VI.</p>\n\n      <h3 class="sub-title">II. Xử lý sự cố</h3>\n      <div class="callout callout-warning">\n        <strong>Xử lý:</strong> Việc dao động các van hơi chính đe dọa trực tiếp đến sự ổn định vòng quay và tải của tuabin máy phát. Trưởng ca đã xin lệnh A0 chủ động tách tải và dừng Tuabin S2 an toàn để đội C&amp;I phối hợp chuyên gia kiểm tra, vệ sinh jack cắm, căn chỉnh dòng servo và thay thế các board card module PSVO bị lỗi.\n      </div>\n    </section>\n\n    '}, {'id': 'sc-1310', 'title': 'C&I / LÒ HƠI\n        4. Sự cố dừng Lò hơi 1A do lỗi hệ thống điều khiển DCS (13/10/2022)', 'html': '<section id="sc-1310" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-boiler">C&amp;I / LÒ HƠI</span>\n        4. Sự cố dừng Lò hơi 1A do lỗi hệ thống điều khiển DCS (13/10/2022)\n      </div>\n      <h3 class="sub-title">I. Diễn biến sự cố</h3>\n      <p>Lúc 01h21 ngày 13/10/2022, Lò hơi 1A đang vận hành bình thường thì bất ngờ xuất hiện lỗi phần cứng trên bộ xử lý Controller / mạch truyền thông điều khiển lò hơi. Tín hiệu đầu vào/đầu ra (I/O) bị gián đoạn, mất phản hồi điều khiển vòng kín các van cấp than và khói gió. Hệ thống tự động phát lệnh <strong>MFT dừng khẩn cấp Lò hơi 1A</strong> để đảm bảo an toàn buồng đốt.</p>\n      <p><strong>Khắc phục:</strong> Kíp trực và tổ tự động C&amp;I đã tiến hành reset card nguồn, kiểm tra cáp quang truyền thông, thay thế module CPU bị lỗi và khởi động lại lò sau khi khôi phục kết nối điều khiển an toàn.</p>\n    </section>\n\n    '}, {'id': 'sc-2012', 'title': 'HỆ THỐNG ĐIỆN\n        5. Mất nguồn thanh cái 10kV 06BBH trạm tuần hoàn gây dừng 2 bơm tuần hoàn và Trip Tổ máy S2 (20/12/2022)', 'html': '<section id="sc-2012" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-elec">HỆ THỐNG ĐIỆN</span>\n        5. Mất nguồn thanh cái 10kV 06BBH trạm tuần hoàn gây dừng 2 bơm tuần hoàn và Trip Tổ máy S2 (20/12/2022)\n      </div>\n      <h3 class="sub-title">I. Diễn biến chuỗi sự cố</h3>\n      <ul>\n        <li>Lúc 07h08 ngày 20/12/2022, tổ máy S2 đang phát công suất lên lưới thì xảy ra sự cố mất điện hoàn toàn thanh cái 10kV trạm bơm tuần hoàn <strong>06BBH</strong>.</li>\n        <li>Hậu quả làm cắt điện và dừng sự cố cả 2 bơm nước tuần hoàn (CWP) đang làm việc cung cấp nước làm mát cho bình ngưng Tổ máy S2.</li>\n        <li>Mất nguồn nước làm mát bình ngưng làm chân không hơi thoát tuabin tụt dốc cực nhanh, kích hoạt bảo vệ chân không thấp làm <strong>Trip Tổ máy S2</strong>.</li>\n      </ul>\n      <h3 class="sub-title">II. Bài học kinh nghiệm</h3>\n      <div class="callout callout-danger">\n        <strong>Bài học chuyển nguồn trạm tuần hoàn:</strong> Thanh cái 10kV trạm tuần hoàn là nguồn điện sống còn duy trì chân không tổ máy. Cần thường xuyên kiểm tra cơ cấu liên động tự động chuyển nguồn (ATS) giữa các nhánh 06BBG và 06BBH, bảo đảm khi một nhánh phân đoạn gặp sự cố máy cắt thì phân đoạn còn lại phải tự động khép liên lạc cấp điện cho ít nhất 01 bơm tuần hoàn hoạt động.\n      </div>\n    </section>\n  '}], 2023: [{'id': 'sc-overview', 'title': 'TỔNG QUAN KỸ THUẬT\n        Tình hình sự cố và bước ngoặt kỹ thuật năm 2023', 'html': '<section id="sc-overview" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-aux">TỔNG QUAN KỸ THUẬT</span>\n        Tình hình sự cố và bước ngoặt kỹ thuật năm 2023\n      </div>\n      <p>Năm 2023 tiếp tục là năm chịu thách thức lớn về sự cố đường ống áp lực lò hơi tầng sôi tuần hoàn (CFB), đồng thời ghi nhận các sự cố phức tạp về hệ thống điều khiển khớp nối thủy lực, kẹt trục tuabin và chạm chập thanh cái tự dùng do động vật xâm nhập:</p>\n      \n<div class="table-container"><table class="data-table">\n        <thead>\n          <tr>\n            <th>Hệ thống</th>\n            <th>Đặc điểm nổi bật năm 2023</th>\n            <th>Các sự cố tiêu biểu</th>\n          </tr>\n        </thead>\n        <tbody>\n          <tr>\n            <td><strong>Ống áp lực Lò hơi</strong></td>\n            <td>Chiếm đa số các vụ dừng lò; nứt vỡ tại các điểm hàn đắp tạm thời và mài mòn cục bộ do xít than.</td>\n            <td>Chuỗi bục ống sinh hơi (tháng 3, 4, 5, 6, 7, 10, 12); bục ống bộ hâm (19/09); xì hở đường rót than (13/06).</td>\n          </tr>\n          <tr>\n            <td><strong>Cơ khí &amp; Tuabin</strong></td>\n            <td>Sự cố liên động van và bó kẹt cơ khí trong quá trình khởi động / dừng máy.</td>\n            <td>Lỗi điều khiển van bảo vệ trip Tuabin (26/04); sự cố kẹt trục Tuabin S2 (14/07).</td>\n          </tr>\n          <tr>\n            <td><strong>Điện &amp; C&amp;I</strong></td>\n            <td>Mất nguồn điều khiển khớp nối thủy lực; sự cố ngoại vật xâm nhập ngăn máy cắt.</td>\n            <td>Lỗi nguồn khớp nối thủy lực bơm cấp gây MFT Lò 1B (03/07); Chuột xâm nhập ngăn TU9TD92B gây trip MBA TD92 (31/12).</td>\n          </tr>\n          <tr>\n            <td><strong>Đột phá kỹ thuật</strong></td>\n            <td>Tổng công ty GENCO 3 phê duyệt phương án thay thế mảng ống SA213-T91 trong đợt tiểu tu S1 (tháng 8/2023).</td>\n            <td>Thay toàn bộ mảng ống tường sau Lò 1B từ Cos Kickout 8m đến Cos 18m bằng vật liệu thép hợp kim cao cấp T91.</td>\n          </tr>\n        </tbody>\n      </table></div>\n    </section>\n\n    '}, {'id': 'sc-1806', 'title': 'SỰ CỐ TRỌNG TÂM\n        1. Sự cố bục ống sinh hơi Lò 1B và MFT Lò 1A do xì hở ống khí nén cánh hướng (18/06/2023)', 'html': '<section id="sc-1806" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-boiler">SỰ CỐ TRỌNG TÂM</span>\n        1. Sự cố bục ống sinh hơi Lò 1B và MFT Lò 1A do xì hở ống khí nén cánh hướng (18/06/2023)\n      </div>\n      <h3 class="sub-title">I. Diễn biến sự cố liên hoàn</h3>\n      <ul>\n        <li><strong>15h59:</strong> Tổ máy S1 đang phát 540 MW. Áp lực buồng đốt Lò 1B tăng đột ngột từ -1 mbar lên +6 mbar, dòng quạt khói A/B tăng vọt lên 107A/113A, chênh lệch nước/hơi tăng cao. Vận hành xác nhận Lò 1B bục ống sinh hơi, tiến hành giảm tải và tách hơi lúc 16h12.</li>\n        <li><strong>16h14:</strong> Ấn MFT dừng Lò 1B do tốc độ giảm nhiệt độ đạt -8°C/phút. Tổ máy S1 giảm công suất còn 270 MW với 1 Lò 1A duy trì vận hành.</li>\n        <li><strong>16h16p20:</strong> Đang trong quá trình cô lập Lò 1B, Lò trưởng 1A phát hiện lưu lượng gió sơ cấp Lò 1A tụt đột ngột từ 460 t/h về 165 t/h; 02 van cánh hướng đầu hút quạt gió sơ cấp A/B tự động đóng sập về 5%. Áp lực buồng đốt Lò 1A tụt sâu từ -0,8 mbar xuống -30 mbar.</li>\n        <li><strong>16h16p31:</strong> Tín hiệu bảo vệ áp lực buồng đốt cực thấp (&lt; -25 mbar trong 3s) tác động kích hoạt lệnh <strong>MFT Lò hơi 1A</strong>, dẫn tới ngừng toàn bộ Tổ máy S1.</li>\n      </ul>\n\n      <h3 class="sub-title">II. Nguyên nhân kỹ thuật</h3>\n      <div class="callout callout-danger">\n        <strong>Nguyên nhân Lò 1B:</strong> Ống số 245 (vật liệu SA-210C) bị nứt tại mối hàn đắp xử lý tạm trước đó (tháng 5/2023); luồng nước áp lực cao phun ra từ vết nứt đã xói mòn và thổi bục tiếp 2 ống bên cạnh là 244 và 246 tại Cos Kickout tường sau.<br><br>\n        <strong>Nguyên nhân Lò 1A:</strong> Bị xì hở đầu nối ống mềm cấp khí nén điều khiển bộ dẫn động (actuator) van cánh hướng đầu hút quạt gió sơ cấp A/B. Mất áp lực khí nén làm xi lanh chấp hành không giữ được lực và kéo đóng sập van cánh hướng, triệt tiêu dòng gió sơ cấp gây sụt áp lực buồng lửa.\n      </div>\n    </section>\n\n    '}, {'id': 'sc-0307', 'title': 'C&I / LÒ HƠI\n        2. MFT Lò 1B do lỗi nguồn bộ chuyển đổi khớp nối thủy lực bơm cấp (03/07/2023)', 'html': '<section id="sc-0307" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-elec">C&amp;I / LÒ HƠI</span>\n        2. MFT Lò 1B do lỗi nguồn bộ chuyển đổi khớp nối thủy lực bơm cấp (03/07/2023)\n      </div>\n      <h3 class="sub-title">I. Hiện tượng &amp; Cơ chế tác động</h3>\n      <p>Lúc 01h25 ngày 03/07/2023, tổ máy đang mang tải thì bộ nguồn chuyển đổi cấp tín hiệu điều khiển khớp nối thủy lực bơm nước cấp Lò 1B bị mất điện đột ngột. Cơ cấu điều khiển tốc độ khớp nối bị tê liệt, lưu lượng nước cấp lên bao hơi Lò 1B suy giảm nghiêm trọng. Hệ thống bảo vệ liên động kích hoạt <strong>MFT dừng khẩn cấp Lò 1B</strong>.</p>\n      <p><strong>Khắc phục:</strong> Kíp trực và đội tự động đã khẩn trương thay thế bộ chuyển đổi nguồn, đo đạc ổn định tín hiệu điều khiển và khôi phục lại Lò 1B hòa mạng sau 0,6 giờ.</p>\n    </section>\n\n    '}, {'id': 'sc-1407', 'title': 'PHẦN TUABIN\n        3. Sự cố kẹt trục Tuabin Tổ máy S2 (14/07/2023)', 'html': '<section id="sc-1407" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-mech">PHẦN TUABIN</span>\n        3. Sự cố kẹt trục Tuabin Tổ máy S2 (14/07/2023)\n      </div>\n      <h3 class="sub-title">I. Diễn biến và phân tích</h3>\n      <p>Ngày 14/07/2023, trong quá trình vận hành / dừng quay trục, Tuabin tổ máy S2 xuất hiện hiện tượng tăng mô-men cản quay trục, thiết bị vần trục (Turning Gear) bị quá dòng ngắt bảo vệ, trục tuabin có dấu hiệu kẹt cơ khí cục bộ tại các vành chèn hơi hoặc gối trục.</p>\n      <p><strong>Xử lý:</strong> Thực hiện quy trình ủ nhiệt tuabin nghiêm ngặt, theo dõi độ đảo trục và chênh lệch nhiệt độ thân trên/dưới xilanh; kiểm tra độ sạch và áp lực dầu nâng trục (Jacking Oil); kiên trì quay nhích trục thủ công kết hợp theo dõi giãn nở nhiệt trước khi đưa thiết bị vần trục điện trở lại làm việc an toàn.</p>\n    </section>\n\n    '}, {'id': 'sc-1908', 'title': 'HỆ THỐNG ĐIỆN\n        4. Sự cố Máy biến áp tự dùng TD11 & Sét đánh đường dây 171 (19/08/2023)', 'html': '<section id="sc-1908" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-elec">HỆ THỐNG ĐIỆN</span>\n        4. Sự cố Máy biến áp tự dùng TD11 &amp; Sét đánh đường dây 171 (19/08/2023)\n      </div>\n      <h3 class="sub-title">I. Diễn biến</h3>\n      <ul>\n        <li>Lúc 05h48 ngày 19/08/2023: Giông sét lớn đánh trực tiếp vào tuyến đường dây 110kV 171 liên kết cấp nguồn dự phòng, bảo vệ đường dây tác động cắt máy cắt cách ly sự cố.</li>\n        <li>Cùng ngày, hệ thống rơ le bảo vệ khối máy biến áp tự dùng <strong>TD11</strong> (cấp nguồn tự dùng 10kV) tác động, đe dọa gián đoạn nguồn cấp tự dùng khối 2. Vận hành đã nhanh chóng chuyển đổi phương thức kết dây nhận nguồn liên lạc để giữ các tổ máy vận hành an toàn.</li>\n      </ul>\n    </section>\n\n    '}, {'id': 'sc-0311', 'title': 'PHẦN LÒ HƠI\n        5. Dừng Lò hơi 2A do bục khớp giãn nở đường cấp gió sơ cấp (03/11/2023)', 'html': '<section id="sc-0311" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-boiler">PHẦN LÒ HƠI</span>\n        5. Dừng Lò hơi 2A do bục khớp giãn nở đường cấp gió sơ cấp (03/11/2023)\n      </div>\n      <h3 class="sub-title">I. Hiện tượng &amp; Hậu quả</h3>\n      <p>Lúc 21h35 ngày 03/11/2023, nhân viên vận hành phát hiện bục rách khớp giãn nở đường gió sơ cấp PA Lò 2A. Bụi than và gió nóng áp lực cao phì mạnh ra khu vực sàn thao tác, áp lực buồng đốt dao động không thể duy trì tầng sôi ổn định. Trưởng ca đã ra lệnh chủ động tách và dừng Lò 2A; thời gian ngừng lò sửa chữa kéo dài <strong>92,45 giờ</strong>.</p>\n    </section>\n\n    '}, {'id': 'sc-3112', 'title': 'PHẦN ĐIỆN\n        6. Chuột chui ngăn TU9TD92B gây chạm chập, Trip MBA TD92 và mất nguồn thanh cái 92B (31/12/2023)', 'html': '<section id="sc-3112" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-elec">PHẦN ĐIỆN</span>\n        6. Chuột chui ngăn TU9TD92B gây chạm chập, Trip MBA TD92 và mất nguồn thanh cái 92B (31/12/2023)\n      </div>\n      <h3 class="sub-title">I. Diễn biến sự cố hi hữu</h3>\n      <p>Vào lúc 19h36 ngày 31/12/2023 (đêm giao thừa Tết Dương lịch), xuất hiện sự cố phóng điện chạm chập ngắn mạch pha-đất dữ dội tại ngăn máy cắt <strong>942B</strong> (ngăn máy cắt lộ tổng hạ áp MBA TD92 cấp cho thanh cái 10kV 26BBB / 92B):</p>\n      <ul>\n        <li>Bảo vệ rơ le tác động cắt MC 942B và gửi lệnh Trip máy biến áp tự dùng khối 2 (TD92).</li>\n        <li>Gây mất điện đột ngột toàn bộ phân đoạn thanh cái 10kV 92B cùng các phụ tải tự dùng quan trọng của khối 2; thời gian gián đoạn xử lý kéo dài 5,42 giờ (sản lượng điện thiếu hụt 2,925 tr. kWh).</li>\n      </ul>\n      <h3 class="sub-title">II. Nguyên nhân &amp; Biện pháp phòng ngừa</h3>\n      <div class="callout callout-warning">\n        <strong>Nguyên nhân:</strong> Do chuột chui lọt qua khe hở cáp nhị thứ vào bên trong ngăn biến điện áp đo lường TU9TD92B tại tủ MC 942B gây phóng điện chạm chập ngắn mạch 2 pha.<br>\n        <strong>Khắc phục:</strong> Vệ sinh cách điện ngăn TU, thay thế biến điện áp bị cháy; tổng kiểm tra bịt kín toàn bộ các lỗ luồn cáp tại tất cả các tủ điện 10kV và 0.4kV bằng keo chống cháy và lưới thép chống chuột.\n      </div>\n    </section>\n\n    '}, {'id': 'sc-buc-ong', 'title': 'ÁP LỰC LÒ HƠI\n        7. Thống kê chuỗi sự cố bục ống áp lực lò hơi năm 2023', 'html': '<section id="sc-buc-ong" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-boiler">ÁP LỰC LÒ HƠI</span>\n        7. Thống kê chuỗi sự cố bục ống áp lực lò hơi năm 2023\n      </div>\n<div class="table-container"><table class="data-table">\n        <thead>\n          <tr>\n            <th>Thời gian</th>\n            <th>Vị trí bục / Thiết bị</th>\n            <th>Cấp sự cố</th>\n            <th>Thời gian dừng</th>\n            <th>Đặc điểm nguyên nhân</th>\n          </tr>\n        </thead>\n        <tbody>\n          <tr>\n            <td>08/04/2023</td>\n            <td>Ống sinh hơi buồng đốt</td>\n            <td>Cấp 3</td>\n            <td>71,62 giờ</td>\n            <td>Mài mòn cơ học vách ống sinh hơi.</td>\n          </tr>\n          <tr>\n            <td>01/05/2023</td>\n            <td>Ống sinh hơi buồng đốt</td>\n            <td>Cấp 3</td>\n            <td>71,23 giờ</td>\n            <td>Xói mòn thành ống dưới tác động tro xỉ CFB.</td>\n          </tr>\n          <tr>\n            <td>07/05/2023</td>\n            <td>Ống sinh hơi buồng đốt</td>\n            <td>Cấp 3</td>\n            <td>45,02 giờ</td>\n            <td>Bục ống sinh hơi góc buồng đốt.</td>\n          </tr>\n          <tr>\n            <td>09/06/2023</td>\n            <td>Ống sinh hơi tường sau</td>\n            <td>Cấp 3</td>\n            <td>56,60 giờ</td>\n            <td>Mòn cơ học vách ống tiếp giáp lớp bảo ôn.</td>\n          </tr>\n          <tr>\n            <td>13/06/2023</td>\n            <td>Đường ống rót than buồng đốt</td>\n            <td>Cấp 3</td>\n            <td>11,28 giờ</td>\n            <td>Xì hở mài mòn cổ rót than vào buồng đốt.</td>\n          </tr>\n          <tr>\n            <td>18/06/2023</td>\n            <td>Ống sinh hơi 244-246 tường sau 1B</td>\n            <td>Cấp 3</td>\n            <td>93,73 giờ</td>\n            <td>Nứt mối hàn đắp ống 245 thổi bục ống 244, 246.</td>\n          </tr>\n          <tr>\n            <td>26/06/2023</td>\n            <td>Ống sinh hơi buồng đốt</td>\n            <td>Cấp 3</td>\n            <td>83,27 giờ</td>\n            <td>Mài mòn giảm mỏng chiều dày vách ống.</td>\n          </tr>\n          <tr>\n            <td>01/07/2023</td>\n            <td>Ống sinh hơi buồng đốt</td>\n            <td>Cấp 3</td>\n            <td>100,10 giờ</td>\n            <td>Bục vỡ ống sinh hơi áp lực cao.</td>\n          </tr>\n          <tr>\n            <td>06/07/2023</td>\n            <td>Ống sinh hơi buồng đốt</td>\n            <td>Cấp 3</td>\n            <td>78,55 giờ</td>\n            <td>Xói mòn dòng liệu tầng sôi.</td>\n          </tr>\n          <tr>\n            <td>09/07/2023</td>\n            <td>Ống sinh hơi buồng đốt</td>\n            <td>Cấp 2</td>\n            <td>227,92 giờ</td>\n            <td>Sự cố bục ống sinh hơi diện rộng kéo dài gần 10 ngày.</td>\n          </tr>\n          <tr>\n            <td>20/07/2023</td>\n            <td>Ống sinh hơi buồng đốt</td>\n            <td>Cấp 2</td>\n            <td>176,12 giờ</td>\n            <td>Bục ống sinh hơi mức độ nghiêm trọng.</td>\n          </tr>\n          <tr>\n            <td>19/09/2023</td>\n            <td>Ống bộ hâm nước (Economizer)</td>\n            <td>Cấp 3</td>\n            <td>70,98 giờ</td>\n            <td>Xói mòn tro bay chùm ống bộ hâm đuôi lò.</td>\n          </tr>\n          <tr>\n            <td>22/10/2023</td>\n            <td>Ống sinh hơi buồng đốt</td>\n            <td>Cấp 3</td>\n            <td>109,20 giờ</td>\n            <td>Bục ống sinh hơi sau đợt tiểu tu S1.</td>\n          </tr>\n          <tr>\n            <td>10/12/2023</td>\n            <td>Ống sinh hơi buồng đốt</td>\n            <td>Cấp 3</td>\n            <td>92,98 giờ</td>\n            <td>Mài mòn cơ học vách ống.</td>\n          </tr>\n          <tr>\n            <td>30/12/2023</td>\n            <td>Ống sinh hơi buồng đốt</td>\n            <td>Cấp 3</td>\n            <td>17,75 giờ</td>\n            <td>Xì hở vi nứt mối hàn ống sinh hơi.</td>\n          </tr>\n        </tbody>\n      </table></div>\n    </section>\n  '}], 2024: [{'id': 'sc-overview', 'title': 'TỔNG QUAN KỸ THUẬT\n        Tình hình vận hành và phân loại sự cố năm 2024', 'html': '<section id="sc-overview" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-aux">TỔNG QUAN KỸ THUẬT</span>\n        Tình hình vận hành và phân loại sự cố năm 2024\n      </div>\n      <p>Năm 2024 ghi nhận các diễn biến kỹ thuật mang tính thử thách cao đối với lực lượng vận hành, từ sự cố liên hoàn mạch bảo vệ tự dùng, bão lịch sử Yagi làm tan rã lưới điện đến các sự cố chạm đất DC điều khiển kích hoạt trip đồng thời cả 2 tổ máy:</p>\n      \n<div class="table-container"><table class="data-table">\n        <thead>\n          <tr>\n            <th>Nhóm sự cố</th>\n            <th>Đặc điểm nổi bật</th>\n            <th>Vụ việc tiêu biểu</th>\n          </tr>\n        </thead>\n        <tbody>\n          <tr>\n            <td><strong>Sự cố Phần Điện &amp; Nhị thứ</strong></td>\n            <td>Các sự cố chạm đất DC kích hoạt bảo vệ 86G; sự cố rơ le nhảy máy cắt sân phân phối 500kV; sự cố chạm đất thanh cái tự dùng.</td>\n            <td>Chạm đất DC kép làm trip cả 2 tổ máy S1 &amp; S2 (23/10); Nhảy MC 531 SPP 500kV làm trip S2 (12/09); Chạm đất TC đá vôi làm sụt áp TC 04BBD (19/05).</td>\n          </tr>\n          <tr>\n            <td><strong>Sự cố Điều khiển &amp; C&amp;I</strong></td>\n            <td>Lỗi phần cứng CPU điều khiển lò hơi và cảm biến nhiệt độ ổ đỡ quạt/bộ sấy không khí.</td>\n            <td>Lỗi watchdog timer trên CPU lò 1A (05/01); Lỗi điểm đo nhiệt độ gối BSKK kích hoạt MFT Lò 1B (19/02).</td>\n          </tr>\n          <tr>\n            <td><strong>Ống áp lực Lò hơi</strong></td>\n            <td>Các vụ bục ống sinh hơi, ống quá nhiệt cấp 3 tiếp tục diễn ra tại các vùng xói mòn tro xỉ tầng sôi.</td>\n            <td>Bục ống sinh hơi (tháng 1, 2, 4, 5, 6, 9, 10, 11); Bục ống quá nhiệt cấp 3 (28/05).</td>\n          </tr>\n          <tr>\n            <td><strong>Sự kiện Thiên tai Bất khả kháng</strong></td>\n            <td>Cơn bão số 3 (Yagi) đổ bộ trực tiếp vào Quảng Ninh làm sụp đổ các tuyến đường dây truyền tải, gây mất điện toàn trạm.</td>\n            <td>Sự cố rã lưới và mất điện toàn nhà máy ngày 07/09/2024; kíp trực giữ an toàn thiết bị thành công.</td>\n          </tr>\n        </tbody>\n      </table></div>\n    </section>\n\n    '}, {'id': 'sc-0501', 'title': 'C&I / LÒ HƠI\n        1. Sự cố MFT Lò hơi 1A do lỗi mạch Watchdog Timer trên CPU điều khiển (05/01/2024)', 'html': '<section id="sc-0501" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-boiler">C&amp;I / LÒ HƠI</span>\n        1. Sự cố MFT Lò hơi 1A do lỗi mạch Watchdog Timer trên CPU điều khiển (05/01/2024)\n      </div>\n      <h3 class="sub-title">I. Diễn biến và nguyên nhân</h3>\n      <p>Lúc 12h08 ngày 05/01/2024, Lò hơi 1A đang vận hành bình thường thì bộ vi xử lý trung tâm (CPU) điều khiển Lò 1A bị treo cứng bộ đếm thời gian giám sát phần cứng (Watchdog Timer). Việc ngắt mạch giám sát CPU khiến hệ thống an toàn tự động phát lệnh <strong>MFT dừng khẩn cấp Lò 1A</strong> để chống mất kiểm soát các van cấp than và khói gió.</p>\n      <p><strong>Xử lý:</strong> Kíp trực và đội tự động C&amp;I đã thay thế module CPU dự phòng, nạp lại chương trình cấu hình điều khiển và khôi phục Lò 1A vận hành an toàn sau 0,72 giờ.</p>\n    </section>\n\n    '}, {'id': 'sc-1902', 'title': 'TRỌNG TÂM LÒ - MÁY\n        2. Sự cố MFT liên hoàn Lò 1B, Lò 1A và Trip Tổ máy S1 (19/02/2024)', 'html': '<section id="sc-1902" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-boiler">TRỌNG TÂM LÒ - MÁY</span>\n        2. Sự cố MFT liên hoàn Lò 1B, Lò 1A và Trip Tổ máy S1 (19/02/2024)\n      </div>\n      <h3 class="sub-title">I. Diễn biến sự cố liên hoàn</h3>\n      <ul>\n        <li><strong>21h12:</strong> Lò hơi 1B xuất hiện tín hiệu báo lỗi nhiệt độ gối trục trên bộ sấy không khí tăng cao vượt ngưỡng bảo vệ, kích hoạt lệnh <strong>MFT dừng khẩn cấp Lò hơi 1B</strong>.</li>\n        <li>Sau khi Lò 1B dừng đột ngột, phụ tải hơi bị dồn ép sang Lò 1A. Áp lực bao hơi biến động mạnh, mức nước bao hơi Lò 1A dâng cao mất kiểm soát.</li>\n        <li><strong>21h15 (sau 3 phút):</strong> Mức nước bao hơi Lò 1A vượt ngưỡng +254 mm, bảo vệ mức nước cao-cao tác động gây <strong>MFT Lò hơi 1A</strong>.</li>\n        <li>Mất hoàn toàn cả 2 nguồn sinh hơi, hệ thống bảo vệ tuabin kích hoạt <strong>Trip Tuabin và Tổ máy S1</strong>.</li>\n      </ul>\n      <h3 class="sub-title">II. Bài học điều khiển giữ lò còn lại</h3>\n      <div class="callout callout-danger">\n        <strong>Bài học thao tác Lò trưởng:</strong> Khi một lò bị MFT đột ngột, Lò trưởng của lò còn lại phải lập tức chuyển Manual van đài nước cấp và Boiler Master để hãm lưu lượng hơi, điều chỉnh áp lực van Bypass cao áp kịp thời để duy trì chênh áp nước cấp, khống chế mức nước bao hơi không để nhảy bảo vệ MFT lò thứ hai.\n      </div>\n    </section>\n\n    '}, {'id': 'sc-2004', 'title': 'PHẦN LÒ HƠI\n        3. Sự cố MFT Lò hơi 2B do mức nước bao hơi thấp (20/04/2024)', 'html': '<section id="sc-2004" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-boiler">PHẦN LÒ HƠI</span>\n        3. Sự cố MFT Lò hơi 2B do mức nước bao hơi thấp (20/04/2024)\n      </div>\n      <h3 class="sub-title">I. Hiện tượng &amp; Xử lý</h3>\n      <p>Lúc 08h29 ngày 20/04/2024, trong quá trình vận hành điều chỉnh chế độ nước cấp Lò 2B, xuất hiện dao động chênh áp giữa ống góp nước cấp và bao hơi. Mức nước bao hơi Lò 2B tụt nhanh xuống dưới ngưỡng bảo vệ thấp-thấp (&lt; -254 mm), kích hoạt lệnh MFT dừng khẩn cấp Lò 2B (sản lượng điện thiếu hụt 0,702 tr. kWh; khôi phục sau 1,3 giờ).</p>\n    </section>\n\n    '}, {'id': 'sc-1905', 'title': 'HỆ THỐNG ĐIỆN\n        4. Chạm đất thanh cái đá vôi gây sụt áp thanh cái tự dùng 04BBD, Trip Tổ máy S1 (19/05/2024)', 'html': '<section id="sc-1905" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-elec">HỆ THỐNG ĐIỆN</span>\n        4. Chạm đất thanh cái đá vôi gây sụt áp thanh cái tự dùng 04BBD, Trip Tổ máy S1 (19/05/2024)\n      </div>\n      <h3 class="sub-title">I. Diễn biến và cơ chế tác động</h3>\n      <p>Lúc 04h15 ngày 19/05/2024, xảy ra chạm đất ngắn mạch tại phân đoạn thanh cái trạm chuẩn bị đá vôi. Dòng ngắn mạch làm sụt áp sâu trên hệ thống thanh cái hạ thế tự dùng <strong>04BBD</strong> của Tổ máy S1:</p>\n      <ul>\n        <li>Hiện tượng sụt áp làm hàng loạt tiếp điểm điều khiển van đầu đẩy các bơm nước cấp báo lỗi chập chờn.</li>\n        <li>Hệ thống liên động bảo vệ DCS nhận định sai trạng thái nguồn nước cấp, kích hoạt bảo vệ liên động dừng lò hơi và Trip Tuabin Tổ máy S1 (thời gian xử lý 1,78 giờ).</li>\n      </ul>\n    </section>\n\n    '}, {'id': 'sc-0709', 'title': 'SỰ KIỆN ĐẶC BIỆT\n        5. Sự cố mất điện toàn nhà máy (Blackout) do ảnh hưởng bão số 3 Yagi (07/09/2024)', 'html': '<section id="sc-0709" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-aux">SỰ KIỆN ĐẶC BIỆT</span>\n        5. Sự cố mất điện toàn nhà máy (Blackout) do ảnh hưởng bão số 3 Yagi (07/09/2024)\n      </div>\n      <h3 class="sub-title">I. Diễn biến thiên tai</h3>\n      <p>Ngày 07/09/2024, siêu bão Yagi đổ bộ trực tiếp vào tâm bão Quảng Ninh với sức gió cấp 14 - 17 kèm mưa lớn cực đoan. Gió giật làm đổ gãy hàng loạt cột truyền tải và đứt đường dây điện 500kV, 110kV liên kết với nhà máy, gây cô lập hoàn toàn nhà máy khỏi lưới điện quốc gia.</p>\n\n      <h3 class="sub-title">II. Ứng phó khẩn cấp của kíp trực</h3>\n      <div class="callout callout-warning">\n        <strong>Xử lý Blackout:</strong> Toàn bộ 2 tổ máy tự động trip an toàn. Các máy phát Diesel khẩn cấp (EDG) tự động khởi động hòa mạng cấp điện cho các phụ tải sống còn (bơm dầu bôi trơn sự cố DC, bơm ngưng khẩn cấp, thiết bị vần trục tuabin và hệ thống DCS). Kíp trực đã túc trực 100% quân số, bảo vệ tuyệt đối an toàn rôto tuabin, ngăn ngừa cong võng trục và sẵn sàng khôi phục ngay khi có điện lưới.\n      </div>\n    </section>\n\n    '}, {'id': 'sc-1209', 'title': 'PHẦN ĐIỆN\n        6. Nhảy Máy cắt 531 SPP 500kV làm Trip MBA T1, TD91 và Trip Tổ máy S2 (12/09/2024)', 'html': '<section id="sc-1209" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-elec">PHẦN ĐIỆN</span>\n        6. Nhảy Máy cắt 531 SPP 500kV làm Trip MBA T1, TD91 và Trip Tổ máy S2 (12/09/2024)\n      </div>\n      <h3 class="sub-title">I. Hiện tượng và Hậu quả</h3>\n      <p>Lúc 16h06 ngày 12/09/2024 (trong giai đoạn khắc phục sau bão Yagi), máy cắt 531 tại sân phân phối 500kV bất ngờ nhảy mở, kéo theo trip máy biến áp chính T1 và máy biến áp tự dùng TD91. Dao động điện áp và mất nguồn liên thông khiến hệ thống bảo vệ kích hoạt <strong>Trip Tổ máy S2</strong> (thời gian gián đoạn 0,33 giờ).</p>\n    </section>\n\n    '}, {'id': 'sc-0710', 'title': 'THIẾT BỊ PHỤ\n        7. Dừng lò do độ rung bộ sấy không khí (BSKK) tăng cao bất thường (07/10/2024)', 'html': '<section id="sc-0710" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-boiler">THIẾT BỊ PHỤ</span>\n        7. Dừng lò do độ rung bộ sấy không khí (BSKK) tăng cao bất thường (07/10/2024)\n      </div>\n      <h3 class="sub-title">I. Diễn biến</h3>\n      <p>Lúc 22h03 ngày 07/10/2024, bộ sấy không khí xuất hiện dao động rung cơ khí tăng đột biến vượt ngưỡng bảo vệ nguy hiểm (&gt; 285 µm). Để chống gãy trục và phá hủy ổ đỡ gối BSKK, vận hành đã xin lệnh dừng lò để cân bằng động và vệ sinh loại bỏ mảng bám tro xỉ (thời gian dừng xử lý kéo dài <strong>69,48 giờ</strong>).</p>\n    </section>\n\n    '}, {'id': 'sc-2310', 'title': 'PHẦN ĐIỆN\n        8. Chạm đất hệ thống DC một chiều kích hoạt bảo vệ 86G, Trip cả 2 Tổ máy S1 & S2 (23/10/2024)', 'html': '<section id="sc-2310" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-elec">PHẦN ĐIỆN</span>\n        8. Chạm đất hệ thống DC một chiều kích hoạt bảo vệ 86G, Trip cả 2 Tổ máy S1 &amp; S2 (23/10/2024)\n      </div>\n      <h3 class="sub-title">I. Hai lần tác động trong cùng một ngày</h3>\n      <ul>\n        <li><strong>Lần 1 (05h27 ngày 23/10/2024):</strong> Xảy ra chạm đất hệ thống điện một chiều DC tại các thanh cái của 2 tổ máy. Lỗi chạm đất gây nhiễu xung tín hiệu điện áp điều khiển truyền vào rơ le bảo vệ máy phát, kích hoạt chức năng <em>TR FAULT</em> gửi lệnh khởi động rơ le Lockout 86GA, 86GB; cắt máy cắt đầu cực và máy cắt kích từ, gây <strong>Trip đồng thời cả 2 Tổ máy S1 và S2</strong> (thời gian xử lý 1,85 giờ).</li>\n        <li><strong>Lần 2 (13h46 ngày 23/10/2024):</strong> Xuất hiện sự cố chạm đất DC thứ hai tại hệ thống nhiên liệu (lỗi chạm đất duy trì không tự giải trừ). Xung nhiễu tiếp tục kích hoạt chức năng bảo vệ 86GA, 86GB làm <strong>Trip lặp lại cả 2 Tổ máy S1 và S2</strong> (thời gian xử lý 3,65 giờ, sản lượng thiếu hụt 3,942 tr. kWh).</li>\n      </ul>\n      <h3 class="sub-title">II. Giải pháp phòng ngừa triệt để</h3>\n      <div class="callout callout-danger">\n        <strong>Giải pháp kỹ thuật:</strong> Tiến hành cách ly dò tìm triệt để điểm chạm đất cáp DC ngoài hiện trường; lắp đặt bổ sung các bộ lọc nhiễu quang và rơ le phụ trung gian cách ly điện áp một chiều trước khi đưa tín hiệu bảo vệ vào cuộn trip 86GA/86GB.\n      </div>\n    </section>\n\n    '}, {'id': 'sc-buc-ong', 'title': 'ÁP LỰC LÒ HƠI\n        9. Thống kê các sự cố bục ống áp lực buồng đốt lò hơi năm 2024', 'html': '<section id="sc-buc-ong" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-boiler">ÁP LỰC LÒ HƠI</span>\n        9. Thống kê các sự cố bục ống áp lực buồng đốt lò hơi năm 2024\n      </div>\n      \n<div class="table-container"><table class="data-table">\n        <thead>\n          <tr>\n            <th>Thời gian</th>\n            <th>Vị trí / Thiết bị</th>\n            <th>Cấp sự cố</th>\n            <th>Thời gian dừng</th>\n            <th>Đặc điểm sự cố</th>\n          </tr>\n        </thead>\n        <tbody>\n          <tr>\n            <td>03/01/2024</td>\n            <td>Bục ống sinh hơi</td>\n            <td>Cấp 3</td>\n            <td>118,97 giờ</td>\n            <td>Mài mòn cơ học vách ống buồng đốt.</td>\n          </tr>\n          <tr>\n            <td>28/02/2024</td>\n            <td>Bục ống sinh hơi</td>\n            <td>Cấp 3</td>\n            <td>82,97 giờ</td>\n            <td>Xói mòn thành ống dưới tác động xỉ than CFB.</td>\n          </tr>\n          <tr>\n            <td>18/04/2024</td>\n            <td>Bục ống sinh hơi</td>\n            <td>Cấp 3</td>\n            <td>115,73 giờ</td>\n            <td>Bục vách buồng đốt, tăng áp lực buồng đốt.</td>\n          </tr>\n          <tr>\n            <td>21/05/2024</td>\n            <td>Bục ống sinh hơi</td>\n            <td>Cấp 3</td>\n            <td>115,32 giờ</td>\n            <td>Giảm mỏng kim loại ống SA-210C dưới mức an toàn.</td>\n          </tr>\n          <tr>\n            <td>26/05/2024</td>\n            <td>Bục ống sinh hơi</td>\n            <td>Cấp 3</td>\n            <td>84,45 giờ</td>\n            <td>Mài mòn cơ học diện rộng buồng đốt.</td>\n          </tr>\n          <tr>\n            <td>28/05/2024</td>\n            <td>Bục ống quá nhiệt cấp 3</td>\n            <td>Cấp 3</td>\n            <td>76,70 giờ</td>\n            <td>Xói mòn tro bay chùm ống quá nhiệt cấp 3.</td>\n          </tr>\n          <tr>\n            <td>07/06/2024</td>\n            <td>Bục ống sinh hơi</td>\n            <td>Cấp 3</td>\n            <td>125,98 giờ</td>\n            <td>Bục vỡ ống sinh hơi áp lực cao.</td>\n          </tr>\n          <tr>\n            <td>27/06/2024</td>\n            <td>Bục ống lò hơi</td>\n            <td>Cấp 3</td>\n            <td>54,73 giờ</td>\n            <td>Thủng vách ống buồng đốt.</td>\n          </tr>\n          <tr>\n            <td>06/09/2024</td>\n            <td>Bục ống sinh hơi</td>\n            <td>Cấp 3</td>\n            <td>71,97 giờ</td>\n            <td>Bục ống sinh hơi trước bão Yagi.</td>\n          </tr>\n          <tr>\n            <td>03/10/2024</td>\n            <td>Bục ống sinh hơi</td>\n            <td>Cấp 3</td>\n            <td>58,80 giờ</td>\n            <td>Xói mòn cơ học bề mặt ngoài ống.</td>\n          </tr>\n          <tr>\n            <td>25/10/2024</td>\n            <td>Bục ống sinh hơi</td>\n            <td>Cấp 2</td>\n            <td>168,12 giờ</td>\n            <td>Sự cố bục ống sinh hơi nghiêm trọng kéo dài 7 ngày.</td>\n          </tr>\n          <tr>\n            <td>28/10/2024</td>\n            <td>Bục ống sinh hơi</td>\n            <td>Cấp 3</td>\n            <td>116,28 giờ</td>\n            <td>Bục ống sinh hơi sau đợt xử lý ngày 25/10.</td>\n          </tr>\n          <tr>\n            <td>18/11/2024</td>\n            <td>Bục ống lò hơi</td>\n            <td>Cấp 3</td>\n            <td>59,82 giờ</td>\n            <td>Xói mòn tro xỉ làm rách vách ống.</td>\n          </tr>\n        </tbody>\n      </table></div>\n    </section>\n  '}], 2025: [{'id': 'sc-overview', 'title': 'TỔNG QUAN VẬN HÀNH\n        Đánh giá tình hình kỹ thuật và sự cố năm 2025', 'html': '<section id="sc-overview" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-aux">TỔNG QUAN VẬN HÀNH</span>\n        Đánh giá tình hình kỹ thuật và sự cố năm 2025\n      </div>\n      <p>Năm 2025 ghi nhận <strong>10 vụ sự cố chính thức</strong> được lập biên bản và lưu trữ trong hệ thống quản lý kỹ thuật của Nhà máy Nhiệt điện Mông Dương 1. Các sự cố tập trung vào van áp lực cao, board mạch điều khiển van tuabin, đặc tính nhiên liệu than ẩm và một sự cố nhị thứ điện hy hữu gây ngừng lò máy:</p>\n      \n<div class="table-container"><table class="data-table">\n        <thead>\n          <tr>\n            <th>Thời gian</th>\n            <th>Thiết bị / Vị trí</th>\n            <th>Phân loại</th>\n            <th>Thời gian dừng</th>\n            <th>Sản lượng thiếu hụt</th>\n            <th>Tóm tắt sự cố</th>\n          </tr>\n        </thead>\n        <tbody>\n          <tr>\n            <td><strong>12/02/2025</strong></td>\n            <td>Chân van hồi liệu (Loop Seal)</td>\n            <td>Lò hơi</td>\n            <td>122,58 giờ</td>\n            <td>33,098 tr. kWh</td>\n            <td>Xì hở xỉ nóng và tro áp lực cao tại chân hồi liệu buồng đốt.</td>\n          </tr>\n          <tr>\n            <td><strong>24/02/2025</strong></td>\n            <td>Ống sinh hơi buồng đốt</td>\n            <td>Áp lực Lò</td>\n            <td>41,25 giờ</td>\n            <td>11,138 tr. kWh</td>\n            <td>Bục ống sinh hơi do mài mòn cơ học hạt tro xỉ.</td>\n          </tr>\n          <tr>\n            <td><strong>28/02/2025</strong></td>\n            <td>Van an toàn hơi tái nhiệt (RH SV)</td>\n            <td>Cơ khí van</td>\n            <td>67,07 giờ</td>\n            <td>18,108 tr. kWh</td>\n            <td>Van an toàn hơi tái nhiệt bị kênh đĩa van xả liên tục ra ngoài.</td>\n          </tr>\n          <tr>\n            <td><strong>15/03/2025</strong></td>\n            <td>Đường cấp phốt phát &amp; Van MOV 1B</td>\n            <td>Lò hơi / Van</td>\n            <td>65,25 giờ</td>\n            <td>35,235 tr. kWh</td>\n            <td>Xử lý xì hở đường định lượng phốt phát bao hơi và kẹt van MOV hơi chính 1B.</td>\n          </tr>\n          <tr>\n            <td><strong>28/04/2025</strong></td>\n            <td>Ống sinh hơi buồng đốt</td>\n            <td>Áp lực Lò</td>\n            <td>69,10 giờ</td>\n            <td>18,657 tr. kWh</td>\n            <td>Bục ống sinh hơi vách buồng đốt dưới tác động dòng liệu.</td>\n          </tr>\n          <tr>\n            <td><strong>05/05/2025</strong></td>\n            <td>Ống xả đọng trước van Stop S1</td>\n            <td>Cơ khí Tuabin</td>\n            <td>7,93 giờ</td>\n            <td>4,284 tr. kWh</td>\n            <td>Xì hở đường ống xả đọng hơi chính áp lực cao trước van Main Stop Tuabin S1.</td>\n          </tr>\n          <tr>\n            <td><strong>18/05/2025</strong></td>\n            <td>Ống sinh hơi buồng đốt</td>\n            <td>Áp lực Lò</td>\n            <td>60,12 giờ</td>\n            <td>16,232 tr. kWh</td>\n            <td>Bục ống sinh hơi buồng đốt tầng sôi CFB.</td>\n          </tr>\n          <tr>\n            <td><strong>25/06/2025</strong></td>\n            <td>Van ETD Tuabin Tổ máy S2</td>\n            <td>C&amp;I / Tuabin</td>\n            <td>1,63 giờ</td>\n            <td>0,882 tr. kWh</td>\n            <td>Hỏng board card điều khiển van xả sự cố khẩn cấp ETD (Emergency Trip Device).</td>\n          </tr>\n          <tr>\n            <td><strong>07/10/2025</strong></td>\n            <td>Hệ thống cấp than buồng đốt</td>\n            <td>Nhiên liệu</td>\n            <td>56,05 giờ</td>\n            <td>0,000 tr. kWh</td>\n            <td>Than ẩm bết dính gây tắc nghẽn liên hoàn các máy cấp than buồng đốt.</td>\n          </tr>\n          <tr>\n            <td><strong>11/10/2025</strong></td>\n            <td>Tủ MC 16BBB07 / TU 16BBB</td>\n            <td>Phần Điện</td>\n            <td>0,03 giờ</td>\n            <td>0,018 tr. kWh</td>\n            <td>Giắc cắm mạch áp công tơ bị xoay ngang gây chạm chập 2 pha, nhảy TU, Trip 2 lò và S1.</td>\n          </tr>\n        </tbody>\n      </table></div>\n    </section>\n\n    '}, {'id': 'sc-1202', 'title': 'PHẦN LÒ HƠI\n        1. Sự cố xì hở chân van hồi liệu Loop Seal (12/02/2025)', 'html': '<section id="sc-1202" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-boiler">PHẦN LÒ HƠI</span>\n        1. Sự cố xì hở chân van hồi liệu Loop Seal (12/02/2025)\n      </div>\n      <h3 class="sub-title">I. Hiện tượng và Thiệt hại</h3>\n      <p>Lúc 07h17 ngày 12/02/2025, phát hiện khói bụi nóng đỏ xì phì mạnh ra ngoài lớp vỏ bảo ôn tại khu vực chân van hồi liệu Loop Seal buồng đốt. Lớp bê tông chịu mài mòn bị xói thủng làm thất thoát áp lực gió hồi liệu và đe dọa nung đỏ kết cấu kim loại sàn lò. Trưởng ca quyết định dừng lò khẩn cấp để xử lý; thời gian dừng lò kéo dài <strong>122,58 giờ</strong> (~5 ngày), sản lượng điện thiếu hụt lên tới <strong>33,098 tr. kWh</strong>.</p>\n    </section>\n\n    '}, {'id': 'sc-2402', 'title': 'ÁP LỰC LÒ HƠI\n        2. Sự cố bục ống sinh hơi buồng đốt lò hơi (24/02/2025)', 'html': '<section id="sc-2402" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-boiler">ÁP LỰC LÒ HƠI</span>\n        2. Sự cố bục ống sinh hơi buồng đốt lò hơi (24/02/2025)\n      </div>\n      <h3 class="sub-title">I. Diễn biến và Khắc phục</h3>\n      <p>Lúc 02h50 ngày 24/02/2025, phát hiện chênh lệch lưu lượng nước cấp / hơi chính tăng vọt, áp lực âm buồng đốt dao động mạnh. Xác định lò bị bục ống sinh hơi, ca trực đã chủ động giảm tải, tách hơi và dừng lò an toàn để thay thế đoạn ống bục hỏng; thời gian khắc phục là <strong>41,25 giờ</strong> (thiếu hụt 11,138 tr. kWh).</p>\n    </section>\n\n    '}, {'id': 'sc-2802', 'title': 'VAN ÁP LỰC\n        3. Sự cố kênh đĩa van an toàn đường hơi tái nhiệt (28/02/2025)', 'html': '<section id="sc-2802" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-mech">VAN ÁP LỰC</span>\n        3. Sự cố kênh đĩa van an toàn đường hơi tái nhiệt (28/02/2025)\n      </div>\n      <h3 class="sub-title">I. Hiện tượng &amp; Phân tích</h3>\n      <p>Lúc 09h56 ngày 28/02/2025, van an toàn (Safety Valve) trên đường hơi tái nhiệt sau khi tác động xả áp đã không thể tự đóng kín hoàn toàn (bị kênh đĩa van). Hơi tái nhiệt áp lực và nhiệt độ cao xả liên tục ra ngoài khí quyển gây mất áp lực hơi tái, hao hụt lượng lớn nước khử khí và đe dọa giảm sâu hiệu suất chu trình nhiệt.</p>\n      <p><strong>Xử lý:</strong> Vận hành phải xin lệnh giảm tải và tách lò để đội sửa chữa cơ khí tiếp cận, xử lý mài rà bề mặt làm kín đĩa van và căn chỉnh lực ép lò xo van an toàn; thời gian ngừng lò kéo dài <strong>67,07 giờ</strong>.</p>\n    </section>\n\n    '}, {'id': 'sc-1503', 'title': 'PHẦN LÒ HƠI\n        4. Xì hở đường cấp phốt phát bao hơi và kẹt van MOV hơi chính Lò 1B (15/03/2025)', 'html': '<section id="sc-1503" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-boiler">PHẦN LÒ HƠI</span>\n        4. Xì hở đường cấp phốt phát bao hơi và kẹt van MOV hơi chính Lò 1B (15/03/2025)\n      </div>\n      <h3 class="sub-title">I. Diễn biến liên hoàn</h3>\n      <ul>\n        <li>Lúc 12h03 ngày 15/03/2025, phát hiện xì hở dung dịch phốt phát áp lực cao tại đường ống châm hóa chất bao hơi Lò 1B, đe dọa ăn mòn kim loại và gây mất an toàn cho thiết bị xung quanh sàn bao hơi.</li>\n        <li>Trong quá trình tiến hành thao tác giảm tải để đóng cô lập đường hơi chính Lò 1B, van điện động hơi chính (MOV) Lò 1B bị lỗi kẹt cơ cấu truyền động, không thể đóng kín hoàn toàn từ phòng điều khiển trung tâm.</li>\n        <li>Ca trực buộc phải dừng khẩn cấp Lò 1B để xử lý đồng thời cả điểm xì hở phốt phát và sửa chữa van MOV hơi chính; thời gian xử lý kéo dài <strong>65,25 giờ</strong> (thiếu hụt 35,235 tr. kWh).</li>\n      </ul>\n    </section>\n\n    '}, {'id': 'sc-2804', 'title': 'ÁP LỰC LÒ HƠI\n        5. Sự cố bục ống sinh hơi vách buồng đốt lò hơi (28/04/2025)', 'html': '<section id="sc-2804" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-boiler">ÁP LỰC LÒ HƠI</span>\n        5. Sự cố bục ống sinh hơi vách buồng đốt lò hơi (28/04/2025)\n      </div>\n      <h3 class="sub-title">I. Hiện tượng</h3>\n      <p>Lúc 12h42 ngày 28/04/2025, phát hiện bục ống sinh hơi vách buồng đốt, tiếng rít xì áp lực lớn tại khu vực giàn ống vách. Vận hành đã khẩn trương thực hiện quy trình hạ tải, tách lò và ấn MFT để bàn giao cho đội sửa chữa cắt vá ống; thời gian dừng lò là <strong>69,10 giờ</strong> (thiếu hụt 18,657 tr. kWh).</p>\n    </section>\n\n    '}, {'id': 'sc-0505', 'title': 'PHẦN TUABIN\n        6. Xì hở đường ống xả đọng trước van Main Stop đầu vào Tuabin S1 (05/05/2025)', 'html': '<section id="sc-0505" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-mech">PHẦN TUABIN</span>\n        6. Xì hở đường ống xả đọng trước van Main Stop đầu vào Tuabin S1 (05/05/2025)\n      </div>\n      <h3 class="sub-title">I. Hiện tượng &amp; Xử lý</h3>\n      <p>Lúc 11h19 ngày 05/05/2025, phát hiện xì hở hơi siêu nhiệt áp lực cao (hơi chính ~170 bar, 538°C) tại đoạn ống xả đọng ngay trước cụm van chặn chính (Main Stop Valve - MSV) đầu vào Tuabin S1. Luồng hơi áp lực cao phun mạnh trong gian máy đe dọa nung nóng cáp điện điều khiển và an toàn nhân sự.</p>\n      <div class="callout callout-warning">\n        <strong>Xử lý:</strong> Ca trực xin lệnh khẩn cấp giảm tải tổ máy S1 để cô lập đường xả đọng và hàn vá khẩn cấp đoạn ống bị rò rỉ; khôi phục lại tổ máy sau <strong>7,93 giờ</strong>.\n      </div>\n    </section>\n\n    '}, {'id': 'sc-1805', 'title': 'ÁP LỰC LÒ HƠI\n        7. Sự cố bục ống sinh hơi buồng đốt lò hơi (18/05/2025)', 'html': '<section id="sc-1805" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-boiler">ÁP LỰC LÒ HƠI</span>\n        7. Sự cố bục ống sinh hơi buồng đốt lò hơi (18/05/2025)\n      </div>\n      <h3 class="sub-title">I. Diễn biến</h3>\n      <p>Lúc 19h55 ngày 18/05/2025, xuất hiện hiện tượng mất cân bằng lưu lượng nước cấp / lưu lượng hơi, áp lực buồng đốt tăng về phía dương, xác định bục ống sinh hơi buồng đốt. Lò hơi được dừng an toàn để thực hiện công tác kiểm tra, hàn thay thế ống trong thời gian <strong>60,12 giờ</strong> (sản lượng điện thiếu hụt 16,232 tr. kWh).</p>\n    </section>\n\n    '}, {'id': 'sc-2506', 'title': 'C&I / TUABIN\n        8. Hỏng board card van bảo vệ ngắt khẩn cấp ETD Tuabin S2 (25/06/2025)', 'html': '<section id="sc-2506" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-mech">C&amp;I / TUABIN</span>\n        8. Hỏng board card van bảo vệ ngắt khẩn cấp ETD Tuabin S2 (25/06/2025)\n      </div>\n      <h3 class="sub-title">I. Cơ chế sự cố</h3>\n      <p>Lúc 21h26 ngày 25/06/2025, mạch điều khiển van ngắt khẩn cấp ETD (Emergency Trip Device) của Tuabin S2 bị lỗi phần cứng bo mạch điện tử (Board card). Lỗi board phát tín hiệu chập chờn tác động nhầm vào van điện tử điều khiển hệ thống dầu bảo vệ tuabin, làm sụt áp suất dầu EH và gây Trip Tuabin S2 (thời gian gián đoạn xử lý thay card là <strong>1,63 giờ</strong>).</p>\n    </section>\n\n    '}, {'id': 'sc-0710', 'title': 'NHIÊN LIỆU\n        9. Than ẩm gây bết dính và tắc nghẽn hệ thống cấp than buồng đốt (07/10/2025)', 'html': '<section id="sc-0710" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-boiler">NHIÊN LIỆU</span>\n        9. Than ẩm gây bết dính và tắc nghẽn hệ thống cấp than buồng đốt (07/10/2025)\n      </div>\n      <h3 class="sub-title">I. Hiện tượng &amp; Xử lý</h3>\n      <p>Lúc 15h21 ngày 07/10/2025, do mưa lớn kéo dài làm độ ẩm toàn phần than cấp vào lò tăng vọt vượt tiêu chuẩn thiết kế. Than ẩm bết dính tạo thành các vòm than đóng tảng gây tắc liên hoàn tại các phễu than rơi và máy cấp than buồng đốt. Thiếu hụt nhiên liệu nghiêm trọng làm tụt nhiệt độ sàn liệu, buộc phải ngừng lò để thông tắc cơ học toàn bộ tuyến cấp than (thời gian xử lý kéo dài <strong>56,05 giờ</strong>).</p>\n    </section>\n\n    '}, {'id': 'sc-1110', 'title': 'PHẦN ĐIỆN\n        10. Giắc cắm mạch áp công tơ bị xoay ngang gây chạm chập, Trip 2 Lò và Tổ máy S1 (11/10/2025)', 'html': '<section id="sc-1110" class="incident-section">\n      <div class="incident-title">\n        <span class="badge badge-elec">PHẦN ĐIỆN</span>\n        10. Giắc cắm mạch áp công tơ bị xoay ngang gây chạm chập, Trip 2 Lò và Tổ máy S1 (11/10/2025)\n      </div>\n      <h3 class="sub-title">I. Diễn biến sự cố nhị thứ hy hữu</h3>\n      <p>Vào lúc 18h13 ngày 11/10/2025, xuất hiện sự cố ngắn mạch pha-pha tại tủ máy cắt 10kV <strong>16BBB07</strong> (ngăn máy cắt cấp nguồn tự dùng cho Máy nén khí B):</p>\n      <ul>\n        <li>Giắc cắm mạch áp cấp cho công tơ đo đếm tại tủ MC 16BBB07 bị lỏng ngàm cố định và xoay ngang, dẫn tới chạm chập ngắn mạch trực tiếp 2 pha nhị thứ.</li>\n        <li>Dòng ngắn mạch làm nhảy đồng thời Attomat Q4 tại tủ MC 16BBB07 và Attomat Q2 tủ biến điện áp TU thanh cái 16BBB.</li>\n        <li>Mất tín hiệu điện áp đo lường TU thanh cái 16BBB làm hệ thống bảo vệ hiểu sai trạng thái, dẫn tới:\n          <ol>\n            <li><strong>Lò 1B bị Trip</strong> do mất toàn bộ tín hiệu vận hành của các quạt khói và quạt gió.</li>\n            <li>Máy nén khí B dừng đột ngột làm tụt áp lực khí nén điều khiển toàn khối dưới 4 bar, kích hoạt bảo vệ áp lực khí nén thấp làm <strong>Trip tiếp Lò 1A và Trip toàn bộ Tổ máy S1</strong>.</li>\n          </ol>\n        </li>\n      </ul>\n      <h3 class="sub-title">II. Biện pháp phòng ngừa</h3>\n      <div class="callout callout-danger">\n        <strong>Yêu cầu siết chặt:</strong> Kiểm tra rà soát toàn bộ các đầu giắc cắm đo đếm, hàng kẹp mạch áp công tơ tại tất cả các tủ máy cắt 10kV và 0.4kV; cố định chống xoay và bọc cách điện bảo vệ ngăn ngừa chạm chập cơ học tương tự.\n      </div>\n    </section>\n  '}]};
+
+    const yearMeta = {
+      2017: { title: "Hồ sơ sự cố năm 2017", desc: "Năm ghi nhận 5 sự cố chính (Điện, UPS, mất áp lực khí nén điều khiển) và sự cố nước vào thân Tuabin 2 khi dừng kiểm tra FAC.", badge: "5 sự cố + 1 FAC" },
+      2018: { title: "Hồ sơ sự cố năm 2018", desc: "Tổng cộng 11 sự cố: Rơ le áp lực dầu OLTC MBA T2, rơ le so lệch 87GT TI561, sự cố tăng nhiệt độ hơi tái nhiệt Tuabin S2, thủy kích Bypass hạ áp 1A.", badge: "11 sự cố" },
+      2019: { title: "Hồ sơ sự cố năm 2019", desc: "Tổng cộng 8 sự cố: Khởi đầu chuỗi bục ống sinh hơi CFB, lỗi chuyển nguồn thanh cái 10kV FTS, mất nguồn khớp nối thủy lực, sét đánh ĐD 571/573.", badge: "8 sự cố" },
+      2020: { title: "Hồ sơ sự cố năm 2020", desc: "Đỉnh điểm 18 vụ sự cố: 11 vụ bục ống áp lực lò do đốt than pha trộn nhiều xít đá, sự cố mất nước bình khử khí, trip biến tần quạt khói và lỗi bảo vệ 59GN.", badge: "18 sự cố" },
+      2021: { title: "Hồ sơ sự cố năm 2021", desc: "Năm ghi nhận sự cố cấp 1 cháy cổ góp máy phát S1 (dừng 27 ngày), 15 vụ bục ống sinh hơi và chủ trương thay thế mảng ống sang vật liệu SA213-T91.", badge: "20 vụ (Cấp 1)" },
+      2022: { title: "Hồ sơ sự cố năm 2022", desc: "Các sự cố đo lường C&I chân không bình ngưng nhánh A, dừng tuabin S2 do lỗi module servo PSVO van hơi chính, mất điện thanh cái 10kV trạm tuần hoàn 06BBH.", badge: "6 sự cố" },
+      2023: { title: "Hồ sơ sự cố năm 2023", desc: "Bục ống sinh hơi Lò 1B kéo theo MFT 1A, lỗi nguồn bộ chuyển đổi khớp nối bơm cấp, kẹt trục Tuabin S2 và chuột chạm chập tủ MC 942B đêm giao thừa.", badge: "8 sự cố lớn" },
+      2024: { title: "Hồ sơ sự cố năm 2024", desc: "Lỗi Watchdog Timer CPU Lò 1A, MFT liên hoàn 1B & 1A, siêu bão số 3 Yagi gây Blackout toàn trạm, chạm đất DC kép làm trip 2 tổ máy hai lần liên tiếp.", badge: "10 sự cố lớn" },
+      2025: { title: "Hồ sơ sự cố năm 2025", desc: "Xì chân van hồi liệu Loop Seal, kênh đĩa van an toàn hơi tái nhiệt, hỏng board card van ETD tuabin S2, giắc cắm công tơ 16BBB07 xoay ngang chạm chập.", badge: "10 sự cố" }
+    };
+
+    let activeYear = 2017;
+
+    function renderFolderTree() {
+      const treeEl = document.getElementById('folderTree');
+      treeEl.innerHTML = '';
+
+      Object.keys(incidentData).sort((a,b)=>a-b).forEach(y => {
+        const year = parseInt(y);
+        const incidents = incidentData[year] || [];
+        const meta = yearMeta[year] || { title: `Năm ${year}`, desc: '', badge: `${incidents.length} mục` };
+
+        const folderDiv = document.createElement('div');
+        folderDiv.className = `year-folder ${year === activeYear ? 'open active-folder' : ''}`;
+        folderDiv.id = `folder-${year}`;
+
+        // Folder Header
+        const row = document.createElement('div');
+        row.className = 'folder-row';
+        row.onclick = () => selectYear(year);
+
+        row.innerHTML = `
+          <div class="folder-row-left">
+            <span class="folder-toggle-icon">▶</span>
+            <span class="folder-icon">📁</span>
+            <span>Thư mục ${year}</span>
+          </div>
+          <span class="folder-badge">${meta.badge}</span>
+        `;
+
+        // Folder Children Files
+        const childrenUl = document.createElement('ul');
+        childrenUl.className = 'folder-children';
+
+        incidents.forEach((item, idx) => {
+          const li = document.createElement('li');
+          li.className = 'file-item';
+          li.id = `nav-item-${item.id}`;
+          li.onclick = (e) => {
+            e.stopPropagation();
+            scrollToIncident(year, item.id);
+          };
+          
+          // clean short title
+          let shortTitle = item.title.replace(/^[0-9]+\.\s*/, '').replace(/<[^>]*>?/gm, '');
+          if (shortTitle.length > 34) shortTitle = shortTitle.substring(0, 32) + '...';
+
+          li.innerHTML = `
+            <span class="file-icon">📄</span>
+            <span title="${item.title.replace(/<[^>]*>?/gm, '')}">${shortTitle}</span>
+          `;
+          childrenUl.appendChild(li);
+        });
+
+        folderDiv.appendChild(row);
+        folderDiv.appendChild(childrenUl);
+        treeEl.appendChild(folderDiv);
+      });
+    }
+
+    
+    function openMobileSidebar() {
+      const sidebar = document.getElementById('sidebarExplorer');
+      const backdrop = document.getElementById('sidebarBackdrop');
+      if (sidebar) sidebar.classList.add('mobile-open');
+      if (backdrop) backdrop.classList.add('active');
+    }
+
+    function closeMobileSidebar() {
+      const sidebar = document.getElementById('sidebarExplorer');
+      const backdrop = document.getElementById('sidebarBackdrop');
+      if (sidebar) sidebar.classList.remove('mobile-open');
+      if (backdrop) backdrop.classList.remove('active');
+    }
+
+    function toggleMobileSidebar() {
+      const sidebar = document.getElementById('sidebarExplorer');
+      if (sidebar && sidebar.classList.contains('mobile-open')) {
+        closeMobileSidebar();
+      } else {
+        openMobileSidebar();
+      }
+    }
+
+    function selectYear(year) {
+      activeYear = year;
+
+      // Update folder tree UI
+      document.querySelectorAll('.year-folder').forEach(el => {
+        if (el.id === `folder-${year}`) {
+          el.classList.add('active-folder');
+          el.classList.toggle('open');
+        } else {
+          el.classList.remove('active-folder');
+        }
+      });
+
+      renderViewer();
+    }
+
+    function renderViewer() {
+      const viewerEl = document.getElementById('mainViewer');
+      const incidents = incidentData[activeYear] || [];
+      const meta = yearMeta[activeYear] || { title: `Năm ${activeYear}`, desc: '', badge: '' };
+
+      let html = `
+        <div class="viewer-hero">
+          <div class="viewer-hero-header">
+            <div>
+              <h2>📂 ${meta.title}</h2>
+              <p>${meta.desc}</p>
+            </div>
+            <span class="badge badge-aux" style="font-size:0.85rem; padding: 4px 10px;">${meta.badge}</span>
+          </div>
+          <div class="quick-stats">
+            <div class="stat-chip">📑 Số lượng hồ sơ chi tiết: <strong>${incidents.length} văn bản</strong></div>
+            <div class="stat-chip">🏭 Đơn vị: <strong>Nhiệt điện Mông Dương 1</strong></div>
+            <div class="stat-chip">⏱️ Trạng thái lưu trữ: <strong>Đã thẩm tra kỹ thuật</strong></div>
+          </div>
+        </div>
+        <div class="incidents-container">
+      `;
+
+      if (incidents.length === 0) {
+        html += `
+          <div class="empty-state">
+            <h3>Chưa có dữ liệu hồ sơ sự cố năm ${activeYear}</h3>
+          </div>
+        `;
+      } else {
+        incidents.forEach(item => {
+          html += item.html;
+        });
+      }
+
+      html += `</div>`;
+      viewerEl.innerHTML = html;
+      viewerEl.scrollTop = 0;
+    }
+
+    function scrollToIncident(year, incidentId) {
+      if (window.innerWidth <= 768) {
+        closeMobileSidebar();
+      }
+      if (activeYear !== year) {
+        activeYear = year;
+        document.querySelectorAll('.year-folder').forEach(el => {
+          if (el.id === `folder-${year}`) {
+            el.classList.add('active-folder');
+            el.classList.add('open');
+          } else {
+            el.classList.remove('active-folder');
+          }
+        });
+        renderViewer();
+      }
+
+      // Highlight in sidebar
+      document.querySelectorAll('.file-item').forEach(el => el.classList.remove('selected'));
+      const navItem = document.getElementById(`nav-item-${incidentId}`);
+      if (navItem) navItem.classList.add('selected');
+
+      // Scroll inside viewer
+      setTimeout(() => {
+        const el = document.getElementById(incidentId);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          el.classList.add('highlight');
+          setTimeout(() => el.classList.remove('highlight'), 2000);
+        }
+      }, 50);
+    }
+
+    function expandAllFolders() {
+      document.querySelectorAll('.year-folder').forEach(el => el.classList.add('open'));
+    }
+
+    function collapseAllFolders() {
+      document.querySelectorAll('.year-folder').forEach(el => el.classList.remove('open'));
+    }
+
+    // Search filter across all years and incidents
+    document.getElementById('searchInput').addEventListener('input', function(e) {
+      const q = e.target.value.toLowerCase().trim();
+      if (!q) {
+        renderFolderTree();
+        renderViewer();
+        return;
+      }
+
+      expandAllFolders();
+
+      // Filter in sidebar
+      document.querySelectorAll('.file-item').forEach(el => {
+        const text = el.textContent.toLowerCase();
+        if (text.includes(q)) {
+          el.style.display = 'flex';
+        } else {
+          el.style.display = 'none';
+        }
+      });
+
+      // Filter in main viewer
+      const cards = document.querySelectorAll('.incident-section');
+      cards.forEach(card => {
+        const text = card.textContent.toLowerCase();
+        if (text.includes(q)) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+
+    // Initial render
+    renderFolderTree();
+    renderViewer();
+  </script>
+
+  <!-- Floating Action Button for Mobile -->
+  <button class="fab-menu" id="fabMenu" onclick="openMobileSidebar()">
+    <span>📂</span>
+    <span>Danh mục</span>
+  </button>
+
+</body>
+</html>
