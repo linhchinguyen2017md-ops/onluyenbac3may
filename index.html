@@ -189,16 +189,16 @@
 
         /* ===== CSS ĐẶC BIỆT CHO FILE SỰ CỐ NHÀ MÁY ===== */
         .file-link.highlight-incident {
-            color: #d32f2f !important; /* Đỏ đậm */
-            font-weight: 900 !important; /* In đậm nét */
+            color: #d32f2f !important;
+            font-weight: 900 !important;
             border-left-color: #d32f2f !important;
-            background-color: #fff5f5; /* Nền phớt đỏ */
+            background-color: #fff5f5;
         }
         .file-link.highlight-incident:hover {
             background-color: #ffebee !important;
         }
         .file-link.highlight-incident::before {
-            content: "🏭" !important; /* Biểu tượng nhà máy */
+            content: "🏭" !important;
         }
 
         /* MÀN HÌNH 3: KHUNG ĐỌC TÀI LIỆU */
@@ -272,7 +272,8 @@
         #btn-stop-read { background-color: #616161; }
         #btn-stop-read:hover:not(:disabled) { background-color: #424242; }
 
-        #read-rate {
+        /* Chọn Tốc độ đọc & Chọn Giọng đọc */
+        #read-rate, #voice-select {
             padding: 9px 10px;
             border: 2px solid #0073e6;
             border-radius: 4px;
@@ -283,6 +284,13 @@
             background: #fff;
             cursor: pointer;
             flex: 0 0 auto;
+        }
+        
+        #voice-select {
+            max-width: 180px; /* Giới hạn độ dài ô chọn giọng */
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
         }
 
         #read-status {
@@ -297,9 +305,10 @@
 
         @media (max-width: 700px) {
             .tool-btn { padding: 9px 11px; font-size: 12.5px; }
+            #read-rate, #voice-select { padding: 9px 6px; font-size: 12.5px; }
             #read-status { display: none; }
             #doc-iframe { padding-top: 60px; }
-            #doc-toolbar { height: 60px; }
+            #doc-toolbar { height: 60px; gap: 6px;}
         }
     </style>
 </head>
@@ -313,7 +322,6 @@
 
     <!-- MÀN HÌNH 1: HIỂN THỊ 6 THƯ MỤC -->
     <div id="screen-home">
-        <!-- Hàng 1 -->
         <div class="folder-card folder-maytruong" onclick="openFolder('screen-maytruong')">
             <div class="folder-icon">📚</div>
             <h2 class="folder-title">Máy Trưởng</h2>
@@ -332,7 +340,6 @@
             <p class="folder-desc">Quy định, thủ tục PCT, BPTC an toàn (12 bài)</p>
         </div>
 
-        <!-- Hàng 2 -->
         <div class="folder-card folder-3d" onclick="openFolder('screen-3d')">
             <div class="folder-icon">🖥️</div>
             <h2 class="folder-title">Mô Phỏng 3D</h2>
@@ -361,10 +368,7 @@
         <div class="list-container">
             <a class="file-link" onclick="openDoc('tonghopmaytruong.html')">📌 Tổng hợp toàn bộ đáp án chuyên môn Máy trưởng</a>
             <a class="file-link" onclick="openDoc('lythuyet.html')">📖 Tài liệu Lý thuyết chung (lythuyet.html)</a>
-            
-            <!-- ĐÃ CẬP NHẬT FILE SỰ CỐ NHÀ MÁY VỚI CLASS HIGHLIGHT-INCIDENT -->
             <a class="file-link highlight-incident" onclick="openDoc('sc201725.html')">Tài liệu Sự cố Nhà máy (sc201725.html)</a>
-            
             <a class="file-link" onclick="openDoc('Ảnhhưởngchânkhôngbìnhngưng.html')">Ảnh hưởng chân không bình ngưng</a>
             <a class="file-link" onclick="openDoc('aplucnhiet.html')">Ảnh hưởng của áp lực, nhiệt độ hơi mới và chân không bình ngưng đến quá trình vận hành và hiệu suất của tuabin</a>
             <a class="file-link" onclick="openDoc('Ảnhhưởngcủanhiệtđộhơichínhtớithiếtbịvàhiệusuấttuabin.html')">Ảnh hưởng của nhiệt độ hơi chính tới thiết bị và hiệu suất tuabin</a>
@@ -452,6 +456,12 @@
         <button id="btn-close-doc" class="tool-btn" onclick="closeDoc()">⬅ ĐÓNG TÀI LIỆU</button>
         <button id="btn-read-doc" class="tool-btn" onclick="toggleReadDoc()">🔊 ĐỌC VĂN BẢN</button>
         <button id="btn-stop-read" class="tool-btn" onclick="stopReadDoc()" disabled>⏹ DỪNG ĐỌC</button>
+        
+        <!-- BỔ SUNG: KHUNG CHỌN GIỌNG ĐỌC -->
+        <select id="voice-select" title="Chọn giọng đọc">
+            <option value="">Đang tải giọng...</option>
+        </select>
+
         <select id="read-rate" title="Tốc độ đọc">
             <option value="0.75">0.75x</option>
             <option value="1" selected>1.0x</option>
@@ -586,17 +596,20 @@
     }
 
     /* =========================================================
-       PHẦN 2: ĐỌC VĂN BẢN (TEXT-TO-SPEECH) CHO TÀI LIỆU ĐANG MỞ
+       PHẦN 2: ĐỌC VĂN BẢN (TEXT-TO-SPEECH) CÓ THỂ CHỌN GIỌNG ĐỌC
        ========================================================= */
     const synth = ('speechSynthesis' in window) ? window.speechSynthesis : null;
     let readState = 'idle';      
     let readQueue = [];          
     let cachedVoices = [];
 
+    /* --- Nạp danh sách giọng đọc và đưa vào Dropdown --- */
     function loadVoices() {
         if (!synth) return;
         cachedVoices = synth.getVoices() || [];
+        populateVoiceList();
     }
+    
     if (synth) {
         loadVoices();
         if (typeof synth.onvoiceschanged !== 'undefined') {
@@ -604,11 +617,33 @@
         }
     }
 
-    function pickVietnameseVoice() {
-        if (!cachedVoices.length) loadVoices();
-        let v = cachedVoices.find(x => x.lang && x.lang.toLowerCase() === 'vi-vn');
-        if (!v) v = cachedVoices.find(x => x.lang && x.lang.toLowerCase().indexOf('vi') === 0);
-        return v || null;
+    /* Hàm đưa danh sách giọng lên giao diện */
+    function populateVoiceList() {
+        const voiceSelect = document.getElementById('voice-select');
+        if (!voiceSelect || cachedVoices.length === 0) return;
+        
+        let viVoices = cachedVoices.filter(v => v.lang.toLowerCase().includes('vi'));
+        let otherVoices = cachedVoices.filter(v => !v.lang.toLowerCase().includes('vi'));
+        let allVoices = [...viVoices, ...otherVoices]; // Ưu tiên xếp Tiếng Việt lên trên
+
+        let currentVal = voiceSelect.value;
+        voiceSelect.innerHTML = '';
+
+        allVoices.forEach(voice => {
+            let option = document.createElement('option');
+            // Cắt bớt tên quá dài cho thanh Menu nhìn gọn gàng
+            let shortName = voice.name.replace('Microsoft ', '').replace('Google ', '');
+            option.textContent = shortName + ' (' + voice.lang + ')';
+            option.value = voice.name;
+            voiceSelect.appendChild(option);
+        });
+
+        // Tự động chọn giọng Tiếng Việt đầu tiên tìm thấy nếu chưa chọn
+        if (currentVal && allVoices.find(v => v.name === currentVal)) {
+            voiceSelect.value = currentVal;
+        } else if (viVoices.length > 0) {
+            voiceSelect.value = viVoices[0].name;
+        }
     }
 
     function getDocTextFromIframe() {
@@ -743,7 +778,7 @@
         const btnRead = document.getElementById('btn-read-doc');
         const oldLabel = btnRead.textContent;
         btnRead.disabled = true;
-        btnRead.textContent = '⏳ ĐANG TẢI NỘI DUNG...';
+        btnRead.textContent = '⏳ ĐANG TẢI...';
 
         const raw = await getDocTextAsync();
 
@@ -754,8 +789,7 @@
             alert('⚠️ KHÔNG ĐỌC ĐƯỢC NỘI DUNG TÀI LIỆU!\n\nNguyên nhân có thể do:\n' +
                   '• Tài liệu chưa tải xong (hãy đợi vài giây rồi bấm lại)\n' +
                   '• Tài liệu là hình ảnh / mô phỏng 3D không có chữ\n' +
-                  '• Trình duyệt chặn truy cập nội dung tài liệu\n\n' +
-                  'Gợi ý: mở tài liệu bằng Chrome/Edge và chạy trên máy chủ web (http/https).');
+                  '• Trình duyệt chặn truy cập nội dung tài liệu');
             return;
         }
 
@@ -784,9 +818,17 @@
         const chunk = readQueue.shift();
         const utter = new SpeechSynthesisUtterance(chunk);
 
-        utter.lang = 'vi-VN';
-        const viVoice = pickVietnameseVoice();
-        if (viVoice) utter.voice = viVoice;
+        /* --- XỬ LÝ LẤY GIỌNG ĐỌC TỪ MENU DROPDOWN --- */
+        const voiceSelect = document.getElementById('voice-select');
+        if (voiceSelect && voiceSelect.value) {
+            const selectedVoice = cachedVoices.find(v => v.name === voiceSelect.value);
+            if (selectedVoice) utter.voice = selectedVoice;
+        } else {
+            // Backup nếu không chọn
+            utter.lang = 'vi-VN';
+            let v = cachedVoices.find(x => x.lang && x.lang.toLowerCase() === 'vi-vn');
+            if (v) utter.voice = v;
+        }
 
         const rateEl = document.getElementById('read-rate');
         utter.rate = parseFloat(rateEl && rateEl.value) || 1;
@@ -825,6 +867,9 @@
 
     document.addEventListener('DOMContentLoaded', function () {
         const rateEl = document.getElementById('read-rate');
+        const voiceEl = document.getElementById('voice-select');
+        
+        // Sự kiện đổi tốc độ đọc
         if (rateEl) {
             rateEl.addEventListener('change', function () {
                 if (readState === 'reading') {
@@ -840,6 +885,24 @@
                 }
             });
         }
+
+        // Sự kiện đổi giọng đọc
+        if (voiceEl) {
+            voiceEl.addEventListener('change', function () {
+                if (readState === 'reading') {
+                    const status = document.getElementById('read-status');
+                    if (status) {
+                        const old = status.textContent;
+                        status.textContent = '🗣️ Đã đổi giọng đọc (áp dụng câu tiếp theo)';
+                        setTimeout(() => {
+                            if (readState === 'reading') status.textContent = '🔈 Đang đọc...';
+                            else status.textContent = old;
+                        }, 2000);
+                    }
+                }
+            });
+        }
+
         updateReadButtons();
     });
 
