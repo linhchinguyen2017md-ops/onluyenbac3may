@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Ôn Thi Trắc Nghiệm - Chế Độ Tương Tác</title>
+    <style>
+        :root {
+            --primary: #0284c7;
+            --primary-dark: #0369a1;
+            --success: #16a34a;
+            --success-bg: #dcfce7;
+            --danger: #dc2626;
+            --danger-bg: #fee2e2;
+            --warning: #ea580c;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
+            --border: #e2e8f0;
+        }
+        * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { margin: 0; padding: 0; background: var(--bg); color: var(--text); line-height: 1.6; }
+        
+        header { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; padding: 20px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+        header h1 { margin: 0; font-size: 1.5rem; }
+        .back-btn { position: absolute; left: 15px; top: 20px; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); color: white; padding: 6px 12px; border-radius: 6px; cursor: pointer; text-decoration: none; font-weight: bold; }
+        .back-btn:hover { background: rgba(255,255,255,0.3); }
+
+        .container { max-width: 900px; margin: 20px auto; padding: 0 15px; }
+        
+        .status-bar { display: flex; justify-content: space-between; background: var(--card); padding: 12px 20px; border-radius: 8px; font-weight: bold; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid var(--border); position: sticky; top: 70px; z-index: 99;}
+        
+        .q-card { background: var(--card); padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid var(--border); transition: border-color 0.2s; }
+        .q-header { display: flex; justify-content: space-between; margin-bottom: 15px; font-weight: bold; color: var(--primary-dark); align-items: flex-start;}
+        .topic-tag { background: #e0f2fe; color: #0369a1; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: normal; white-space: nowrap;}
+        .mmc-tag { background: #fef3c7; color: #b45309; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; margin-left: 10px; white-space: nowrap;}
+        
+        .options { display: flex; flex-direction: column; gap: 10px; }
+        .opt-label { display: flex; align-items: flex-start; gap: 10px; padding: 10px 15px; border: 1px solid var(--border); border-radius: 6px; cursor: pointer; transition: background 0.15s; }
+        .opt-label:hover:not(.disabled) { background: #f1f5f9; }
+        .opt-label input { margin-top: 5px; transform: scale(1.2); cursor: inherit;}
+        .opt-label.disabled { cursor: default; }
+        
+        /* Chế độ tương tác màu sắc */
+        .opt-label.correct { background: var(--success-bg) !important; border-color: var(--success) !important; color: #14532d; font-weight: bold; }
+        .opt-label.wrong { background: var(--danger-bg) !important; border-color: var(--danger) !important; color: #7f1d1d; }
+        .opt-label.missed { background: var(--success-bg) !important; border-color: var(--success) !important; color: #14532d; border-style: dashed !important;}
+
+        .check-btn { display: inline-block; margin-top: 15px; padding: 10px 20px; background: var(--warning); color: white; border: none; border-radius: 6px; font-size: 0.95rem; font-weight: bold; cursor: pointer; transition: background 0.2s;}
+        .check-btn:hover:not(:disabled) { background: #c2410c; }
+        .check-btn:disabled { background: #94a3b8; cursor: not-allowed; }
+        .check-btn.hidden { display: none; }
+
+        .feedback-text { display: none; margin-top: 15px; padding: 12px; border-radius: 6px; font-weight: bold; }
+        .feedback-text.show { display: block; }
+        .fb-success { background: var(--success-bg); color: var(--success); border: 1px solid var(--success); }
+        .fb-danger { background: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger); }
+        
+        /* Phân trang */
+        .pagination { display: flex; justify-content: center; gap: 10px; margin: 30px 0; flex-wrap: wrap;}
+        .page-btn { padding: 8px 15px; border: 1px solid var(--border); background: var(--card); border-radius: 6px; cursor: pointer; font-weight: bold;}
+        .page-btn.active { background: var(--primary); color: white; border-color: var(--primary);}
+        .page-btn:hover:not(.active) { background: #f1f5f9; }
+    </style>
+</head>
+<body>
+
+<header>
+    <button class="back-btn" onclick="location.reload()">🔄 Tải Lại Trang</button>
+    <h1>Ôn Tập: Ngân Hàng QTNV & VHDN (49 Câu)</h1>
+</header>
+
+<div class="container">
+    
+    <div class="status-bar">
+        <span id="progress-text">Đã trả lời: 0 / 49</span>
+        <span id="score-text" style="color: var(--success);">Đúng: 0</span>
+    </div>
+
+    <div id="q-container"></div>
+    
+    <div class="pagination" id="pagination"></div>
+    
+</div>
+
+<script>
+    const allQuestions = [{"category": "QTNV", "level": "Nhận biết", "question": "Trường hợp những máy trưởng đã chuyển sang công tác khác hoặc bị đình chỉ do sự cố chủ quan, trước khi bố trí trở lại làm máy trưởng thì phải", "A": "Qua thời gian tìm hiểu để nắm tình hình thực tế sản xuất không dưới 3 ngày, nếu thời gian ngừng công tác máy trưởng từ 2 đến 3 tháng", "B": "Qua thời gian thực tập ít nhất 7 ngày nếu đã ngừng công tác trên 3 tháng", "C": "•\tPhải qua kiểm tra sát hạch lại trình độ chuyên môn đạt yêu cầu khi gây ra sự cố chủ quan thuộc trách nhiệm của máy trưởng.", "D": "Cả 3 đáp án trên", "correct": "D", "explanation": "", "is_multiple": false}, {"category": "QTNV", "level": "Nhận biết", "question": "máy trưởng nhà Nhà máy Nhiệt điện Mông Dương là", "A": "người chỉ huy vận hành, bảo đảm vận hành an toàn, tin cậy các thiết bị chính và phụ của Tua bin và các thiết bị công nghệ được phân giao trong ca vận hành", "B": "người bảo đảm vận hành an toàn, tin cậy các thiết bị chính và phụ của Tua bin và các thiết bị công nghệ được phân giao trong ca vận hành", "C": "người chỉ huy vận hành, bảo đảm vận hành an toàn, các thiết bị chính và phụ của Tua bin và các thiết bị công nghệ được phân giao trong ca vận hành và", "D": "người chỉ huy vận hành, bảo đảm vận hành tin cậy các thiết bị chính và phụ của Tua bin và các thiết bị công nghệ được phân giao trong ca vận hành", "correct": "A", "explanation": "", "is_multiple": false}, {"category": "QTNV", "level": "Nhận biết", "question": "Yêu cầu về sức khỏe, chuyên môn của máy trưởng", "A": "máy trưởng phải là người có sức khỏe, có trình độ kỹ thuật được đào tạo theo chương trình đào tạo máy trưởng. Người đó phải qua kỳ kiểm tra công nhận chức danh máy trưởng do Giám đốc Quyết định công nhận chức danh.", "B": "máy trưởng phải là người có sức khỏe, có trình độ kỹ thuật được đào tạo theo chương trình đào tạo máy trưởng. Người đó phải qua kỳ kiểm tra công nhận chức danh máy trưởng do Quản đốc phân xưởng quyết định công nhận chức danh.", "C": "máy trưởng phải là người có sức khỏe, có trình độ kỹ thuật được đào tạo theo chương trình đào tạo máy trưởng. Người đó phải qua kỳ kiểm tra công nhận chức danh máy trưởng do Phó quản đốc quyết định công nhận chức danh.", "D": "Cả 3 đáp án trên", "correct": "A", "explanation": "", "is_multiple": false}, {"category": "QTNV", "level": "Nhận biết", "question": "máy trưởng trong quan trong quan hệ hành chính và kỹ thuật", "A": "máy trưởng dưới quyền của Quản đốc phân xưởng, trực tiếp là Phó Quản đốc phân xưởng và trong ca vận hành chịu sự điều hành của Trưởng kíp lò máy, Trưởng ca nhà máy", "B": "máy trưởng dưới quyền của Quản đốc phân xưởng, trực tiếp là Kỹ thuật viên phân xưởng và trong ca vận hành chịu sự điều hành củaTrưởng kíp lò máy, Trưởng ca nhà máy", "C": "máy trưởng dưới quyền của Quản đốc phân xưởng, trực tiếp là Phó Quản đốc phân xưởng và trong ca vận hành chịu sự điều hành của Trưởng kíp lò máy, Trưởng ca nhà máy, Kỹ thuật viên phân xưởng", "D": "Cả 3 đáp án trên đều sai", "correct": "A", "explanation": "", "is_multiple": false}, {"category": "QTNV", "level": "Nhận biết", "question": "Trong quan hệ công tác kỹ thuật, máy trưởng cần?", "A": "máy trưởng thực hiện trực tiếp các mệnh lệnh của Trưởng ca. Trong trường hợp máy trưởng nhận lệnh thao tác từ người khác thì trước khi thao tác phải báo cáo lại cho Trưởng ca biết.", "B": "máy trưởng thực hiện trực tiếp các mệnh lệnh của Trưởng kíp. Trong trường hợp máy trưởng nhận lệnh thao tác từ Kĩ thuật viên, Trưởng ca thì trước khi thao tác phải báo cáo lại cho Trưởng kíp biết.", "C": "máy trưởng thực hiện trực tiếp các mệnh lệnh của Trưởng ca. Trong trường hợp máy trưởng nhận lệnh thao tác từ kĩ thuật viên thì trước khi thao tác phải báo cáo lại cho Trưởng ca biết.", "D": "máy trưởng thực hiện trực tiếp các mệnh lệnh của Kỹ thuật viên. Trong trường hợp máy trưởng nhận lệnh thao tác từ người khác thì trước khi thao tác phải báo cáo lại cho Kỹ thuật viên biết.", "correct": "B", "explanation": "", "is_multiple": false}, {"category": "QTNV", "level": "Nhận biết", "question": "máy trưởng phải nắm chắc các nội dung nào sau đây", "A": "Sơ đồ nhiệt chi tiết của tổ máy;Cấu tạo, nguyên lý làm việc và sơ đồ công nghệ các thiết bị chính, phụ của các thiết bị Tuabin trong dây chuyền và tình trạng thực tế vận hành thiết bị đó", "B": "Vị trí thực tế, tính năng tác dụng, thông số kỹ thuật và phương pháp vận hành thao tác các thiết bị thuộc phạm vi quản lý. Phương pháp khởi động, ngừng, điều chỉnh thông số bảo đảm chế độ vận hành ổn định của các thiết bị", "C": "Quy phạm quản lý kỹ thuật vận hành các nhà máy điện; Quy phạm kỹ thuật an toàn;  Các quy trình vận hành", "D": "Cả 3 đáp án trên", "correct": "D", "explanation": "", "is_multiple": false}, {"category": "QTNV", "level": "Nhận biết", "question": "Nội dung nào sau đây là chính xác nhất đối với quy định khi nhận ca", "A": "máy trưởng có nhiệm vụ chuẩn bị tốt về tinh thần và sức khoẻ và cần có mặt trước khi nhận ca 30 phút để nắm bắt tình hình vận hành của những ca trước. Đọc kỹ sổ nhật ký vận hành của ca trước để nắm chắc tình hình làm việc, những khiếm khuyết hoặc tình trạng không bình thường của thiết bị", "B": "máy trưởng có nhiệm vụ chuẩn bị tốt về tinh thần và sức khoẻ và cần có mặt trước khi nhận ca 30 phút để nắm bắt tình hình vận hành của những ca trước. Đọc kỹ sổ nhật ký vận hành, nghe và hỏi thêm máy trưởng của ca trước để nắm chắc tình hình làm việc, những khiếm khuyết hoặc tình trạng không bình thường của thiết bị", "C": "máy trưởng có mặt trước khi nhận ca 30 phút để nắm bắt tình hình vận hành của những ca trước. Đọc kỹ sổ nhật ký vận hành, nghe và hỏi thêm máy trưởng của ca trước để nắm chắc tình hình làm việc, những khiếm khuyết hoặc tình trạng không bình thường của thiết bị", "D": "máy trưởng có nhiệm vụ chuẩn bị tốt về tinh thần và sức khoẻ và cần có mặt trước khi nhận ca 30 phút để nắm bắt tình hình vận hành của những ca trước, nghe và hỏi thêm máy trưởng của ca trước để nắm chắc tình hình làm việc, những khiếm khuyết hoặc tình trạng không bình thường của thiết bị", "correct": "B", "explanation": "", "is_multiple": false}, {"category": "QTNV", "level": "Nhận biết", "question": "Nội dung nào sau đây là không chính xác đối với quy định khi nhận ca", "A": "Sau khi nắm chắc toàn bộ thông tin cần thiết người nhận ca phải ký vào sổ giao nhận ca..", "B": "máy trưởng có nhiệm vụ chuẩn bị tốt về tinh thần và sức khoẻ và cần có mặt trước khi nhận ca 30 phút để nắm bắt tình hình vận hành của những ca trước.", "C": "Sau khi nắm chắc toàn bộ thông tin cần thiết người giao ca phải ký vào sổ giao nhận ca. Sau khi nhận ca, máy trưởng báo cáo cho Trưởng kíp biết về tình hình các thiết bị của tuabin.", "D": "Đọc kỹ sổ nhật ký vận hành, nghe và hỏi thêm máy trưởng của ca trước để nắm chắc tình hình làm việc, những khiếm khuyết hoặc tình trạng không bình thường của thiết bị", "correct": "C", "explanation": "", "is_multiple": false}, {"category": "QTNV", "level": "Nhận biết", "question": "Nội dung nào sau đây là chính xác nhất đối với quy định khi giao ca", "A": "Sau khi giao ca, máy trưởng phải ghi đầy đủ, rõ ràng vào sổ nhật ký vận hành về phương thức vận hành, tình trạng không bình thường của thiết bị.Khi giao ca phải thông báo cho ca sau biết về tình hình làm việc của tuabin trong ca, những mệnh lệnh mới của cấp trên và những lưu ý cần thiết khác", "B": "Trước khi giao ca, máy trưởng phải ghi đầy đủ, rõ ràng vào sổ nhật ký vận hành về phương thức vận hành, tình trạng không bình thường của thiết bị.Khi giao ca phải thông báo cho ca sau biết về tình hình làm việc của tuabin trong ca.", "C": "Trước khi giao ca, máy trưởng phải ghi đầy đủ, rõ ràng vào sổ nhật ký vận hành tình trạng không bình thường của thiết bị.Khi giao ca phải thông báo cho ca sau biết về tình hình làm việc của tuabin trong ca, những mệnh lệnh mới của cấp trên và những lưu ý cần thiết khác", "D": "Trước khi giao ca, máy trưởng phải ghi đầy đủ, rõ ràng vào sổ nhật ký vận hành về phương thức vận hành, tình trạng không bình thường của thiết bị.Khi giao ca phải thông báo cho ca sau biết về tình hình làm việc của tuabin trong ca, những mệnh lệnh mới của cấp trên và những lưu ý cần thiết khác", "correct": "D", "explanation": "", "is_multiple": false}, {"category": "QTNV", "level": "Nhận biết", "question": "Nội dung nào sau đây là chính xác nhất đối với quy định khi giao ca", "A": "Khi người nhận ca hỏi hoặc yêu cầu giải thích, người giao ca có nhiệm vụ giải đáp những thắc mắc đó và ký bàn giao và rời khỏi vị trí sản xuất.Nếu không có người đến nhận ca, máy trưởng không được phép rời khỏi vị trí sản xuất, khi đó phải báo cho Lãnh đạo phân xưởng điều người thay thế", "B": "Khi người nhận ca hỏi hoặc yêu cầu giải thích, người giao ca có nhiệm vụ giải đáp những thắc mắc đó và chỉ khi người nhận ca ký vào sổ nhật ký vận hành thì người giao ca mới được ký bàn giao và rời khỏi vị trí sản xuất. Nếu không có người đến nhận ca, máy trưởng không được phép rời khỏi vị trí sản xuất, khi đó phải báo cho Lãnh đạo phân xưởng điều người thay thế", "C": "Khi người nhận ca hỏi hoặc yêu cầu giải thích, người giao ca có nhiệm vụ giải đáp những thắc mắc đó và chỉ khi người nhận ca ký vào sổ nhật ký vận hành thì người giao ca mới được ký bàn giao và rời khỏi vị trí sản xuất.Nếu không có người đến nhận ca, máy trưởng được phép rời khỏi vị trí sản xuất, khi đó phải báo cho Lãnh đạo phân xưởng điều người thay thế", "D": "Khi người nhận ca hỏi hoặc yêu cầu giải thích, người giao ca có nhiệm vụ giải đáp những thắc mắc đó và chỉ khi người nhận ca ký vào sổ nhật ký vận hành thì người giao ca mới được ký bàn giao và rời khỏi vị trí sản xuất.Nếu không có người đến nhận ca, máy trưởng không được phép rời khỏi vị trí sản xuất, khi đó phải báo cho Trưởng ca điều người thay thế", "correct": "B", "explanation": "", "is_multiple": false}, {"category": "QTNV", "level": "Nhận biết", "question": "Nội dung nào sau đây là chính xác nhất đối với nhiệm vụ của máy trưởng", "A": "Trực tiếp chỉ huy các chức danh vận hành của mình theo sự điều hành của Trưởng ca, thực hiện theo các quy trình, quy phạm để hoàn thành nhiệm vụ sản xuất được giao. Đảm bảo vận hành, khai thác các thiết bị trong dây chuyền thuộc phạm vi quản lý một cách an toàn và hiệu quả", "B": "Trực tiếp chỉ huy các chức danh vận hành của mình theo sự điều hành của Trưởng kíp, thực hiện theo các quy trình, quy phạm để hoàn thành nhiệm vụ sản xuất được giao. Đảm bảo vận hành, khai thác các thiết bị trong dây chuyền thuộc phạm vi quản lý một cách an toàn và hiệu quả", "C": "Trực tiếp chỉ huy các chức danh vận hành của mình theo sự điều hành của kĩ thuật viên, thực hiện theo các quy trình, quy phạm để hoàn thành nhiệm vụ sản xuất được giao. Đảm bảo vận hành, khai thác các thiết bị trong dây chuyền thuộc phạm vi quản lý một cách an toàn và hiệu quả", "D": "Trực tiếp chỉ huy các chức danh vận hành của mình theo sự điều hành của Phó Quản đốc, thực hiện theo các quy trình, quy phạm để hoàn thành nhiệm vụ sản xuất được giao. Đảm bảo vận hành, khai thác các thiết bị trong dây chuyền thuộc phạm vi quản lý một cách an toàn và hiệu quả", "correct": "B", "explanation": "", "is_multiple": false}, {"category": "QTNV", "level": "Nhận biết", "question": "Nội dung nào sau đây là chính xác nhất đối với quy chế giao nhận ca của máy trưởng", "A": "Tất cả các Máy trưởng làm việc theo chế độ 3 ca 5 kíp hoặc 3 ca 4 kíp…  và phải đi theo đúng lịch ca đã được Giám đốc nhà máy duyệt. Trong những trường hợp đặc biệt nếu được sự đồng ý của Chánh, Phó quản đốc Phân xưởng nhân viên vận hành có thể đổi ca cho nhau", "B": "Tất cả các Máy trưởng làm việc theo chế độ 3 ca 5 kíp hoặc 3 ca 4 kíp…  và phải đi theo đúng lịch ca đã được Quản đốc duyệt. Trong những trường hợp đặc biệt nếu được sự đồng ý của Chánh, Phó quản đốc Phân xưởng nhân viên vận hành có thể đổi ca cho nhau", "C": "Tất cả các Máy trưởng làm việc theo chế độ 3 ca 5 kíp hoặc 3 ca 4 kíp…  và phải đi theo đúng lịch ca đã được Giám đốc nhà máy duyệt. Trong những trường hợp đặc biệt nếu được sự đồng ý của Trưởng ca có thể đổi ca cho nhau", "D": "Tất cả các Máy trưởng làm việc theo chế độ 3 ca 5 kíp hoặc 3 ca 4 kíp…  và phải đi theo đúng lịch ca đã được Giám đốc nhà máy duyệt. Trong những trường hợp đặc biệt nếu được sự đồng ý của Trưởng kíp, kĩ thuật viên có thể đổi ca cho nhau", "correct": "A", "explanation": "", "is_multiple": false}, {"category": "QTNV", "level": "Nhận biết", "question": "Nội dung nào sau đấy là đúng về trách nhiệm của máy trưởng", "A": "Thực hiện tốt tất cả những nhiệm vụ và quyền hạn trong quy trình này và quyền hạn có trong nội quy khác của phân xưởng; chấp hành những quy định trong công tác bảo hộ lao động và kỷ luật lao động do phân xưởng đề ra. máy trưởng phải chịu hình thức kỷ luật về hành chính hay bị truy tố trước pháp luật tùy theo mức độ và tính chất của các vi phạm do mình gây ra.", "B": "máy trưởng phải chịu trách nhiệm về sự làm việc an toàn, liên tục của tuabin và thiết bị phụ trong phạm vi mình được giao. máy trưởng phải chịu trách nhiệm về những trường hợp ngừng, hỏng thiết bị, tai nạn lao động và cháy nổ, mất mát thiết bị do lỗi của mình và liên đới trách nhiệm khi mình hoặc do người ngoài đơn vị vào vị trí làm việc của kíp mình gây ra trong ca mà đã không kịp thời có biện pháp phòng chống, ngăn chặn", "C": "Chịu trách nhiệm trong việc bảo quản, sử dụng đúng mục đích và duy trì độ sẵn sàng của các trang thiết bị an toàn và phòng chống cháy nổ được bố trí tại vị trí vận hành. Chịu trách nhiệm thực hiện đầy đủ, nghiêm chỉnh mọi lệnh đình chỉ của các kỹ sư an toàn đối với đội sửa chữa, đồng thời phản ánh với Lãnh đạo phân xưởng và Trưởng kíp và Trưởng ca", "D": "Cả 3 phương án trên", "correct": "D", "explanation": "", "is_multiple": false}, {"category": "QTNV", "level": "Nhận biết", "question": "Nội dung nào sau đây là đúng về quyền hạn của máy trưởng", "A": "Có quyền không thực hiện mệnh lệnh của cấp trên nếu thấy mệnh lệnh đó đe doạ đến tính mạng con người hoặc sự an toàn của thiết bị. máy trưởng có quyền lập luận, giải thích. Nếu người ra lệnh vẫn yêu cầu thực hiện thì báo cáo với Kĩ thuật viên và phải chịu trách nhiệm về hành động của mình", "B": "Có quyền không thực hiện mệnh lệnh của cấp trên nếu thấy mệnh lệnh đó đe doạ đến tính mạng con người hoặc sự an toàn của thiết bị. máy trưởng có quyền lập luận, giải thích. Nếu người ra lệnh vẫn yêu cầu thực hiện thì báo cáo với Trưởng ca phải chịu trách nhiệm về hành động của mình", "C": "Có quyền không thực hiện mệnh lệnh của cấp trên nếu thấy mệnh lệnh đó đe doạ đến tính mạng con người hoặc sự an toàn của thiết bị. máy trưởng có quyền lập luận, giải thích. Nếu người ra lệnh vẫn yêu cầu thực hiện thì báo cáo với Phó quản đốc phải chịu trách nhiệm về hành động của mình", "D": "Có quyền không thực hiện mệnh lệnh của cấp trên nếu thấy mệnh lệnh đó đe doạ đến tính mạng con người hoặc sự an toàn của thiết bị. máy trưởng có quyền lập luận, giải thích. Nếu người ra lệnh vẫn yêu cầu thực hiện thì báo cáo với Quản đốc và  phải chịu trách nhiệm về hành động của mình", "correct": "B", "explanation": "", "is_multiple": false}, {"category": "QTNV", "level": "Nhận biết", "question": "Nọi dung nào sau đây là đúng về quan hệ của máy trưởng với cấp trên cấp dưới và các bên liên quan", "A": "máy trưởng chịu sự điều hành trực tiếp và thực hiện những mệnh lệnh về hành chính, kỹ thuật của Trưởng kíp. Khi nhận lệnh trực tiếp của Quản đốc, phó Quản đốc thì máy trưởng phải thông qua và phải được Trưởng kíp, Trưởng ca đồng ý trước khi thực hiện.", "B": "máy trưởng chịu sự điều hành trực tiếp và thực hiện những mệnh lệnh về hành chính, kỹ thuật của Trưởng kíp. Khi nhận lệnh trực tiếp của Quản đốc, phó Quản đốc thì máy trưởng phải thông qua và phải được Trưởng kíp đồng ý trước khi thực hiện.", "C": "máy trưởng chịu sự điều hành gián tiếp và thực hiện những mệnh lệnh về hành chính, kỹ thuật của Trưởng kíp. Khi nhận lệnh trực tiếp của Quản đốc, phó Quản đốc thì máy trưởng phải thông qua và phải được Trưởng kíp, Trưởng ca đồng ý trước khi thực hiện.", "D": "Cả 3 phương án đều đúng.", "correct": "A", "explanation": "", "is_multiple": false}, {"category": "QTNV", "level": "Nhận biết", "question": "Nội dung nào sau đây là đúng về quyền hạn của máy trưởng", "A": "Có quyền báo cáo bằng văn bản lên Quản đốc, Phó Quản đốc những sự việc và kiến nghị về tình trạng kỹ thuật của thiết bị hoặc về tổ chức của ca vận hành.", "B": "Chỉ có quyền báo cáo bằng văn bản lên Trưởng ca những sự việc và kiến nghị về tình trạng kỹ thuật của thiết bị hoặc về tổ chức của ca vận hành.", "C": "Chỉ có quyền báo cáo bằng văn bản lên Trưởng kíp những sự việc và kiến nghị về tình trạng kỹ thuật của thiết bị hoặc về tổ chức của ca vận hành.", "D": "Cả 3 phuương án đều sai", "correct": "A", "explanation": "", "is_multiple": false}, {"category": "QTNV", "level": "Nhận biết", "question": "Nội dung nào sau đây là sai trong quyền hạn của máy trưởng", "A": "Có quyền đề nghị với Trưởng kíp, Phó Quản đốc, Quản đốc phân xưởng về việc đình chỉ nhân viên dưới quyền và đưa ra khỏi vị trí làm việc khi có dấu hiệu vi phạm quy trình vận hành, quy trình an toàn, quy trình nhiệm vụ, nội quy kỷ luật lao động... nhưng chỉ được phép đưa người đó ra khỏi vị trí sản xuất khi đã bố trí người thay thế", "B": "Yêu cầu những người lạ mặt, những người không có phận sự ra khỏi khu vực đặt thiết bị và phạm vi của phân xưởng. Báo cáo Trưởng kíp yêu cầu hỗ trợ trong việc bắt giữ, ngăn chặn những người cố tình vi phạm nội quy nơi sản xuất hoặc xâm phạm tài sản của nhà máy", "C": ". Máy trưởng trong ca được trực tiếp chỉ huy mọi công việc vận hành và xử lý mọi trường hợp không bình thường trong hệ thống các thiết bị thuộc quyền quản lý vận hành để góp phần hoàn thành nhiệm vụ của kíp vận hành", "D": "Cả 3 phương án đều đúng.", "correct": "D", "explanation": "", "is_multiple": false}, {"category": "QTNV", "level": "Nhận biết", "question": "Nội dung nào sau đây là sai trong quy định về trách nhiệm của máy trưởng", "A": "Chịu trách nhiệm trong việc bảo quản, sử dụng đúng mục đích và duy trì độ sẵn sàng của các trang thiết bị an toàn và phòng chống cháy nổ được bố trí tại vị trí vận hành", "B": "Thực hiện tốt tất cả những nhiệm vụ và quyền hạn trong quy trình này và quyền hạn có trong nội quy khác của phân xưởng", "C": "máy trưởng phải chịu trách nhiệm về sự làm việc an toàn, liên tục của Lò hơi và Tuabin và thiết bị phụ trong phạm vi mình được giao.", "D": "máy trưởng phải chịu hình thức kỷ luật về hành chính hay bị truy tố trước pháp luật tùy theo mức độ và tính chất của các vi phạm do mình gây ra.", "correct": "C", "explanation": "", "is_multiple": false}, {"category": "QTNV", "level": "Nhận biết", "question": "Nội dung nào sau đây là sai trong quy định chung của QTNV - Máy trưởng", "A": "máy trưởng nhà Nhà máy Nhiệt điện Mông Dương là công nhân vận hành thuộc Phân xưởng Vận hành, là người trợ giúp Trưởng kíp điều khiển, vận hành tuabin và các thiết bị khác liên quan đến tuabin", "B": "máy trưởng do Giám đốc nhà máy hoặc Phó Giám đốc nhà máy bổ nhiệm hoặc bãi miễn theo đề nghị của Quản đốc Phân xưởng thông qua Trưởng phòng Tổ chức của nhà máy", "C": "Trong quan hệ công tác kỹ thuật, máy trưởng thực hiện trực tiếp các mệnh lệnh của Trưởng Kíp. Trong trường hợp máy trưởng nhận lệnh thao tác từ Trưởng ca thì trước khi thao tác phải báo cáo lại cho Trưởng kíp biết", "D": "máy trưởng phải là người có sức khỏe, có trình độ kỹ thuật được đào tạo theo chương trình đào tạo máy trưởng. Người đó phải qua kỳ kiểm tra công nhận chức danh máy trưởng do Quản đốc Quyết định công nhận chức danh", "correct": "D", "explanation": "", "is_multiple": false}, {"category": "QTNV", "level": "Nhận biết", "question": "Nội dung nào sau đây là sai trong quy định khi giao ca", "A": "Nếu không có người đến nhận ca, máy trưởng không được phép rời khỏi vị trí sản xuất, khi đó phải báo cho Lãnh đạo phân xưởng điều người thay thế.", "B": "Trước khi giao ca, máy trưởng phải ghi đầy đủ, rõ ràng vào sổ nhật ký vận hành về phương thức vận hành, tình trạng không bình thường của thiết bị.", "C": "Cấm giao ca trong thời gian xảy ra sự cố hoặc đang thao tác thay đổi phương thức vận hành các thiết bị. Chỉ được phép giao nhận ca khi được sự đồng ý của Phó quản đốc", "D": "Khi người nhận ca hỏi hoặc yêu cầu giải thích, người giao ca có nhiệm vụ giải đáp những thắc mắc đó và chỉ khi người nhận ca ký vào sổ nhật ký vận hành thì người giao ca mới được ký bàn giao và rời khỏi vị trí sản xuất.", "correct": "C", "explanation": "", "is_multiple": false}, {"category": "VHDN", "level": "Nhận biết", "question": "Những đáp án nào sau đây nhận định đúng về \"Tầm nhìn và sứ mệnh'' của EVNGENCO3 ?", "A": "Tổng Công ty Phát điện 3 là một trong những Đơn vị hàng đầu trong lĩnh vực năng lượng đầu tư phát triển nguồn điện tại Việt Nam và khu vực.", "B": "Tổng Công ty Phát điện 3 luôn đảm bảo sản xuất điện an toàn, liên tục, kinh tế, đầu tư nguồn điện hiệu quả - góp phần giữ vững an ninh năng lượng của Hệ thống điện Quốc gia.", "C": "Tổng Công ty Phát điện 3 là một trong những Đơn vị hàng đầu trong lĩnh vực năng lượng của Việt Nam.", "D": "", "correct": "B, C", "explanation": "", "is_multiple": true}, {"category": "VHDN", "level": "Nhận biết", "question": "Trang phục đối với lực lượng lao động trực tiếp trong Công ty Nhiệt điện Mông Dương ?", "A": "Mặc quần áo bảo hộ lao động, đi giày bảo hộ lao động, đội mũ bảo hộ lao động và các thiết bị bảo hộ lao động được cấp khi ra công trường.", "B": "Mặc quần áo bảo hộ lao động, đi giày thể thao hoặc dép có quai hậu, đội mũ bảo hộ lao động và các thiết bị bảo hộ lao động được cấp khi ra công trường.", "C": "Mặc quần áo gọn gàng, lịch sự, đi giày hoặc dép có quai hậu.", "D": "", "correct": "B", "explanation": "", "is_multiple": false}, {"category": "VHDN", "level": "Nhận biết", "question": "Giá trị cốt lõi \"Tận tâm - Trí tuệ\" trong xây dựng VHDN của EVNGENCO3 có ý nghĩa như thế nào ?", "A": "Cán bộ công nhân viên EVNGENCO3 chỉ cần làm tốt các công việc của mình, không cần quan tâm đến việc phục vụ khách hàng.", "B": "Cán bộ công nhân viên EVNGENCO3 luôn cố gắng thể hiện tinh thần trách nhiệm cao đối với công việc, luôn vận dụng tri thức, trí tuệ để hành động với hiệu quả cao nhất.", "C": "Tất cả các đáp án trên.", "D": "", "correct": "A", "explanation": "", "is_multiple": false}, {"category": "VHDN", "level": "Nhận biết", "question": "Thái độ nghiêm túc và tinh thần trách nhiệm cao đối với công việc, hết lòng phục vụ khách hàng, vì lợi ích của nhà đầu tư và người lao động; luôn vận dụng tri thức, trí tuệ để hành động với hiệu quả cao nhất là ý nghĩa của giá trị cốt lõi nào sau đây ?", "A": "Tận tâm - Trí tuệ.", "B": "Sáng tạo - Hiệu quả.", "C": "Chất lượng - Tín nhiệm.", "D": "", "correct": "B", "explanation": "", "is_multiple": false}, {"category": "VHDN", "level": "Nhận biết", "question": "Trong xây dựng VHDN, EVNGENCO3 xác định giá trị cốt lõi \"Sáng tạo - Hiệu quả\" có ý nghĩa như thế nào ?", "A": "Là Tinh thần chủ đạo mà EVNGENCO3 mong muốn đạt được.", "B": "Là đòn bẩy cho sự phát triển.", "C": "Là nguyện vọng mà EVNGENCO3 mong muốn đạt được.", "D": "", "correct": "C", "explanation": "", "is_multiple": false}, {"category": "VHDN", "level": "Nhận biết", "question": "\"Giá trị cốt lõi\" trong xây dựng VHDN của EVNGENCO3 gồm mấy tiêu chí:", "A": "4", "B": "3", "C": "2", "D": "", "correct": "B", "explanation": "", "is_multiple": false}, {"category": "VHDN", "level": "Nhận biết", "question": "Câu nào sao đây nói về quy tắc ứng xử đối với các đơn vị trong Công ty Nhiệt điện Mông Dương ?", "A": "Khuyến khích và tạo điều kiện tốt nhất để các Phòng và Phân xưởng phát triển thành các bộ phận tham mưu giỏi, đắc lực cho lãnh đạo Công ty.", "B": "Xây dựng và duy trì môi trường làm việc bình đẳng, tôn trọng và công bằng.", "C": "Tất cả các đáp án trên.", "D": "", "correct": "D", "explanation": "", "is_multiple": false}, {"category": "VHDN", "level": "Nhận biết", "question": "Lễ phục đối với nữ khi tham dự các cuộc hội nghị, hội họp và các lễ ký kết hợp tác là:", "A": "Áo dài truyền thống.", "B": "Comple nữ.", "C": "Mùa đông: Comple nữ; Mùa hè: áo dài truyền thống.", "D": "", "correct": "D", "explanation": "", "is_multiple": false}, {"category": "VHDN", "level": "Nhận biết", "question": "Câu nào sau đây đúng về quy tắc ứng xử đối với cá nhân từng CBCNV trong Công ty Nhiệt điện Mông Dương ?", "A": "Không ngừng học tập nâng cao trình độ chuyên môn, nghiệp vụ để nắm bắt tri thức và sử dụng công nghệ mới. Khi giải quyết công việc qua mọi hình thức (trực tiếp, điện thoại, văn bản, thư điện tử..) phải thể hiện thái độ giao tiếp chuyên nghiệp, khiêm nhường, lịch sự. Thực hiện lối sống văn minh nơi công sở.", "B": "Giữ gìn, bảo vệ uy tín của Công ty. Giữ gìn cảnh quan môi trường, đảm bảo nơi làm việc gọn gàng, sạch sẽ. Thẳng thắn và chân thành đấu tranh với những việc làm sai trái hay cử xử không đúng mực. Không đi muộn, về sớm, tự ý bỏ vị trí công tác trong giờ làm việc.", "C": "Tất cả các đáp án trên.", "D": "", "correct": "D", "explanation": "", "is_multiple": false}, {"category": "VHDN", "level": "Nhận biết", "question": "\"Giá trị cốt lõi\" trong xây dựng VHDN của EVNGENCO3 gồm những tiêu chí nào ?", "A": "Chất lượng - Tín nhiệm, Hợp tác - chia sẻ.", "B": "Chất lượng - Tín nhiệm, Tậm tâm - Trí tuệ, Hợp tác - Chia sẻ, Sáng tạo - Hiệu quả.", "C": "Sáng tạo - Hiệu quả.", "D": "", "correct": "C", "explanation": "", "is_multiple": false}, {"category": "VHDN", "level": "Nhận biết", "question": "Tiêu chí \"ứng xử nội bộ\" trong xây dựng VHDN của EVNGENCO3 được thể hiện như thế nào ?", "A": "Vì một cộng đồng phát triển.", "B": "Trên thuận, dưới hòa, tôn trọng lẫn nhau.", "C": "Vì sự phát triển bền vững.", "D": "", "correct": "C", "explanation": "", "is_multiple": false}, {"category": "VHDN", "level": "Nhận biết", "question": "Quy tắc ứng xử của CBCNV với Lãnh đạo trong Công ty NĐ Mông Dương được thực thi như thế nào ?", "A": "Tôn trọng ý kiến của Lãnh đạo.\n- Khi thực hiện quyết định của Lãnh đạo, nếu phát hiện quyết định đó trái pháp luật, làm ảnh hưởng tới lợi ích chung, hoặc không phù hợp với thực tế thì phải báo cáo ngay với người ra quyết định. Trong trường hợp phải chấp hành quyết định mà trái pháp luật thì phải báo cáo ngay với Lãnh đạo trực tiếp của người ra quyết định.", "B": "Tôn trọng ý kiến của Lãnh đạo. Khi thực hiện quyết định của Lãnh đạo, nếu phát hiện quyết định đó trái pháp luật, làm ảnh hưởng tới lợi ích chung, hoặc không phù hợp với thực tế thì không cần báo cáo và coi như mình không biết.", "C": "Luôn lấy lòng Lãnh đạo để đạt được mục đích của mình.", "D": "", "correct": "A, B", "explanation": "", "is_multiple": true}, {"category": "VHDN", "level": "Nhận biết", "question": "Khẩu hiệu của TPC MÔNG DƯƠNG là gì ?", "A": "Chất lượng - Tin cậy - Hiệu quả.", "B": "Vì sự phát triển bền vững.", "C": "Vì một cộng đồng phát triển.", "D": "", "correct": "B", "explanation": "", "is_multiple": false}, {"category": "VHDN", "level": "Nhận biết", "question": "Quy tắc ứng xử nội bộ của CBCNV trong Công ty Nhiệt điện Mông Dương được thực thi như thế nào?", "A": "Cùng đồng nghiệp xây dựng môi trường làm việc thân thiện. Luôn niềm nở chào hỏi đồng ngiệp vào buổi sáng đến công ty và chào tạm biệt trước khi rời công ty.", "B": "Luôn tôn trọng, bảo vệ uy tín, danh dự của đồng nghiệp. Biết lắng nghe ý kiến góp ý của đồng nghiệp. Chân thành và thẳng thắn khi góp ý cho đồng nghiệp.", "C": "Tất cả các đáp án trên", "D": "", "correct": "D", "explanation": "", "is_multiple": false}, {"category": "VHDN", "level": "Nhận biết", "question": "Quy tắc ứng xử đối với đồng nghiệp cùng phòng, phân xưởng khi được giao giải quyết một công việc ?", "A": "Né tránh, đùn đẩy công việc cho đồng nghiệp.", "B": "Từ chối sự phối hợp với đồng nghiệp.", "C": "Chỉ làm việc với đồng nghiệp mà mình thích.", "D": "", "correct": "A", "explanation": "", "is_multiple": false}, {"category": "VHDN", "level": "Nhận biết", "question": "Trong công việc được giao, khi bất đồng quan điểm với đồng nghiệp của mình trong cùng phòng/phân xưởng, bạn sẽ làm gì ?", "A": "Báo cáo trực tiếp với người quản lý giao việc để người quản lý quyết định.", "B": "Gây khó khăn, cản trở cho đồng nghiệp", "C": "Tất cả các đáp án trên", "D": "", "correct": "B", "explanation": "", "is_multiple": false}, {"category": "VHDN", "level": "Nhận biết", "question": "Quy tắc ứng xử của CBCNV đối với các đồng nghiệp khác phòng/phân xưởng trong giải quyết công việc ?", "A": "Có thái độ gây khó khăn, thiếu hợp tác khi giải quyết và phối hợp công việc.", "B": "Sẵn sàng, nhanh chóng phối hợp công việc một cách hiệu quả nhất. Không có thái độ gây khó khăn, cản trở, thiếu hợp tác khi giải quyết và phối hợp công việc. Khi phát hiện đồng nghiệp khác có hành động thiếu hợp tác trong giải quyết công việc, kịp thời báo cáo Lãnh đạo của các bên liên quan.", "C": "Sẵn sàng phối hợp công việc một cách hiệu quả nhất. Không có thái độ gây khó khăn, thiếu hợp tác khi giải quyết và phối hợp công việc.", "D": "", "correct": "C", "explanation": "", "is_multiple": false}, {"category": "VHDN", "level": "Nhận biết", "question": "Trong điều hành và thực thi công việc, CBCNV trong Công ty Nhiệt điện Mông Dương cần thực hiện như thế nào ?", "A": "Người đứng đầu và cấp phó của người đứng đầu được giao phụ trách công việc, bộ phận có thẩm quyền quản lý và sử dụng cán bộ có trách nhiệm đôn đốc, kiểm tra việc thực hiện nhiệm vụ của cán bộ thuộc thẩm quyền. CBCNV khi thực hiện nhiệm vụ phải chấp hành quyết định của cấp quản lý trực tiếp. Trường hợp có quyết định của Lãnh đạo cao hơn thì CBCNV phải thực hiện theo quyết định của cấp có thẩm quyền, đồng thời có trách nhiệm báo cáo Lãnh đạo trực tiếp của mình về việc thực hiện quyết định đó.", "B": "Khi thực hiện nhiệm vụ, giải quyết công việc, phải phối hợp với cá nhân bộ phận liên quan khác để hoàn thành công việc có hiệu quả, không được cố tình kéo dài thời gian hoặc từ chối sự phối hợp của những Công ty, đơn vị, cá nhân liên quan. Luôn có thái độ cầu thị, thẳng thắn, chân thành tham gia đóng góp trong công việc. Đảm bảo xử lý công việc trong thời gian nhanh nhất. Trong trường hợp được yêu cầu xử lý gấp của Công ty chức năng hoặc Lãnh đạo thì phải xử lý ngay trong ngày làm việc.", "C": "Tất cả các đáp án trên", "D": "", "correct": "D", "explanation": "", "is_multiple": false}, {"category": "VHDN", "level": "Nhận biết", "question": "Ngày Bác Hồ về thăm ngành Điện (Ngày truyền thống ngành Điện lực Việt Nam) là ngày nào ?", "A": "12/21/1954", "B": "12/22/1954", "C": "12/26/1954", "D": "", "correct": "B", "explanation": "", "is_multiple": false}, {"category": "VHDN", "level": "Nhận biết", "question": "Thái độ của CBCNV Công ty Nhiệt điện Mông Dương trong điều hành và thực thi công việc là ?", "A": "Chấp hành sự điều động, phân công công tác của Lãnh đạo. Không được trốn tránh đùn đẩy trách nhiệm khi thực hiện nhiệm vụ, giải quyết công việc.  Khi thực hiện nhiệm vụ, giải quyết công việc, phải phối hợp với cá nhân bộ phận liên quan khác để hoàn thành công việc có hiệu quả, không được cố tình kéo dài thời gian hoặc từ chối sự phối hợp của những Công ty, đơn vị, cá nhân liên quan.", "B": "Chỉ có thái độ niềm nở, tôn trọng với Lãnh đạo, còn đối với đồng nghiệp thì không cần.", "C": "Trốn tránh đùn đẩy trách nhiệm khi thực hiện nhiệm vụ, giải quyết công việc.", "D": "", "correct": "A, B", "explanation": "", "is_multiple": true}, {"category": "VHDN", "level": "Nhận biết", "question": "Có mấy nghi thức giao tiếp qua điện thoại trong Công ty Nhiệt điện mông Dương ?", "A": "4", "B": "2", "C": "3", "D": "", "correct": "C", "explanation": "", "is_multiple": false}, {"category": "VHDN", "level": "Nhận biết", "question": "Nhiệm vụ của CBCNV Công ty Nhiệt điện Mông Dương trong việc sử dụng tài sản của Công ty ?", "A": "Mọi CBCNV phải có trách nhiệm bảo quản, giữ gìn và sử dụng đúng mục đích, tiết kiệm tránh lãng phí các tài sản, phương tiện chung tại phòng làm việc. Được sử dụng các tài sản trong phòng vào mục đích cá nhân.", "B": "Được sử dụng các tài sản trong phòng vào mục đích cá nhân.", "C": "Tất cả các đáp án trên.", "D": "", "correct": "A", "explanation": "", "is_multiple": false}, {"category": "VHDN", "level": "Nhận biết", "question": "Nhiệm vụ của CBCNV Công ty Nhiệt điện Mông Dương trong việc bảo quản tài sản ?", "A": "Không được mang tài sản, phương tiện ra khỏi phòng làm việc nếu chưa được cấp có thẩm quyền cho phép. Các nghi ngờ về vi phạm sử dụng tài sản của Công ty, CBCNV phải lập tức báo cáo ngay cho Lãnh đạo để kiểm tra.", "B": "CBCNV được phép sử dụng thoải mái các phương tiện chung tại phòng làm việc.", "C": "Tất cả các đáp án trên.", "D": "", "correct": "A, B", "explanation": "", "is_multiple": true}, {"category": "VHDN", "level": "Nhận biết", "question": "Nghi thức giao tiếp qua điện thoại trong Công ty Nhiệt điện Mông Dương là những nghi thức nào ?", "A": "Khi gọi.", "B": "Nhắn tin.", "C": "Tất cả các đáp án trên.", "D": "", "correct": "A, B", "explanation": "", "is_multiple": true}, {"category": "VHDN", "level": "Nhận biết", "question": "Nghi thức giao tiếp điện thoại khi gọi cần chuẩn bị những gì ?", "A": "Chuẩn bị nội dung cần trao đổi; Khi có người cầm máy, phải có lời chào, xưng tên, chức danh, bộ phận làm việc và đề nghị gặp người cần gặp. Trao đổi nội dung ngắn gọn, rõ ràng cụ thể. Tác phong nói chuyện từ tốn, âm lượng vừa phải; Kết thúc trao đổi phải có lời cảm ơn, lời chào.", "B": "Chuẩn bị nội dung cần trao đổi; Phải có lời chào, xưng tên, chức danh, bộ phận làm việc khi có người cầm máy.", "C": "Chuẩn bị nội dung cần trao đổi; Phải có lời chào, xưng tên, chức danh, bộ phận làm việc khi có người cầm máy; Trao đổi nội dung ngắn gọn, rõ ràng cụ thể.", "D": "", "correct": "B", "explanation": "", "is_multiple": false}, {"category": "VHDN", "level": "Nhận biết", "question": "“Khẩu hiệu” EVN trong tài liệu Văn hóa là gì?", "A": "EVN giữ vững niềm tin.", "B": "EVN tỏa sáng niềm tin.", "C": "EVN vì sự phát triển bền vững.", "D": "", "correct": "A", "explanation": "", "is_multiple": false}, {"category": "VHDN", "level": "Nhận biết", "question": "Theo quy định, đơn vị của bạn có phải ban hành tài liệu Văn hóa doanh nghiệp (VHDN)/Bộ quy tắc ứng xử (QTƯX) để áp dụng trong đơn vị không?", "A": "Áp dụng VHDN của EVNGENCO 3 và ban hành QTƯX.", "B": "Ban hành VHDN và QTƯX.", "C": "Chỉ ban hành QTƯX.", "D": "", "correct": "B, C", "explanation": "", "is_multiple": true}, {"category": "VHDN", "level": "Nhận biết", "question": "Quy định Văn hóa doanh nghiệp của EVNGENCO3, CBCNV khi nhận điện thoại, ý nào sau đây là đúng?", "A": "Khi nhận điện thoại, đầu tiên phải hỏi xem người gọi đến là ai, ở bộ phận/đơn vị nào.", "B": "Khi nhận điện thoại, thì nói Alo sau đó nghe người gọi đến.", "C": "Tất cả các câu trên.", "D": "", "correct": "A", "explanation": "", "is_multiple": false}, {"category": "VHDN", "level": "Nhận biết", "question": "Quy định Văn hóa doanh nghiệp của EVNGENCO 3, giao tiếp qua thư điện tử như thế nào là đúng?", "A": "Trình bày email theo kiểu chữ dễ đọc, khoảng cách các dòng hợp lý, in đậm hoặc dưới những nội dung quan trọng.", "B": "Sử dụng dòng tiêu đề để trích yếu nội dung của email, phần trình bày trích yếu này phải ngắn gọn và phù hợp với nội dung cần truyền tải.", "C": "Tất cả các câu trên.", "D": "", "correct": "D", "explanation": "", "is_multiple": false}];
+    const itemsPerPage = 50; 
+    let currentPage = 1;
+    let totalPages = Math.ceil(allQuestions.length / itemsPerPage);
+    
+    // Lưu trữ trạng thái làm bài của người dùng để sang trang không bị mất
+    let userState = {}; 
+    let correctCount = 0;
+    
+    // Khởi tạo state rỗng cho tất cả câu hỏi
+    allQuestions.forEach((q, idx) => {
+        userState[idx] = {
+            answered: false,
+            choices: [],
+            isCorrect: false
+        };
+    });
+
+    function renderPage(page) {
+        currentPage = page;
+        const container = document.getElementById('q-container');
+        container.innerHTML = '';
+        
+        const start = (page - 1) * itemsPerPage;
+        const end = Math.min(start + itemsPerPage, allQuestions.length);
+        const pageQuestions = allQuestions.slice(start, end);
+        
+        const keyMap = ['A', 'B', 'C', 'D'];
+        
+        pageQuestions.forEach((q, loopIdx) => {
+            const globalIdx = start + loopIdx; // Index thật trong mảng
+            const state = userState[globalIdx];
+            
+            const card = document.createElement('div');
+            card.className = 'q-card';
+            card.id = 'q-card-' + globalIdx;
+            
+            const isMultiple = q.is_multiple;
+            const inputType = isMultiple ? 'checkbox' : 'radio';
+            const mmcBadge = isMultiple ? '<span class="mmc-tag">Chọn nhiều đáp án</span>' : '';
+            
+            let optsHtml = '';
+            
+            keyMap.forEach((key) => {
+                const optText = q[key];
+                if(optText && optText.trim() !== '') {
+                    // Phục hồi giao diện nếu câu này đã làm rồi
+                    let labelClasses = 'opt-label';
+                    let inputAttrs = '';
+                    let isChecked = state.choices.includes(key);
+                    
+                    if (isChecked) inputAttrs += ' checked';
+                    
+                    if (state.answered) {
+                        labelClasses += ' disabled';
+                        inputAttrs += ' disabled';
+                        
+                        const correctAnswers = q.correct.split(',').map(s => s.trim());
+                        const isRightChoice = correctAnswers.includes(key);
+                        
+                        if (isRightChoice && isChecked) labelClasses += ' correct';
+                        else if (isRightChoice && !isChecked) labelClasses += ' missed';
+                        else if (!isRightChoice && isChecked) labelClasses += ' wrong';
+                    }
+
+                    optsHtml += `
+                        <label class="${labelClasses}" id="lbl-${globalIdx}-${key}">
+                            <input type="${inputType}" name="q-${globalIdx}" value="${key}" ${inputAttrs} onchange="handleSelect(${globalIdx}, ${isMultiple})">
+                            <span><strong>${key}.</strong> ${optText}</span>
+                        </label>
+                    `;
+                }
+            });
+            
+            let checkBtnHtml = '';
+            let feedbackHtml = '';
+            
+            if (state.answered) {
+                // Đã trả lời, hiện thông báo đúng/sai
+                let fbClass = state.isCorrect ? 'fb-success' : 'fb-danger';
+                let fbIcon = state.isCorrect ? '✓ Chính xác!' : '✗ Sai rồi!';
+                feedbackHtml = `<div class="feedback-text show ${fbClass}">${fbIcon} Đáp án đúng là: ${q.correct}</div>`;
+            } else {
+                if (isMultiple) {
+                    checkBtnHtml = `<button class="check-btn" id="btn-check-${globalIdx}" onclick="checkMultipleAnswer(${globalIdx})" disabled>Kiểm Tra Đáp Án</button>`;
+                }
+                feedbackHtml = `<div class="feedback-text" id="fb-${globalIdx}"></div>`;
+            }
+
+            card.innerHTML = `
+                <div class="q-header">
+                    <span>Câu ${globalIdx + 1}: ${q.question} ${mmcBadge}</span>
+                    <span class="topic-tag">${q.category}</span>
+                </div>
+                <div class="options">${optsHtml}</div>
+                ${checkBtnHtml}
+                ${feedbackHtml}
+            `;
+            container.appendChild(card);
+        });
+        
+        renderPagination();
+        window.scrollTo(0, 0);
+    }
+    
+    function handleSelect(globalIdx, isMultiple) {
+        if (userState[globalIdx].answered) return;
+        
+        if (isMultiple) {
+            // Câu nhiều đáp án: mở khóa nút Kiểm tra
+            const checked = document.querySelectorAll(`input[name="q-${globalIdx}"]:checked`);
+            document.getElementById(`btn-check-${globalIdx}`).disabled = checked.length === 0;
+        } else {
+            // Câu 1 đáp án: Khóa luôn và kiểm tra ngay
+            const selectedVal = document.querySelector(`input[name="q-${globalIdx}"]:checked`).value;
+            userState[globalIdx].choices = [selectedVal];
+            processAnswer(globalIdx);
+        }
+    }
+    
+    function checkMultipleAnswer(globalIdx) {
+        if (userState[globalIdx].answered) return;
+        const checked = document.querySelectorAll(`input[name="q-${globalIdx}"]:checked`);
+        let vals = [];
+        checked.forEach(inp => vals.push(inp.value));
+        userState[globalIdx].choices = vals;
+        document.getElementById(`btn-check-${globalIdx}`).classList.add('hidden');
+        processAnswer(globalIdx);
+    }
+    
+    function processAnswer(globalIdx) {
+        const q = allQuestions[globalIdx];
+        const state = userState[globalIdx];
+        state.answered = true;
+        
+        // Khóa giao diện của câu này
+        const allInputs = document.querySelectorAll(`input[name="q-${globalIdx}"]`);
+        allInputs.forEach(inp => {
+            inp.disabled = true;
+            inp.closest('.opt-label').classList.add('disabled');
+        });
+        
+        const correctAnswers = q.correct.split(',').map(s => s.trim());
+        const userAnsSorted = [...state.choices].sort();
+        const correctAnsSorted = [...correctAnswers].sort();
+        
+        state.isCorrect = JSON.stringify(userAnsSorted) === JSON.stringify(correctAnsSorted);
+        
+        if (state.isCorrect) correctCount++;
+        
+        // Tô màu
+        allInputs.forEach(inp => {
+            const val = inp.value;
+            const label = document.getElementById(`lbl-${globalIdx}-${val}`);
+            const isRightChoice = correctAnswers.includes(val);
+            const wasChosen = state.choices.includes(val);
+            
+            if (isRightChoice && wasChosen) label.classList.add('correct');
+            else if (isRightChoice && !wasChosen) label.classList.add('missed');
+            else if (!isRightChoice && wasChosen) label.classList.add('wrong');
+        });
+        
+        // Hiện thông báo
+        const fbDiv = document.getElementById(`fb-${globalIdx}`);
+        if (fbDiv) {
+            fbDiv.classList.add('show');
+            if (state.isCorrect) {
+                fbDiv.classList.add('fb-success');
+                fbDiv.innerHTML = `✓ Chính xác!`;
+            } else {
+                fbDiv.classList.add('fb-danger');
+                fbDiv.innerHTML = `✗ Sai rồi! Đáp án đúng là: ${q.correct}`;
+            }
+        }
+        
+        updateStats();
+    }
+    
+    function updateStats() {
+        let answeredTotal = 0;
+        for (let key in userState) {
+            if (userState[key].answered) answeredTotal++;
+        }
+        document.getElementById('progress-text').textContent = `Đã trả lời: ${answeredTotal} / ${allQuestions.length}`;
+        document.getElementById('score-text').textContent = `Đúng: ${correctCount}`;
+    }
+    
+    function renderPagination() {
+        const pag = document.getElementById('pagination');
+        pag.innerHTML = '';
+        // Ẩn phân trang nếu chỉ có 1 trang
+        if (totalPages <= 1) return;
+        for (let i = 1; i <= totalPages; i++) {
+            const btn = document.createElement('button');
+            btn.className = 'page-btn' + (i === currentPage ? ' active' : '');
+            btn.textContent = 'Trang ' + i;
+            btn.onclick = () => renderPage(i);
+            pag.appendChild(btn);
+        }
+    }
+
+    // Load trang 1 khi khởi động
+    renderPage(1);
+
+</script>
+</body>
+</html>
