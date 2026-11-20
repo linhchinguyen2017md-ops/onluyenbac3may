@@ -86,6 +86,7 @@
         .folder-quiz { border-bottom: 8px solid #6a1b9a; }
         .folder-drive { border-bottom: 8px solid #f4511e; } 
         .folder-3d { border-bottom: 8px solid #e91e63; }
+        .folder-research { border-bottom: 8px solid #3949ab; }
         
         .folder-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
         .folder-maytruong:hover { border-color: #0056b3; }
@@ -94,6 +95,7 @@
         .folder-quiz:hover { border-color: #6a1b9a; }
         .folder-drive:hover { border-color: #f4511e; }
         .folder-3d:hover { border-color: #e91e63; }
+        .folder-research:hover { border-color: #3949ab; }
 
         .folder-icon { font-size: 60px; margin-bottom: 20px; }
         .folder-title { font-size: 22px; font-weight: bold; margin: 0 0 10px 0; color: #1a252f; text-transform: uppercase; }
@@ -115,6 +117,7 @@
         #screen-maypho { border-top-color: #00838f; }
         #screen-safety { border-top-color: #2e7d32; }
         #screen-quiz { border-top-color: #6a1b9a; }
+        #screen-research { border-top-color: #3949ab; }
 
         .section-header {
             display: flex;
@@ -123,6 +126,8 @@
             margin-bottom: 25px;
             padding-bottom: 15px;
             border-bottom: 2px dashed #ccc;
+            flex-wrap: wrap;
+            gap: 10px;
         }
         
         .section-title { font-size: 22px; font-weight: bold; margin: 0; text-transform: uppercase; }
@@ -130,6 +135,32 @@
         #screen-maypho .section-title { color: #00838f; }
         #screen-safety .section-title { color: #2e7d32; }
         #screen-quiz .section-title { color: #6a1b9a; }
+        #screen-research .section-title { color: #3949ab; }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .external-btn {
+            background-color: #3949ab;
+            color: white;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 4px;
+            font-family: 'Segoe UI', sans-serif;
+            font-weight: bold;
+            font-size: 14px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .external-btn:hover { background-color: #283593; }
 
         .back-btn {
             background-color: #e53935;
@@ -174,6 +205,7 @@
         #screen-maypho .file-link { border-left-color: #00838f; }
         #screen-safety .file-link { border-left-color: #2e7d32; }
         #screen-quiz .file-link { border-left-color: #6a1b9a; }
+        #screen-research .file-link { border-left-color: #3949ab; }
         
         .file-link:hover {
             background-color: #e9ecef;
@@ -315,12 +347,12 @@
         <p>Chuyên Đề Máy Nhiệt Điện Mông Dương 1</p>
     </div>
 
-    <!-- MÀN HÌNH 1: HIỂN THỊ 6 THƯ MỤC -->
+    <!-- MÀN HÌNH 1: HIỂN THỊ CÁC THƯ MỤC -->
     <div id="screen-home">
         <div class="folder-card folder-maytruong" onclick="openFolder('screen-maytruong')">
             <div class="folder-icon">📚</div>
             <h2 class="folder-title">Máy Trưởng</h2>
-            <p class="folder-desc">Đáp án chuyên môn Máy trưởng (16 bài + Tổng hợp)</p>
+            <p class="folder-desc">Đáp án chuyên môn Máy trưởng (20 bài + Tổng hợp)</p>
         </div>
         
         <div class="folder-card folder-maypho" onclick="openFolder('screen-maypho')">
@@ -335,7 +367,7 @@
             <p class="folder-desc">Quy định, thủ tục PCT, BPTC an toàn (12 bài)</p>
         </div>
 
-        <!-- ĐÃ CẬP NHẬT LINK TRỰC TIẾP SANG GITHUB PAGES MÔ PHỎNG 3D -->
+        <!-- LINK TRỰC TIẾP SANG GITHUB PAGES MÔ PHỎNG 3D -->
         <a class="folder-card folder-3d" href="https://linhchinguyen2017md-ops.github.io/m-_ph-ng_3D/" target="_blank" rel="noopener noreferrer">
             <div class="folder-icon">🖥️</div>
             <h2 class="folder-title">Mô Phỏng 3D</h2>
@@ -346,6 +378,13 @@
             <div class="folder-icon">📝</div>
             <h2 class="folder-title">Trắc Nghiệm</h2>
             <p class="folder-desc">Luyện thi trắc nghiệm các chuyên đề tổng hợp</p>
+        </div>
+
+        <!-- THƯ MỤC MỚI: CHIA SẺ TÀI LIỆU NGHIÊN CỨU RIÊNG -->
+        <div class="folder-card folder-research" onclick="openFolder('screen-research')">
+            <div class="folder-icon">🔬</div>
+            <h2 class="folder-title">Tài Liệu Nghiên Cứu</h2>
+            <p class="folder-desc">Kho tài liệu chuyên sâu & nghiên cứu kỹ thuật riêng</p>
         </div>
 
         <a class="folder-card folder-drive" href="https://drive.google.com/drive/folders/1RNLyJO_PgKzgML6FNUyuJBboSq7ypu6F?usp=drive_link" target="_blank" rel="noopener noreferrer">
@@ -426,14 +465,25 @@
             <button class="back-btn" onclick="goBackToHome()">⬅ QUAY LẠI TỔNG</button>
         </div>
         <div class="list-container">
-            <!-- Đường link dẫn sang bộ thi mới chính xác, mở ở tab mới -->
             <a class="file-link highlight-incident" href="https://linhchinguyen2017md-ops.github.io/-n-luy-n-l-/" target="_blank" rel="noopener noreferrer">
                 🔥 Hệ thống Luyện Thi Trắc Nghiệm Mới (Click để chuyển trang)
             </a>
-            
-            <!-- Giữ lại các đề thi ngoài chuyên môn -->
             <a class="file-link" onclick="openDoc('antoandien.html')">Đề thi Trắc nghiệm An toàn điện</a>
             <a class="file-link" onclick="openDoc('OnTap_QTNV_VHDN_49_Cau.html')">Bộ Đề thi QTNV & VHDN (49 câu)</a>
+        </div>
+    </div>
+
+    <!-- MÀN HÌNH 2E: THƯ MỤC TÀI LIỆU NGHIÊN CỨU RIÊNG -->
+    <div id="screen-research" class="list-section">
+        <div class="section-header">
+            <h2 class="section-title">🔬 Mục: Tài Liệu Nghiên Cứu Riêng</h2>
+            <div class="header-actions">
+                <a class="external-btn" href="https://linhchinguyen2017md-ops.github.io/chiasetailieu/" target="_blank" rel="noopener noreferrer">🌐 Mở trang gốc</a>
+                <button class="back-btn" onclick="goBackToHome()">⬅ QUAY LẠI TỔNG</button>
+            </div>
+        </div>
+        <div class="list-container" id="research-list-container">
+            <!-- Tự động đồng bộ dữ liệu từ https://linhchinguyen2017md-ops.github.io/chiasetailieu/ -->
         </div>
     </div>
 
@@ -446,7 +496,6 @@
         <button id="btn-read-doc" class="tool-btn" onclick="toggleReadDoc()">🔊 ĐỌC VĂN BẢN</button>
         <button id="btn-stop-read" class="tool-btn" onclick="stopReadDoc()" disabled>⏹ DỪNG ĐỌC</button>
         
-        <!-- BỔ SUNG: KHUNG CHỌN GIỌNG ĐỌC -->
         <select id="voice-select" title="Chọn giọng đọc">
             <option value="">Đang tải giọng...</option>
         </select>
@@ -471,7 +520,9 @@
        ========================================================= */
     let currentFolderId = '';
     let isMayPhoLoaded = false;
+    let isResearchLoaded = false;
     let currentDocFile = '';   
+    const RESEARCH_BASE_URL = 'https://linhchinguyen2017md-ops.github.io/chiasetailieu/';
 
     function openFolder(folderId) {
         currentFolderId = folderId;
@@ -480,12 +531,15 @@
         document.getElementById('screen-maypho').style.display = 'none';
         document.getElementById('screen-safety').style.display = 'none';
         document.getElementById('screen-quiz').style.display = 'none';
+        document.getElementById('screen-research').style.display = 'none';
         
         document.getElementById(folderId).style.display = 'block';
         window.scrollTo(0, 0); 
 
-        if(folderId === 'screen-maypho') {
+        if (folderId === 'screen-maypho') {
             loadMayPhoQuestionsAutomatically();
+        } else if (folderId === 'screen-research') {
+            loadResearchDocsAutomatically();
         }
     }
 
@@ -494,11 +548,24 @@
         document.getElementById('screen-maypho').style.display = 'none';
         document.getElementById('screen-safety').style.display = 'none';
         document.getElementById('screen-quiz').style.display = 'none';
+        document.getElementById('screen-research').style.display = 'none';
         
         document.getElementById('screen-home').style.display = 'grid'; 
     }
 
     function openDoc(filename) {
+        // Hỗ trợ cả đường dẫn tương đối lẫn đường dẫn đầy đủ (https://...)
+        const isExternalUrl = /^https?:\/\//i.test(filename);
+
+        if (isExternalUrl) {
+            stopReadDoc();
+            currentDocFile = filename;
+            document.getElementById('doc-iframe').src = filename;
+            document.getElementById('main-wrapper').style.display = 'none';
+            document.getElementById('screen-content').style.display = 'block';
+            return;
+        }
+
         fetch(filename, { method: 'HEAD' })
             .then(response => {
                 if (response.ok) {
@@ -526,6 +593,96 @@
         document.getElementById('screen-content').style.display = 'none';
         document.getElementById('main-wrapper').style.display = 'block';
         openFolder(currentFolderId);
+    }
+
+    /* --- TỰ ĐỘNG ĐỒNG BỘ DỮ LIỆU TỪ TRANG CHIA SẺ TÀI LIỆU NGHIÊN CỨU --- */
+    function loadResearchDocsAutomatically() {
+        if (isResearchLoaded) return;
+        isResearchLoaded = true;
+
+        const container = document.getElementById('research-list-container');
+        container.innerHTML = `<div class="file-link">⏳ Đang đồng bộ danh sách tài liệu từ kho nghiên cứu...</div>`;
+
+        fetch(RESEARCH_BASE_URL)
+            .then(response => {
+                if (!response.ok) throw new Error("Không thể tải dữ liệu từ trang chia sẻ tài liệu.");
+                return response.text();
+            })
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const anchors = Array.from(doc.querySelectorAll('a[href]'));
+                
+                const seenUrls = new Set();
+                const docItems = [];
+
+                anchors.forEach(a => {
+                    const rawHref = a.getAttribute('href').trim();
+                    // Bỏ qua các neo nội bộ (#), javascript hoặc mailto
+                    if (!rawHref || rawHref.startsWith('#') || rawHref.startsWith('javascript:') || rawHref.startsWith('mailto:')) return;
+
+                    let fullUrl = '';
+                    try {
+                        fullUrl = new URL(rawHref, RESEARCH_BASE_URL).href;
+                    } catch (e) {
+                        return;
+                    }
+
+                    // Tránh trùng lặp link và không lấy lại chính trang chủ
+                    if (fullUrl === RESEARCH_BASE_URL || seenUrls.has(fullUrl)) return;
+                    seenUrls.add(fullUrl);
+
+                    let title = a.innerText.replace(/\s+/g, ' ').trim();
+                    if (!title) {
+                        title = decodeURIComponent(rawHref.split('/').pop() || rawHref);
+                    }
+
+                    docItems.push({ title, url: fullUrl, rawHref });
+                });
+
+                container.innerHTML = '';
+
+                // Luôn hiển thị thẻ mở toàn bộ giao diện kho chia sẻ tài liệu ở đầu
+                const portalLink = document.createElement('a');
+                portalLink.className = 'file-link highlight-incident';
+                portalLink.innerHTML = `📌 Mở giao diện đầy đủ Kho Chia Sẻ Tài Liệu Nghiên Cứu`;
+                portalLink.onclick = () => openDoc(RESEARCH_BASE_URL);
+                container.appendChild(portalLink);
+
+                if (docItems.length > 0) {
+                    docItems.forEach(item => {
+                        const link = document.createElement('a');
+                        link.className = 'file-link';
+                        link.textContent = item.title;
+
+                        // Nếu là file HTML cùng nguồn GitHub Pages thì mở trong trình đọc có giọng đọc; ngược lại mở tab mới
+                        const isHtml = /\.html?(\?.*)?$/i.test(item.url) || item.url.startsWith(RESEARCH_BASE_URL);
+                        if (isHtml && !/\.(pdf|docx?|xlsx?|pptx?|zip|rar)$/i.test(item.url)) {
+                            link.onclick = () => openDoc(item.url);
+                        } else {
+                            link.href = item.url;
+                            link.target = '_blank';
+                            link.rel = 'noopener noreferrer';
+                        }
+                        container.appendChild(link);
+                    });
+                } else {
+                    const infoNote = document.createElement('div');
+                    infoNote.className = 'file-link';
+                    infoNote.textContent = 'ℹ️ Chưa tìm thấy tệp liên kết lẻ nào, vui lòng bấm mục trên cùng để xem toàn bộ nội dung trang.';
+                    container.appendChild(infoNote);
+                }
+            })
+            .catch(err => {
+                container.innerHTML = `
+                    <a class="file-link highlight-incident" onclick="openDoc('${RESEARCH_BASE_URL}')">
+                        📌 Mở Kho Chia Sẻ Tài Liệu Nghiên Cứu (chiasetailieu)
+                    </a>
+                    <a class="file-link" href="${RESEARCH_BASE_URL}" target="_blank" rel="noopener noreferrer">
+                        🔗 Truy cập trực tiếp trên tab mới (${RESEARCH_BASE_URL})
+                    </a>
+                `;
+            });
     }
 
     function loadMayPhoQuestionsAutomatically() {
@@ -590,7 +747,6 @@
     let readQueue = [];          
     let cachedVoices = [];
 
-    /* --- Nạp danh sách giọng đọc và đưa vào Dropdown --- */
     function loadVoices() {
         if (!synth) return;
         cachedVoices = synth.getVoices() || [];
@@ -604,28 +760,25 @@
         }
     }
 
-    /* Hàm đưa danh sách giọng lên giao diện */
     function populateVoiceList() {
         const voiceSelect = document.getElementById('voice-select');
         if (!voiceSelect || cachedVoices.length === 0) return;
         
         let viVoices = cachedVoices.filter(v => v.lang.toLowerCase().includes('vi'));
         let otherVoices = cachedVoices.filter(v => !v.lang.toLowerCase().includes('vi'));
-        let allVoices = [...viVoices, ...otherVoices]; // Ưu tiên xếp Tiếng Việt lên trên
+        let allVoices = [...viVoices, ...otherVoices];
 
         let currentVal = voiceSelect.value;
         voiceSelect.innerHTML = '';
 
         allVoices.forEach(voice => {
             let option = document.createElement('option');
-            // Cắt bớt tên quá dài cho thanh Menu nhìn gọn gàng
             let shortName = voice.name.replace('Microsoft ', '').replace('Google ', '');
             option.textContent = shortName + ' (' + voice.lang + ')';
             option.value = voice.name;
             voiceSelect.appendChild(option);
         });
 
-        // Tự động chọn giọng Tiếng Việt đầu tiên tìm thấy nếu chưa chọn
         if (currentVal && allVoices.find(v => v.name === currentVal)) {
             voiceSelect.value = currentVal;
         } else if (viVoices.length > 0) {
@@ -805,13 +958,11 @@
         const chunk = readQueue.shift();
         const utter = new SpeechSynthesisUtterance(chunk);
 
-        /* --- XỬ LÝ LẤY GIỌNG ĐỌC TỪ MENU DROPDOWN --- */
         const voiceSelect = document.getElementById('voice-select');
         if (voiceSelect && voiceSelect.value) {
             const selectedVoice = cachedVoices.find(v => v.name === voiceSelect.value);
             if (selectedVoice) utter.voice = selectedVoice;
         } else {
-            // Backup nếu không chọn
             utter.lang = 'vi-VN';
             let v = cachedVoices.find(x => x.lang && x.lang.toLowerCase() === 'vi-vn');
             if (v) utter.voice = v;
@@ -856,7 +1007,6 @@
         const rateEl = document.getElementById('read-rate');
         const voiceEl = document.getElementById('voice-select');
         
-        // Sự kiện đổi tốc độ đọc
         if (rateEl) {
             rateEl.addEventListener('change', function () {
                 if (readState === 'reading') {
@@ -873,7 +1023,6 @@
             });
         }
 
-        // Sự kiện đổi giọng đọc
         if (voiceEl) {
             voiceEl.addEventListener('change', function () {
                 if (readState === 'reading') {
