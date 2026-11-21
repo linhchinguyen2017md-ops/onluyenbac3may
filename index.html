@@ -295,14 +295,12 @@
         #btn-read-doc:hover:not(:disabled) { background-color: #0056b3; }
         #btn-read-doc.reading { background-color: #f39c12; }
         #btn-read-doc.reading:hover { background-color: #d68910; }
-        #btn-read-doc.vieneu-ready { background-color: #2e7d32; }
-        #btn-read-doc.vieneu-ready:hover:not(:disabled) { background-color: #1b5e20; }
 
         #btn-stop-read { background-color: #616161; }
         #btn-stop-read:hover:not(:disabled) { background-color: #424242; }
 
-        /* Chọn Nguồn đọc, Tốc độ đọc & Chọn Giọng đọc */
-        #tts-mode, #read-rate, #voice-select {
+        /* Chọn Tốc độ đọc & Chọn Giọng đọc */
+        #read-rate, #voice-select {
             padding: 9px 10px;
             border: 2px solid #0073e6;
             border-radius: 4px;
@@ -314,42 +312,12 @@
             cursor: pointer;
             flex: 0 0 auto;
         }
-
-        #tts-mode {
-            border-color: #2e7d32;
-            color: #1b5e20;
-        }
         
         #voice-select {
-            max-width: 170px;
+            max-width: 220px;
             text-overflow: ellipsis;
             white-space: nowrap;
             overflow: hidden;
-        }
-
-        /* Thanh tiến trình khi phát file Audio VieNeu-TTS */
-        #audio-progress-wrap {
-            display: none;
-            align-items: center;
-            gap: 8px;
-            background: #f1f8e9;
-            border: 1px solid #a5d6a7;
-            padding: 6px 10px;
-            border-radius: 4px;
-            flex: 0 0 auto;
-        }
-
-        #audio-seek {
-            width: 120px;
-            accent-color: #2e7d32;
-            cursor: pointer;
-        }
-
-        #audio-time {
-            font-size: 12.5px;
-            font-weight: bold;
-            color: #1b5e20;
-            font-variant-numeric: tabular-nums;
         }
 
         #read-status {
@@ -361,14 +329,10 @@
             flex: 0 0 auto;
             white-space: nowrap;
         }
-        #read-status.vieneu-badge {
-            color: #2e7d32;
-        }
 
         @media (max-width: 700px) {
             .tool-btn { padding: 9px 11px; font-size: 12.5px; }
-            #tts-mode, #read-rate, #voice-select { padding: 9px 6px; font-size: 12.5px; }
-            #audio-seek { width: 85px; }
+            #read-rate, #voice-select { padding: 9px 6px; font-size: 12.5px; }
             #read-status { display: none; }
             #doc-iframe { padding-top: 60px; }
             #doc-toolbar { height: 60px; gap: 6px;}
@@ -531,16 +495,9 @@
         <button id="btn-close-doc" class="tool-btn" onclick="closeDoc()">⬅ ĐÓNG TÀI LIỆU</button>
         <button id="btn-read-doc" class="tool-btn" onclick="toggleReadDoc()">🔊 ĐỌC VĂN BẢN</button>
         <button id="btn-stop-read" class="tool-btn" onclick="stopReadDoc()" disabled>⏹ DỪNG ĐỌC</button>
-
-        <!-- Chọn nguồn giọng đọc: VieNeu-TTS MP3 hoặc Trình duyệt -->
-        <select id="tts-mode" title="Chọn nguồn giọng đọc">
-            <option value="auto" selected>✨ Tự động (Ưu tiên VieNeu)</option>
-            <option value="mp3">🎙️ VieNeu-TTS (Audio MP3)</option>
-            <option value="browser">🗣️ Giọng trình duyệt</option>
-        </select>
         
-        <select id="voice-select" title="Chọn giọng đọc trình duyệt">
-            <option value="">Đang tải giọng...</option>
+        <select id="voice-select" title="Chọn giọng đọc Hoài My / Nam Minh">
+            <option value="">Đang tải giọng Hoài My / Nam Minh...</option>
         </select>
 
         <select id="read-rate" title="Tốc độ đọc">
@@ -551,19 +508,8 @@
             <option value="1.75">1.75x</option>
             <option value="2">2.0x</option>
         </select>
-
-        <!-- Thanh tua tiến trình khi phát file VieNeu-TTS MP3 -->
-        <div id="audio-progress-wrap">
-            <input type="range" id="audio-seek" min="0" max="100" value="0" step="0.1" title="Tua giọng đọc">
-            <span id="audio-time">00:00 / 00:00</span>
-        </div>
-
         <span id="read-status"></span>
     </div>
-
-    <!-- Trình phát Audio ẩn cho VieNeu-TTS -->
-    <audio id="vieneu-audio" preload="metadata"></audio>
-
     <iframe id="doc-iframe" src=""></iframe>
 </div>
 
@@ -616,7 +562,6 @@
             document.getElementById('doc-iframe').src = filename;
             document.getElementById('main-wrapper').style.display = 'none';
             document.getElementById('screen-content').style.display = 'block';
-            checkVieNeuAudio(filename);
             return;
         }
 
@@ -628,7 +573,6 @@
                     document.getElementById('doc-iframe').src = filename;
                     document.getElementById('main-wrapper').style.display = 'none';
                     document.getElementById('screen-content').style.display = 'block';
-                    checkVieNeuAudio(filename);
                 } else {
                     throw new Error(`File "${filename}" không tồn tại hoặc chưa được tải lên (Lỗi ${response.status}).`);
                 }
@@ -790,125 +734,14 @@
     }
 
     /* =========================================================
-       PHẦN 2: HỆ THỐNG GIỌNG ĐỌC KÉP (VIENEU-TTS MP3 + TRÌNH DUYỆT)
+       PHẦN 2: ĐỌC VĂN BẢN CHUYÊN BIỆT GIỌNG HOÀI MY / NAM MINH
        ========================================================= */
     const synth = ('speechSynthesis' in window) ? window.speechSynthesis : null;
-    const vieneuAudio = document.getElementById('vieneu-audio');
-
-    let readState = 'idle';          // 'idle' | 'reading' | 'paused'
-    let activeEngine = 'browser';    // 'mp3' | 'browser'
-    let hasVieNeuAudio = false;
-    let currentAudioPath = '';
+    let readState = 'idle';      
     let readQueue = [];          
     let cachedVoices = [];
+    let hasNaturalEdgeVoices = false;
 
-    /* --- 2A. XỬ LÝ FILE AUDIO VIENEU-TTS (THƯ MỤC audio/) --- */
-    function getExpectedAudioPath(filename) {
-        if (!filename) return '';
-        let clean = filename.split('?')[0].split('#')[0];
-        clean = clean.substring(clean.lastIndexOf('/') + 1);
-        if (!clean || !/\.html?$/i.test(clean)) return '';
-        let baseName = clean.replace(/\.html?$/i, '');
-        try { baseName = decodeURIComponent(baseName); } catch (e) {}
-        return 'audio/' + baseName + '.mp3';
-    }
-
-    function checkVieNeuAudio(filename) {
-        hasVieNeuAudio = false;
-        currentAudioPath = getExpectedAudioPath(filename);
-        updateReadButtons();
-
-        if (!currentAudioPath) return;
-
-        fetch(encodeURI(currentAudioPath), { method: 'HEAD' })
-            .then(res => {
-                if (res.ok && currentDocFile === filename) {
-                    hasVieNeuAudio = true;
-                    updateReadButtons();
-                }
-            })
-            .catch(() => {
-                hasVieNeuAudio = false;
-            });
-    }
-
-    function formatTime(sec) {
-        if (!isFinite(sec) || sec < 0) return '00:00';
-        const m = Math.floor(sec / 60);
-        const s = Math.floor(sec % 60);
-        return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
-    }
-
-    function shouldUseVieNeuMp3() {
-        const modeEl = document.getElementById('tts-mode');
-        const mode = modeEl ? modeEl.value : 'auto';
-        if (mode === 'mp3') return true;
-        if (mode === 'browser') return false;
-        return hasVieNeuAudio; // chế độ 'auto'
-    }
-
-    function startVieNeuAudio() {
-        if (!hasVieNeuAudio || !currentAudioPath) {
-            const expected = currentAudioPath || 'audio/<tên-bài>.mp3';
-            alert(
-                `⚠️ CHƯA CÓ FILE GIỌNG ĐỌC VIENEU-TTS CHO BÀI NÀY!\n\n` +
-                `Hệ thống đang tìm file: "${expected}"\n\n` +
-                `• Cách thêm: Xuất file MP3 từ VieNeu-TTS, đặt đúng tên trên và tải vào thư mục audio/ trên GitHub.\n` +
-                `• Hoặc chuyển mục chọn nguồn sang "✨ Tự động" / "🗣️ Giọng trình duyệt" để nghe đọc ngay.`
-            );
-            return;
-        }
-
-        const rateEl = document.getElementById('read-rate');
-        const rate = parseFloat(rateEl && rateEl.value) || 1;
-        const encodedSrc = encodeURI(currentAudioPath);
-
-        activeEngine = 'mp3';
-        if (!vieneuAudio.src || !vieneuAudio.src.endsWith(encodedSrc)) {
-            vieneuAudio.src = encodedSrc;
-        }
-        vieneuAudio.playbackRate = rate;
-
-        vieneuAudio.play()
-            .then(() => {
-                readState = 'reading';
-                updateReadButtons();
-            })
-            .catch(err => {
-                readState = 'idle';
-                updateReadButtons();
-                alert('⚠️ Không thể phát file audio VieNeu-TTS.\nChi tiết: ' + err.message);
-            });
-    }
-
-    // Đồng bộ thanh tua thời gian cho VieNeu-TTS Audio
-    vieneuAudio.addEventListener('loadedmetadata', () => {
-        const seekEl = document.getElementById('audio-seek');
-        const timeEl = document.getElementById('audio-time');
-        if (seekEl && isFinite(vieneuAudio.duration)) {
-            seekEl.max = vieneuAudio.duration;
-            timeEl.textContent = `${formatTime(vieneuAudio.currentTime)} / ${formatTime(vieneuAudio.duration)}`;
-        }
-    });
-
-    vieneuAudio.addEventListener('timeupdate', () => {
-        if (activeEngine !== 'mp3') return;
-        const seekEl = document.getElementById('audio-seek');
-        const timeEl = document.getElementById('audio-time');
-        if (seekEl && isFinite(vieneuAudio.duration)) {
-            seekEl.max = vieneuAudio.duration;
-            seekEl.value = vieneuAudio.currentTime;
-            timeEl.textContent = `${formatTime(vieneuAudio.currentTime)} / ${formatTime(vieneuAudio.duration)}`;
-        }
-    });
-
-    vieneuAudio.addEventListener('ended', () => {
-        readState = 'idle';
-        vieneuAudio.currentTime = 0;
-        updateReadButtons();
-    });
-
-    /* --- 2B. GIỌNG ĐỌC TRÌNH DUYỆT (WEB SPEECH API) --- */
     function loadVoices() {
         if (!synth) return;
         cachedVoices = synth.getVoices() || [];
@@ -924,27 +757,60 @@
 
     function populateVoiceList() {
         const voiceSelect = document.getElementById('voice-select');
+        const status = document.getElementById('read-status');
         if (!voiceSelect || cachedVoices.length === 0) return;
-        
-        let viVoices = cachedVoices.filter(v => v.lang.toLowerCase().includes('vi'));
-        let otherVoices = cachedVoices.filter(v => !v.lang.toLowerCase().includes('vi'));
-        let allVoices = [...viVoices, ...otherVoices];
 
-        let currentVal = voiceSelect.value;
+        // Lọc riêng 2 giọng tự nhiên Hoài My & Nam Minh (Microsoft Edge Online Natural)
+        const hoaiMy = cachedVoices.find(v => v.name.toLowerCase().includes('hoaimy'));
+        const namMinh = cachedVoices.find(v => v.name.toLowerCase().includes('namminh'));
+
+        const currentVal = voiceSelect.value;
         voiceSelect.innerHTML = '';
 
-        allVoices.forEach(voice => {
-            let option = document.createElement('option');
-            let shortName = voice.name.replace('Microsoft ', '').replace('Google ', '');
-            option.textContent = shortName + ' (' + voice.lang + ')';
-            option.value = voice.name;
-            voiceSelect.appendChild(option);
-        });
+        if (hoaiMy || namMinh) {
+            hasNaturalEdgeVoices = true;
 
-        if (currentVal && allVoices.find(v => v.name === currentVal)) {
-            voiceSelect.value = currentVal;
-        } else if (viVoices.length > 0) {
-            voiceSelect.value = viVoices[0].name;
+            if (hoaiMy) {
+                const opt = document.createElement('option');
+                opt.value = hoaiMy.name;
+                opt.textContent = '👩 Hoài My (Nữ - Tự nhiên)';
+                voiceSelect.appendChild(opt);
+            }
+            if (namMinh) {
+                const opt = document.createElement('option');
+                opt.value = namMinh.name;
+                opt.textContent = '👨 Nam Minh (Nam - Tự nhiên)';
+                voiceSelect.appendChild(opt);
+            }
+
+            if (currentVal && (currentVal === (hoaiMy && hoaiMy.name) || currentVal === (namMinh && namMinh.name))) {
+                voiceSelect.value = currentVal;
+            }
+            if (readState === 'idle' && status) {
+                status.textContent = '✅ Giọng tự nhiên sẵn sàng';
+            }
+        } else {
+            // Dự phòng nếu người dùng mở bằng Chrome/Safari không có giọng Edge
+            hasNaturalEdgeVoices = false;
+            const viVoices = cachedVoices.filter(v => v.lang && v.lang.toLowerCase().includes('vi'));
+
+            if (viVoices.length > 0) {
+                viVoices.forEach(voice => {
+                    const opt = document.createElement('option');
+                    opt.value = voice.name;
+                    opt.textContent = '🗣️ ' + voice.name.replace('Google ', '').replace('Microsoft ', '') + ' (Dự phòng)';
+                    voiceSelect.appendChild(opt);
+                });
+            } else {
+                const opt = document.createElement('option');
+                opt.value = '';
+                opt.textContent = '⚠️ Mở bằng Microsoft Edge';
+                voiceSelect.appendChild(opt);
+            }
+
+            if (readState === 'idle' && status) {
+                status.textContent = '💡 Mở bằng Microsoft Edge để dùng giọng Hoài My / Nam Minh';
+            }
         }
     }
 
@@ -1027,52 +893,23 @@
         return chunks;
     }
 
-    /* --- 2C. ĐIỀU KHIỂN CHUNG (PHÁT / TẠM DỪNG / DỪNG) --- */
     function updateReadButtons() {
         const btnRead = document.getElementById('btn-read-doc');
         const btnStop = document.getElementById('btn-stop-read');
         const status  = document.getElementById('read-status');
-        const progressWrap = document.getElementById('audio-progress-wrap');
-        const voiceSelect  = document.getElementById('voice-select');
-        const useMp3 = shouldUseVieNeuMp3();
-
-        // Ẩn/hiện chọn giọng trình duyệt và thanh tua MP3 cho gọn thanh công cụ
-        if (voiceSelect) {
-            voiceSelect.style.display = useMp3 ? 'none' : 'inline-block';
-        }
-        if (progressWrap) {
-            progressWrap.style.display = (activeEngine === 'mp3' && readState !== 'idle') ? 'inline-flex' : 'none';
-        }
-
-        status.classList.remove('vieneu-badge');
-        btnRead.classList.remove('vieneu-ready');
 
         if (readState === 'idle') {
+            btnRead.textContent = '🔊 ĐỌC VĂN BẢN';
             btnRead.classList.remove('reading');
             btnStop.disabled = true;
-
-            if (useMp3 && hasVieNeuAudio) {
-                btnRead.textContent = '🎙️ NGHE VIENEU-TTS';
-                btnRead.classList.add('vieneu-ready');
-                status.textContent = '✅ Có bản đọc VieNeu-TTS';
-                status.classList.add('vieneu-badge');
-            } else if (useMp3 && !hasVieNeuAudio) {
-                btnRead.textContent = '🎙️ NGHE VIENEU-TTS';
-                status.textContent = '⚠️ Chưa có file MP3';
-            } else {
-                btnRead.textContent = '🔊 ĐỌC VĂN BẢN';
-                status.textContent = hasVieNeuAudio ? '💡 Bài này có file VieNeu-TTS' : '';
-            }
+            status.textContent = hasNaturalEdgeVoices
+                ? '✅ Giọng tự nhiên sẵn sàng'
+                : '💡 Mở bằng Microsoft Edge để dùng giọng Hoài My / Nam Minh';
         } else if (readState === 'reading') {
             btnRead.textContent = '⏸ TẠM DỪNG';
             btnRead.classList.add('reading');
             btnStop.disabled = false;
-            if (activeEngine === 'mp3') {
-                status.textContent = '🎙️ Đang phát VieNeu-TTS...';
-                status.classList.add('vieneu-badge');
-            } else {
-                status.textContent = '🔈 Đang đọc (Trình duyệt)...';
-            }
+            status.textContent = '🔈 Đang đọc...';
         } else { 
             btnRead.textContent = '▶ TIẾP TỤC';
             btnRead.classList.add('reading');
@@ -1082,49 +919,32 @@
     }
 
     function toggleReadDoc() {
-        // Nếu đang đọc hoặc tạm dừng -> điều khiển theo engine đang chạy
+        if (!synth) {
+            alert('⚠️ Trình duyệt của bạn không hỗ trợ đọc văn bản.\n\nVui lòng mở bằng Microsoft Edge để dùng giọng Hoài My / Nam Minh.');
+            return;
+        }
         if (readState === 'reading') {
-            if (activeEngine === 'mp3') {
-                vieneuAudio.pause();
-            } else if (synth) {
-                synth.pause();
-            }
+            synth.pause();
             readState = 'paused';
             updateReadButtons();
             return;
         }
-
         if (readState === 'paused') {
             readState = 'reading';
-            if (activeEngine === 'mp3') {
-                vieneuAudio.play();
-            } else if (synth) {
-                if (synth.speaking && !synth.pending) {
-                    synth.resume();
-                } else if (synth.paused) {
-                    synth.resume();
-                } else {
-                    speakNextChunk();
-                }
+            if (synth.speaking && !synth.pending) {
+                synth.resume();
+            } else if (synth.paused) {
+                synth.resume();
+            } else {
+                speakNextChunk();
             }
             updateReadButtons();
             return;
         }
-
-        // Bắt đầu đọc mới
-        if (shouldUseVieNeuMp3()) {
-            startVieNeuAudio();
-        } else {
-            if (!synth) {
-                alert('⚠️ Trình duyệt của bạn không hỗ trợ đọc văn bản (Web Speech API).\n\nVui lòng dùng Google Chrome, Microsoft Edge hoặc Cốc Cốc.');
-                return;
-            }
-            startReadDocBrowser();
-        }
+        startReadDoc();
     }
 
-    async function startReadDocBrowser() {
-        activeEngine = 'browser';
+    async function startReadDoc() {
         const btnRead = document.getElementById('btn-read-doc');
         const oldLabel = btnRead.textContent;
         btnRead.disabled = true;
@@ -1157,7 +977,7 @@
     }
 
     function speakNextChunk() {
-        if (!synth || readState === 'idle' || activeEngine !== 'browser') return;
+        if (!synth || readState === 'idle') return;
 
         if (readQueue.length === 0) {
             readState = 'idle';
@@ -1167,15 +987,17 @@
 
         const chunk = readQueue.shift();
         const utter = new SpeechSynthesisUtterance(chunk);
+        utter.lang = 'vi-VN';
 
         const voiceSelect = document.getElementById('voice-select');
         if (voiceSelect && voiceSelect.value) {
             const selectedVoice = cachedVoices.find(v => v.name === voiceSelect.value);
             if (selectedVoice) utter.voice = selectedVoice;
         } else {
-            utter.lang = 'vi-VN';
-            let v = cachedVoices.find(x => x.lang && x.lang.toLowerCase() === 'vi-vn');
-            if (v) utter.voice = v;
+            const preferred = cachedVoices.find(v => v.name.toLowerCase().includes('hoaimy'))
+                           || cachedVoices.find(v => v.name.toLowerCase().includes('namminh'))
+                           || cachedVoices.find(v => v.lang && v.lang.toLowerCase().includes('vi'));
+            if (preferred) utter.voice = preferred;
         }
 
         const rateEl = document.getElementById('read-rate');
@@ -1184,14 +1006,14 @@
         utter.volume = 1;
 
         utter.onend = function () {
-            if (readState === 'reading' && activeEngine === 'browser') {
+            if (readState === 'reading') {
                 speakNextChunk();
             }
         };
 
         utter.onerror = function (e) {
             if (e && (e.error === 'interrupted' || e.error === 'canceled')) return;
-            if (readState === 'reading' && activeEngine === 'browser') {
+            if (readState === 'reading') {
                 speakNextChunk();
             }
         };
@@ -1207,68 +1029,24 @@
     function stopReadDoc() {
         readState = 'idle';
         readQueue = [];
-
-        // Dừng giọng đọc trình duyệt
         if (synth) {
             try { synth.cancel(); } catch (e) { }
         }
-
-        // Dừng file audio VieNeu-TTS
-        if (vieneuAudio) {
-            try {
-                vieneuAudio.pause();
-                vieneuAudio.currentTime = 0;
-            } catch (e) { }
-        }
-
-        const seekEl = document.getElementById('audio-seek');
-        const timeEl = document.getElementById('audio-time');
-        if (seekEl) seekEl.value = 0;
-        if (timeEl) timeEl.textContent = '00:00 / 00:00';
-
         updateReadButtons();
     }
 
     document.addEventListener('DOMContentLoaded', function () {
         const rateEl = document.getElementById('read-rate');
         const voiceEl = document.getElementById('voice-select');
-        const modeEl = document.getElementById('tts-mode');
-        const seekEl = document.getElementById('audio-seek');
-
-        if (modeEl) {
-            modeEl.addEventListener('change', function () {
-                stopReadDoc();
-                updateReadButtons();
-            });
-        }
-
-        if (seekEl) {
-            seekEl.addEventListener('input', function () {
-                if (activeEngine === 'mp3' && isFinite(vieneuAudio.duration)) {
-                    vieneuAudio.currentTime = parseFloat(seekEl.value) || 0;
-                }
-            });
-        }
         
         if (rateEl) {
             rateEl.addEventListener('change', function () {
-                const newRate = parseFloat(rateEl.value) || 1;
-                if (activeEngine === 'mp3') {
-                    vieneuAudio.playbackRate = newRate;
-                }
                 if (readState === 'reading') {
                     const status = document.getElementById('read-status');
                     if (status) {
-                        const old = status.textContent;
-                        status.textContent = '⚡ Đã đổi tốc độ ' + rateEl.value + 'x';
+                        status.textContent = '⚡ Đã đổi tốc độ ' + rateEl.value + 'x (áp dụng câu tiếp theo)';
                         setTimeout(() => {
-                            if (readState === 'reading') {
-                                status.textContent = activeEngine === 'mp3'
-                                    ? '🎙️ Đang phát VieNeu-TTS...'
-                                    : '🔈 Đang đọc (Trình duyệt)...';
-                            } else {
-                                status.textContent = old;
-                            }
+                            if (readState === 'reading') status.textContent = '🔈 Đang đọc...';
                         }, 1500);
                     }
                 }
@@ -1277,14 +1055,12 @@
 
         if (voiceEl) {
             voiceEl.addEventListener('change', function () {
-                if (readState === 'reading' && activeEngine === 'browser') {
+                if (readState === 'reading') {
                     const status = document.getElementById('read-status');
                     if (status) {
-                        const old = status.textContent;
                         status.textContent = '🗣️ Đã đổi giọng đọc (áp dụng câu tiếp theo)';
                         setTimeout(() => {
-                            if (readState === 'reading') status.textContent = '🔈 Đang đọc (Trình duyệt)...';
-                            else status.textContent = old;
+                            if (readState === 'reading') status.textContent = '🔈 Đang đọc...';
                         }, 2000);
                     }
                 }
@@ -1296,7 +1072,6 @@
 
     window.addEventListener('beforeunload', function () {
         if (synth) { try { synth.cancel(); } catch (e) {} }
-        if (vieneuAudio) { try { vieneuAudio.pause(); } catch (e) {} }
     });
 </script>
 
