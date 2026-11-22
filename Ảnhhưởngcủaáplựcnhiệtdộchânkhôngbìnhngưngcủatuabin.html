@@ -3,368 +3,179 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ảnh hưởng của áp lực, nhiệt độ hơi mới và chân không bình ngưng đến tuabin hơi</title>
+<title>Ảnh hưởng của P₀, T₀ và áp suất bình ngưng P_k đến tuabin hơi</title>
 <style>
-  :root{
-    --primary: #0b5394;
-    --primary-light: #e8f0fb;
-    --accent: #c0392b;
-    --border: #d0d7de;
-    --bg: #f7f9fc;
-    --text: #1f2328;
-    --muted: #57606a;
-  }
-  *{box-sizing: border-box;}
-  body{
-    margin: 0;
-    font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    line-height: 1.65;
-    font-size: 16px;
-  }
-  .container{
-    max-width: 980px;
-    margin: 0 auto;
-    padding: 40px 24px 80px;
-  }
-  header{
-    background: linear-gradient(135deg, #0b5394 0%, #1a73c9 100%);
-    color: #fff;
-    padding: 40px 24px;
-    text-align: center;
-    border-radius: 12px;
-    margin-bottom: 32px;
-    box-shadow: 0 6px 20px rgba(11,83,148,0.25);
-  }
-  header h1{
-    margin: 0 0 10px;
-    font-size: 1.9rem;
-    line-height: 1.3;
-  }
-  header p{
-    margin: 0;
-    opacity: 0.92;
-    font-size: 1rem;
-  }
-  h2{
-    color: var(--primary);
-    border-left: 5px solid var(--primary);
-    padding-left: 14px;
-    margin-top: 42px;
-    margin-bottom: 16px;
-    font-size: 1.4rem;
-  }
-  h3{
-    color: #1a4d80;
-    margin-top: 24px;
-    margin-bottom: 10px;
-    font-size: 1.12rem;
-  }
-  p{margin: 10px 0;}
-  ul{margin: 8px 0 12px; padding-left: 22px;}
-  li{margin: 6px 0;}
-  code{
-    background: #eef2f7;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-family: "Consolas", "Courier New", monospace;
-    font-size: 0.94em;
-    color: #b83280;
-  }
-  .formula{
-    background: #fff;
-    border: 1px solid var(--border);
-    border-left: 4px solid var(--primary);
-    padding: 14px 18px;
-    border-radius: 6px;
-    margin: 16px 0;
-    text-align: center;
-    font-family: "Cambria Math", "Times New Roman", serif;
-    font-size: 1.15rem;
-    color: #0b3d6b;
-    overflow-x: auto;
-  }
-  .callout{
-    background: var(--primary-light);
-    border-left: 4px solid var(--primary);
-    padding: 14px 18px;
-    border-radius: 6px;
-    margin: 18px 0;
-  }
-  .callout.warning{
-    background: #fdecea;
-    border-left-color: var(--accent);
-  }
-  .callout.note{
-    background: #fff8e1;
-    border-left-color: #f39c12;
-  }
-  table{
-    width: 100%;
-    border-collapse: collapse;
-    margin: 20px 0;
-    background: #fff;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-    font-size: 0.95rem;
-  }
-  thead{
-    background: var(--primary);
-    color: #fff;
-  }
-  th, td{
-    padding: 12px 14px;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
-    vertical-align: top;
-  }
-  tbody tr:nth-child(even){background: #f4f7fb;}
-  tbody tr:hover{background: #e8f0fb;}
-  th{font-weight: 600;}
-  .section-card{
-    background: #fff;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 20px 24px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  }
-  .badge{
-    display: inline-block;
-    background: var(--primary);
-    color: #fff;
-    padding: 3px 10px;
-    border-radius: 12px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    margin-right: 8px;
-  }
-  .badge.inc{background: #27ae60;}
-  .badge.dec{background: #c0392b;}
-  footer{
-    margin-top: 50px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border);
-    text-align: center;
-    color: var(--muted);
-    font-size: 0.9rem;
-  }
-  @media(max-width: 640px){
-    header h1{font-size: 1.4rem;}
-    h2{font-size: 1.2rem;}
-    table{font-size: 0.85rem;}
-    th, td{padding: 9px 10px;}
-  }
+:root{--p:#0b5394;--pl:#e8f0fb;--ac:#c0392b;--bd:#d0d7de;--bg:#f7f9fc;--tx:#1f2328;--mu:#57606a}
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.65 "Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--tx)}
+.c{max-width:980px;margin:0 auto;padding:40px 24px 80px}
+header{background:linear-gradient(135deg,#0b5394,#1a73c9);color:#fff;padding:36px 24px;text-align:center;border-radius:12px;margin-bottom:28px}
+header h1{margin:0 0 8px;font-size:1.8rem;line-height:1.3}header p{margin:0;opacity:.92}
+h2{color:var(--p);border-left:5px solid var(--p);padding-left:14px;margin:40px 0 14px;font-size:1.4rem}
+h3{color:#1a4d80;margin:22px 0 8px;font-size:1.1rem}
+ul{padding-left:22px;margin:8px 0}li{margin:6px 0}
+code{background:#eef2f7;padding:2px 6px;border-radius:4px;font-family:Consolas,monospace;color:#b83280;font-size:.94em}
+.f{background:#fff;border:1px solid var(--bd);border-left:4px solid var(--p);padding:12px 18px;border-radius:6px;margin:14px 0;text-align:center;font:1.12rem "Cambria Math","Times New Roman",serif;color:#0b3d6b;overflow-x:auto}
+.co{background:var(--pl);border-left:4px solid var(--p);padding:14px 18px;border-radius:6px;margin:16px 0}
+.co.n{background:#fff8e1;border-left-color:#f39c12}
+.co.w{background:#fdecea;border-left-color:var(--ac)}
+.card{background:#fff;border:1px solid var(--bd);border-radius:10px;padding:20px 24px;margin-bottom:18px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.b{display:inline-block;color:#fff;padding:2px 10px;border-radius:12px;font-size:.8rem;font-weight:600;margin-right:6px;background:#27ae60}
+.b.d{background:#c0392b}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;margin:16px 0;background:#fff;font-size:.93rem;min-width:620px}
+thead{background:var(--p);color:#fff}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--bd);vertical-align:top}
+tbody tr:nth-child(even){background:#f4f7fb}
+footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--bd);text-align:center;color:var(--mu);font-size:.9rem}
+@media(max-width:640px){header h1{font-size:1.35rem}h2{font-size:1.2rem}}
 </style>
 </head>
 <body>
-<div class="container">
+<div class="c">
+<header>
+<h1>Ảnh hưởng của áp suất hơi mới, nhiệt độ hơi mới và áp suất bình ngưng đến vận hành và hiệu suất tuabin hơi</h1>
+<p>Phân tích nhiệt – cơ – hiệu suất theo chu trình Rankine (bản hiệu chỉnh)</p>
+</header>
 
-  <header>
-    <h1>Ảnh hưởng của áp lực, nhiệt độ hơi mới và chân không bình ngưng đến quá trình vận hành và hiệu suất tuabin hơi</h1>
-    <p>Phân tích nhiệt – cơ – hiệu suất cho tuabin hơi theo chu trình Rankine</p>
-  </header>
+<section><h2>1. Khái quát và cơ sở nhiệt động</h2>
+<div class="card">
+<p>Tuabin hơi làm việc theo chu trình Rankine. Cần phân biệt rõ trạng thái cuối giãn nở <strong>đẳng entropi</strong> (h<sub>ks</sub>) và trạng thái <strong>thực</strong> (h<sub>k</sub>):</p>
+<div class="f">h<sub>k</sub> = h₀ − η<sub>oi</sub>·(h₀ − h<sub>ks</sub>)</div>
+<div class="f">P = ṁ · (h₀ − h<sub>ks</sub>) · η<sub>oi</sub> · η<sub>cơ</sub> · η<sub>g</sub></div>
+<div class="f">η<sub>t</sub> = [(h₀ − h<sub>ks</sub>) − w<sub>b</sub>] / (h₀ − h'<sub>k</sub> − w<sub>b</sub>) ≈ 1 − T̄₂ / T̄₁</div>
+<ul>
+<li><code>P₀, T₀</code>: áp suất và nhiệt độ hơi mới trước van chặn.</li>
+<li><code>P_k</code>: áp suất tuyệt đối trong bình ngưng (độ chân không = P<sub>khí quyển</sub> − P_k).</li>
+<li><code>η_oi</code>: hiệu suất nội tương đối; <code>w_b</code>: công bơm nước ngưng; <code>h'_k</code>: entanpi nước ngưng bão hòa.</li>
+<li><code>T̄₁, T̄₂</code>: nhiệt độ trung bình của quá trình cấp nhiệt và thải nhiệt.</li>
+</ul>
+<p>Lưu ý: công thức công suất dùng độ giáng entanpi <em>đẳng entropi</em> nhân η<sub>oi</sub>; không nhân η<sub>oi</sub> với độ giáng entanpi thực vì sẽ đếm hai lần tổn thất.</p>
+<div class="co">Ba thông số P₀, T₀, P_k ảnh hưởng đồng thời đến <strong>công suất</strong>, <strong>hiệu suất</strong>, <strong>độ ẩm cuối</strong>, <strong>an toàn</strong> và <strong>tuổi thọ</strong> thiết bị.</div>
+</div></section>
 
-  <!-- 1 -->
-  <section>
-    <h2>1. Khái quát chung</h2>
-    <div class="section-card">
-      <p>Tuabin hơi làm việc theo chu trình Rankine. Công suất và hiệu suất của tuabin phụ thuộc chủ yếu vào entanpi hơi vào, entanpi hơi ra và tổn thất trong quá trình giãn nở:</p>
+<section><h2>2. Ảnh hưởng của áp suất hơi mới P₀</h2>
+<div class="card">
+<h3>2.1. Đến vận hành</h3>
+<p>Với tầng/nhóm tầng làm việc ở chế độ dưới tới hạn, lưu lượng theo phương trình Stodola:</p>
+<div class="f">ṁ ∝ √(P₀² − P₂²)  (T₀ không đổi)</div>
+<p>Do đó áp suất các tầng gần như tỷ lệ với lưu lượng, và <strong>áp suất tầng điều chỉnh là chỉ thị tải đáng tin cậy</strong>.</p>
+<ul>
+<li><span class="b">Tăng P₀</span>
+<ul>
+<li>Lưu lượng qua tuabin tăng nếu độ mở van không đổi; áp suất các tầng, lực dọc trục, ứng suất thân vỏ và cánh tăng.</li>
+<li>Tăng nguy cơ quá tải cánh, rung động, hư hỏng ổ chặn.</li>
+<li><strong>Độ ẩm cuối tăng</strong> nếu T₀ không đổi: s₀ giảm khi P₀ tăng, điểm đầu giãn nở dịch về vùng entropi thấp, đường giãn nở đẳng entropi kết thúc ở độ khô x thấp hơn (độ quá nhiệt giảm chỉ là hệ quả).</li>
+</ul></li>
+<li><span class="b d">Giảm P₀</span>
+<ul>
+<li>Công suất giảm; để giữ tải phải mở van rộng hơn.</li>
+<li>Lưu lượng thể tích hơi qua tầng cuối tăng, có thể quá tải tầng cuối.</li>
+<li>Tổn thất tiết lưu tăng và lệch khỏi điểm thiết kế.</li>
+</ul></li>
+</ul>
+<h3>2.2. Đến hiệu suất</h3>
+<ul>
+<li>Trong giới hạn cho phép, tăng P₀ nâng T̄₁ → <strong>tăng hiệu suất chu trình</strong>.</li>
+<li>Nếu tăng P₀ mà không tăng T₀ hoặc không có hâm nóng trung gian, độ ẩm cuối tăng → tổn thất ẩm tăng, <strong>giảm η<sub>oi</sub></strong> và xói mòn cánh.</li>
+<li><strong>Vận hành trượt áp</strong> ở tải thấp giảm tổn thất tiết lưu, đồng thời giữ nhiệt độ kim loại ổn định hơn.</li>
+</ul>
+<div class="co n"><strong>Quy tắc kinh nghiệm (Baumann):</strong> độ ẩm cuối cho phép khoảng 10–12 % (x ≥ 0,88–0,90); mỗi 1 % ẩm tăng thêm làm giảm hiệu suất tầng khoảng 1 % và đẩy nhanh xói mòn.</div>
+</div></section>
 
-      <div class="formula">
-        P = ṁ · (h₀ − h<sub>k</sub>) · η<sub>td</sub> · η<sub>g</sub>
-      </div>
-      <div class="formula">
-        η<sub>chu trình</sub> ≈ (h₀ − h<sub>k</sub>) / (h₀ − h'<sub>k</sub>)
-      </div>
+<section><h2>3. Ảnh hưởng của nhiệt độ hơi mới T₀</h2>
+<div class="card">
+<h3>3.1. Đến vận hành</h3>
+<ul>
+<li><span class="b">Tăng T₀</span>
+<ul>
+<li>Entanpi hơi vào tăng, công sinh ra tăng, độ ẩm cuối giảm.</li>
+<li>Nhiệt độ kim loại, giãn nở nhiệt và ứng suất nhiệt tăng; nguy cơ creep, oxy hóa, giảm tuổi thọ.</li>
+<li>Bị giới hạn bởi vật liệu thân, van, cánh và đường ống.</li>
+</ul></li>
+<li><span class="b d">Giảm T₀</span>
+<ul>
+<li>Entanpi giảm, công suất giảm; độ ẩm cuối tăng, xói mòn cánh tầng cuối.</li>
+<li>Giảm nhanh gây sốc nhiệt, chênh lệch giãn nở; cần giảm tải/ngừng máy theo quy trình.</li>
+</ul></li>
+</ul>
+<h3>3.2. Đến hiệu suất</h3>
+<ul>
+<li>Hiệu suất Carnot chỉ phụ thuộc T<sub>max</sub> và T<sub>min</sub>; còn hiệu suất Rankine phụ thuộc <strong>nhiệt độ cấp nhiệt trung bình T̄₁</strong>. Tăng T₀ nâng T̄₁ nên tăng hiệu suất và giảm độ ẩm cuối.</li>
+<li>Giảm T₀ làm giảm hiệu suất, tăng suất tiêu hao nhiệt và tổn thất ẩm.</li>
+<li>T₀ nhạy với an toàn thiết bị nên thường giữ ổn định ở định mức.</li>
+</ul>
+</div></section>
 
-      <p>Trong đó:</p>
-      <ul>
-        <li><code>P₀, T₀</code>: áp lực và nhiệt độ hơi mới.</li>
-        <li><code>P_k</code>: áp suất bình ngưng, đặc trưng bởi chân không.</li>
-        <li><code>h₀, h_k</code>: entanpi hơi vào và hơi thải.</li>
-        <li><code>η_td</code>: hiệu suất tuabin.</li>
-      </ul>
+<section><h2>4. Ảnh hưởng của áp suất bình ngưng P_k (độ chân không)</h2>
+<div class="card">
+<p>Quy ước: <strong>chân không sâu hơn = P_k giảm</strong>.</p>
+<h3>4.1. Đến vận hành</h3>
+<ul>
+<li><span class="b">Chân không sâu hơn (P_k giảm)</span>
+<ul>
+<li>Nhiệt độ ngưng tụ giảm, độ giáng entanpi tăng, công suất tăng.</li>
+<li>Độ ẩm cuối tăng; thể tích riêng hơi thải lớn, tầng cuối chịu tải nặng, dễ rung và xói mòn.</li>
+<li><strong>Giới hạn tầng cuối:</strong> khi P_k giảm tới áp suất giới hạn, dòng hơi ở dãy cánh cuối đạt tốc độ âm (nghẽn). Dưới ngưỡng này, công không tăng thêm dù chân không sâu hơn.</li>
+<li>Ít rủi ro nhiệt cho ống thải hơn so với chân không xấu.</li>
+</ul></li>
+<li><span class="b d">Chân không xấu đi (P_k tăng)</span>
+<ul>
+<li>Công suất giảm; nhiệt độ hơi thải tăng, ống thải và bệ đỡ giãn nở, biến dạng, có nguy cơ lệch tâm trục, rung và ngắt bảo vệ.</li>
+<li>Không khí lọt vào làm tăng P_k, giảm truyền nhiệt bình ngưng, tăng oxy hòa tan gây ăn mòn.</li>
+<li>Ở tải rất thấp, ma sát gió (windage) tầng cuối gây tăng nhiệt độ hơi thải.</li>
+</ul></li>
+</ul>
+<h3>4.2. Đến hiệu suất</h3>
+<ul>
+<li>Giảm P_k làm giảm T̄₂ → <strong>tăng hiệu suất chu trình</strong>, giảm nhiệt tiêu hao.</li>
+<li><strong>Tổn thất tốc độ thoát</strong> (leaving loss) tăng theo lưu lượng thể tích hơi thải, tạo cực tiểu trong đường cong tổng tổn thất. Đây là cơ sở của khái niệm chân không tối ưu.</li>
+<li>Cải thiện chân không quá mức đòi hỏi tăng công bơm tuần hoàn, ejector/bơm chân không, quạt → <strong>tồn tại chân không tối ưu kinh tế</strong>, phụ thuộc nhiệt độ nước làm mát, lưu lượng và tình trạng bình ngưng.</li>
+<li>Ở tải thấp, chân không quá sâu có thể gây tách dòng và rung cánh tầng cuối.</li>
+</ul>
+</div></section>
 
-      <div class="callout">
-        Ba thông số này ảnh hưởng đồng thời đến <strong>công suất</strong>, <strong>hiệu suất</strong>, <strong>độ an toàn</strong> và <strong>tuổi thọ thiết bị</strong>.
-      </div>
-    </div>
-  </section>
+<section><h2>5. Bảng tóm tắt ảnh hưởng</h2>
+<div class="tw"><table>
+<thead><tr><th>Thông số</th><th>Khi tăng</th><th>Khi giảm</th><th>Ảnh hưởng hiệu suất</th><th>Giới hạn chính</th></tr></thead>
+<tbody>
+<tr><td><strong>P₀</strong></td><td>Tăng công, tăng áp suất tầng và lực dọc trục, tăng độ ẩm cuối (T₀ không đổi)</td><td>Giảm công, tăng tổn thất tiết lưu</td><td>Tăng η chu trình trong giới hạn; giảm η<sub>oi</sub> nếu ẩm quá mức</td><td>Ứng suất, rung, xói mòn</td></tr>
+<tr><td><strong>T₀</strong></td><td>Tăng entanpi, giảm độ ẩm cuối</td><td>Giảm công, tăng độ ẩm, sốc nhiệt</td><td>Tăng hiệu suất khi T₀ tăng</td><td>Creep, oxy hóa, giãn nở</td></tr>
+<tr><td><strong>P_k</strong> (tuyệt đối)</td><td>Giảm công, nóng ống thải và thân</td><td>Tăng công, tăng độ ẩm cuối</td><td>Giảm P_k (chân không sâu hơn) làm tăng hiệu suất</td><td>Nghẽn tầng cuối, tổn thất thoát, chi phí phụ trợ</td></tr>
+</tbody></table></div>
+</section>
 
-  <!-- 2 -->
-  <section>
-    <h2>2. Ảnh hưởng của áp lực hơi mới P₀</h2>
+<section><h2>6. Độ nhạy định lượng (bậc độ lớn tham khảo)</h2>
+<div class="card">
+<ul>
+<li>Tăng P₀ khoảng 1 MPa: suất tiêu hao nhiệt giảm khoảng 0,2–0,3 %.</li>
+<li>Tăng T₀ 10 °C: suất tiêu hao nhiệt giảm khoảng 0,25–0,3 %.</li>
+<li>Tăng chân không 1 kPa (P_k giảm 1 kPa): công suất tăng khoảng 1–1,5 %, tùy loại tuabin.</li>
+</ul>
+<div class="co w"><strong>Cảnh báo:</strong> các số trên chỉ để ước lượng. Khi tính toán và nghiệm thu phải dùng <strong>đường cong hiệu chỉnh của nhà chế tạo</strong> (theo P₀, T₀, P_k) và phương pháp thử theo ASME PTC 6.</div>
+</div></section>
 
-    <div class="section-card">
-      <h3>2.1. Đến quá trình vận hành</h3>
-      <ul>
-        <li><span class="badge inc">Tăng P₀</span>
-          <ul>
-            <li>Mật độ hơi tăng, lưu lượng qua tuabin tăng nếu độ mở van không đổi.</li>
-            <li>Áp suất các tầng tăng, lực dọc trục tăng, ứng suất thân vỏ và cánh tăng.</li>
-            <li>Dễ gây rung động, quá tải cánh tầng cuối và tăng nguy cơ hư hỏng ổ trục.</li>
-            <li>Nhiệt độ bão hòa tăng, nếu giữ T₀ không đổi thì độ quá nhiệt giảm, hơi cuối ẩm hơn → xói mòn cánh.</li>
-          </ul>
-        </li>
-        <li><span class="badge dec">Giảm P₀</span>
-          <ul>
-            <li>Công suất giảm, phải mở van lớn hơn để giữ tải.</li>
-            <li>Lưu lượng thể tích tăng, có thể quá tải tầng cuối.</li>
-            <li>Hiệu suất giảm do tổn thất tiết lưu và lệch khỏi điểm thiết kế.</li>
-          </ul>
-        </li>
-      </ul>
+<section><h2>7. Tương tác, reheat, hồi nhiệt và vận hành tối ưu</h2>
+<div class="card">
+<ul>
+<li><strong>Hâm nóng trung gian (reheat):</strong> giải pháp chính để tăng P₀ mà vẫn giữ độ ẩm cuối trong giới hạn.</li>
+<li><strong>Gia nhiệt hồi nhiệt:</strong> thay đổi P₀, T₀ làm đổi áp suất các cửa trích và nhiệt độ nước cấp, ảnh hưởng heat rate toàn nhà máy và hiệu suất lò hơi.</li>
+<li>Chân không sâu làm tăng độ ẩm cuối, nên cần phối hợp với T₀.</li>
+<li>Giới hạn lệch thông số thường gặp: P₀ khoảng +5 %/−10 %, T₀ khoảng +5…+10 °C so với định mức trong thời gian giới hạn; ngưỡng cảnh báo/ngắt chân không theo quy trình nhà chế tạo.</li>
+<li>Theo dõi: nhiệt độ hơi thải, độ ẩm cuối, rung, lực dọc trục, độ giãn nở, áp suất tầng, nhiệt độ kim loại.</li>
+<li>Vận hành tối ưu: giữ T₀ định mức, điều chỉnh P₀ theo trượt áp, duy trì P_k ở giá trị tối ưu kinh tế.</li>
+</ul>
+<div class="co n"><strong>Lưu ý:</strong> điểm tối ưu không phải điểm có hiệu suất tuabin cao nhất, mà là điểm cân bằng giữa hiệu suất, an toàn thiết bị và chi phí phụ trợ.</div>
+</div></section>
 
-      <h3>2.2. Đến hiệu suất</h3>
-      <ul>
-        <li>Trong giới hạn cho phép, tăng P₀ làm tăng nhiệt độ trung bình cấp nhiệt → <strong>tăng hiệu suất chu trình Rankine</strong>.</li>
-        <li>Nếu tăng quá cao mà không tăng T₀ hoặc không có quá nhiệt trung gian, độ ẩm cuối tăng, tổn thất ẩm tăng → <strong>giảm hiệu suất tuabin</strong> và tăng xói mòn.</li>
-        <li>Vận hành <strong>trượt áp suất</strong> ở tải thấp giúp giảm tổn thất tiết lưu, cải thiện hiệu suất.</li>
-      </ul>
-    </div>
-  </section>
+<section><h2>8. Kết luận</h2>
+<div class="card"><ul>
+<li>Tăng <strong>P₀</strong> và <strong>T₀</strong> trong giới hạn nâng hiệu suất chu trình (nhờ T̄₁ tăng), nhưng bị giới hạn bởi vật liệu, độ ẩm cuối và an toàn.</li>
+<li>Chân không sâu (P_k thấp) tăng công suất và hiệu suất, nhưng bị chặn bởi nghẽn tầng cuối, tổn thất tốc độ thoát và chi phí phụ trợ.</li>
+<li>Vận hành hiệu quả đòi hỏi phối hợp ba thông số trong dải thiết kế, đối chiếu đường cong hiệu chỉnh và giám sát chặt thông số nhiệt – cơ – rung động.</li>
+</ul></div></section>
 
-  <!-- 3 -->
-  <section>
-    <h2>3. Ảnh hưởng của nhiệt độ hơi mới T₀</h2>
-
-    <div class="section-card">
-      <h3>3.1. Đến quá trình vận hành</h3>
-      <ul>
-        <li><span class="badge inc">Tăng T₀</span>
-          <ul>
-            <li>Entanpi hơi vào tăng, công sinh ra tăng.</li>
-            <li>Nhiệt độ kim loại, độ giãn nở nhiệt và ứng suất nhiệt tăng.</li>
-            <li>Dễ gây creep, oxy hóa, biến dạng và giảm tuổi thọ vật liệu.</li>
-            <li>Cần giới hạn theo vật liệu thân, van, cánh và đường ống.</li>
-          </ul>
-        </li>
-        <li><span class="badge dec">Giảm T₀</span>
-          <ul>
-            <li>Entanpi giảm, công suất giảm.</li>
-            <li>Độ ẩm cuối tăng, gây xói mòn cánh tầng cuối.</li>
-            <li>Có thể phải giảm tải để bảo vệ tuabin.</li>
-          </ul>
-        </li>
-      </ul>
-
-      <h3>3.2. Đến hiệu suất</h3>
-      <ul>
-        <li>Tăng T₀ làm tăng độ giáng entanpi lý thuyết, tăng hiệu suất Carnot/Rankine và <strong>giảm độ ẩm cuối</strong>.</li>
-        <li>Giảm T₀ làm giảm hiệu suất, tăng suất tiêu hao nhiên liệu và tăng tổn thất ẩm.</li>
-        <li>T₀ là thông số rất nhạy với an toàn thiết bị, nên thường được giữ ổn định ở giá trị định mức.</li>
-      </ul>
-    </div>
-  </section>
-
-  <!-- 4 -->
-  <section>
-    <h2>4. Ảnh hưởng của chân không bình ngưng P_k</h2>
-
-    <div class="section-card">
-      <h3>4.1. Đến quá trình vận hành</h3>
-      <ul>
-        <li><span class="badge inc">Chân không tốt (P_k thấp)</span>
-          <ul>
-            <li>Nhiệt độ ngưng tụ giảm, độ giáng entanpi tăng, công suất tăng.</li>
-            <li>Nhưng độ ẩm cuối tăng, thể tích hơi thải lớn, tầng cuối chịu tải nặng, dễ rung và xói mòn.</li>
-            <li>Nhiệt độ hơi thải thấp, cần kiểm soát giãn nở thân tuabin.</li>
-          </ul>
-        </li>
-        <li><span class="badge dec">Chân không xấu (P_k cao)</span>
-          <ul>
-            <li>Công suất giảm, nhiệt độ hơi thải tăng.</li>
-            <li>Thân tuabin nóng, giãn nở không đều, rung động, có thể trip bảo vệ.</li>
-            <li>Không khí lọt vào bình ngưng làm tăng P_k, giảm truyền nhiệt, tăng oxy hòa tan gây ăn mòn.</li>
-          </ul>
-        </li>
-      </ul>
-
-      <h3>4.2. Đến hiệu suất</h3>
-      <ul>
-        <li>Chân không sâu trong giới hạn làm giảm nhiệt độ ngưng tụ, <strong>tăng hiệu suất chu trình</strong>, giảm nhiệt tiêu hao.</li>
-        <li>Cải thiện chân không quá mức cần tăng công bơm nước tuần hoàn, ejector, quạt gió → có thể không kinh tế.</li>
-        <li>Tồn tại <strong>chân không tối ưu kinh tế</strong>, phụ thuộc nhiệt độ nước làm mát, lưu lượng và tình trạng thiết bị.</li>
-      </ul>
-    </div>
-  </section>
-
-  <!-- 5 -->
-  <section>
-    <h2>5. Bảng tóm tắt ảnh hưởng</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Thông số</th>
-          <th>Tăng</th>
-          <th>Giảm</th>
-          <th>Ảnh hưởng hiệu suất</th>
-          <th>Giới hạn chính</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><strong>Áp lực hơi mới P₀</strong></td>
-          <td>Tăng công, tăng áp suất tầng, tăng lực dọc trục</td>
-          <td>Giảm công, tăng tổn thất tiết lưu</td>
-          <td>Tăng trong giới hạn, nhưng tăng độ ẩm cuối</td>
-          <td>Ứng suất, rung, xói mòn</td>
-        </tr>
-        <tr>
-          <td><strong>Nhiệt độ hơi mới T₀</strong></td>
-          <td>Tăng entanpi, giảm độ ẩm cuối</td>
-          <td>Giảm công, tăng độ ẩm</td>
-          <td>Tăng hiệu suất</td>
-          <td>Creep, oxy hóa, giãn nở</td>
-        </tr>
-        <tr>
-          <td><strong>Chân không bình ngưng P_k</strong></td>
-          <td>Giảm công, nóng thân tuabin</td>
-          <td>Tăng công, tăng hiệu suất</td>
-          <td>Chân không sâu tăng hiệu suất</td>
-          <td>Độ ẩm cuối, tải tầng cuối, chi phí phụ trợ</td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
-
-  <!-- 6 -->
-  <section>
-    <h2>6. Tương tác và vận hành tối ưu</h2>
-    <div class="section-card">
-      <p>Ba thông số này không độc lập mà tác động qua lại:</p>
-      <ul>
-        <li>Tăng P₀ và T₀ có thể nâng cao hiệu suất nhưng phải kiểm soát độ ẩm cuối.</li>
-        <li>Chân không càng sâu càng làm độ ẩm cuối tăng, nên cần phối hợp với nhiệt độ hơi mới.</li>
-        <li>Cần theo dõi: nhiệt độ hơi thải, độ ẩm, rung, lực dọc trục, độ giãn nở, áp suất tầng, nhiệt độ kim loại.</li>
-        <li>Vận hành tối ưu là giữ T₀ định mức, điều chỉnh P₀ theo chế độ trượt áp suất, và duy trì P_k ở giá trị tối ưu kinh tế.</li>
-      </ul>
-
-      <div class="callout note">
-        <strong>Lưu ý:</strong> Điểm vận hành tối ưu không phải là điểm có hiệu suất tuabin cao nhất, mà là điểm cân bằng giữa hiệu suất, an toàn thiết bị và chi phí phụ trợ.
-      </div>
-    </div>
-  </section>
-
-  <!-- 7 -->
-  <section>
-    <h2>7. Kết luận</h2>
-    <div class="section-card">
-      <ul>
-        <li><strong>Áp lực hơi mới</strong> và <strong>nhiệt độ hơi mới</strong> tăng trong giới hạn sẽ nâng cao hiệu suất chu trình, nhưng bị giới hạn bởi vật liệu, độ ẩm cuối và an toàn tuabin.</li>
-        <li><strong>Chân không bình ngưng</strong> tốt giúp tăng công suất và hiệu suất, nhưng phải cân bằng với tải tầng cuối, chi phí phụ trợ và điều kiện nước làm mát.</li>
-        <li>Vận hành tuabin hiệu quả và an toàn đòi hỏi phối hợp hài hòa cả ba thông số trong dải thiết kế, đồng thời giám sát chặt chẽ các thông số nhiệt – cơ – rung động.</li>
-      </ul>
-    </div>
-  </section>
-
-  <footer>
-    Tài liệu tham khảo nội bộ – Phân tích vận hành và hiệu suất tuabin hơi.
-  </footer>
-
+<footer>Tài liệu tham khảo nội bộ – Phân tích vận hành và hiệu suất tuabin hơi (bản hiệu chỉnh).</footer>
 </div>
 </body>
 </html>
